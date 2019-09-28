@@ -14,8 +14,8 @@
   <link></link>
   <description><![CDATA[]]></description>
   <language>en</language>
-  <pubDate>Sat, 28 Sep 2019 16:37:22 +0800</pubDate>
-  <lastBuildDate>Sat, 28 Sep 2019 16:37:22 +0800</lastBuildDate>
+  <pubDate>Sat, 28 Sep 2019 22:07:47 +0800</pubDate>
+  <lastBuildDate>Sat, 28 Sep 2019 22:07:47 +0800</lastBuildDate>
   <generator>Emacs 26.3 Org-mode 9.2.6</generator>
   <webMaster>demo@Macy (demo)</webMaster>
   <image>
@@ -25,7 +25,7 @@
   </image>
 
   <ul class="org-ul">
-    <li>7月 22, 2019 <a href="use-git-hooks-and-phpcs-and-composer-scripts-to-practice-php-coding-startand/index.html">使用git-hooks+phpcs+composer-scripts践行PHP编码规范</a></li>
+    <li>7月 22, 2019 <a href="use-git-hooks-and-phpcs-and-composer-scripts-to-practice-php-coding-startand/index.html">使用 git-hooks + phpcs + composer-scripts 践行PHP编码规范</a></li>
   </ul>
 </channel>
 </rss>

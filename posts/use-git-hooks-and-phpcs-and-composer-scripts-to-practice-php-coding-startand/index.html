@@ -4,7 +4,7 @@
 <!-- 9月 28, 2019 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>使用git-hooks+phpcs+composer-scripts践行PHP编码规范</title>
+<title>使用 git-hooks + phpcs + composer-scripts 践行PHP编码规范</title>
 <meta name="generator" content="Org mode">
 
 <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
@@ -29,21 +29,21 @@
 </div>
 <div id="content">
 <header>
-<h1 class="title">使用git-hooks+phpcs+composer-scripts践行PHP编码规范</h1>
+<h1 class="title">使用 git-hooks + phpcs + composer-scripts 践行PHP编码规范</h1>
 <p class="subtitle">Published on 7月 22, 2019</p>
 </header>
-<div id="outline-container-org69f90e2" class="outline-2">
-<h2 id="org69f90e2">背景</h2>
-<div class="outline-text-2" id="text-org69f90e2">
+<div id="outline-container-org7d98d70" class="outline-2">
+<h2 id="org7d98d70">背景</h2>
+<div class="outline-text-2" id="text-org7d98d70">
 <p>
 关于代码规范的重要性，诸如促进团队合作、降低维护成本、有助于代码审查、有助于自身成长等，这里就不详细赘述了，直接进入正题。
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgb628186" class="outline-2">
-<h2 id="orgb628186">PHP编码规范</h2>
-<div class="outline-text-2" id="text-orgb628186">
+<div id="outline-container-org3116a20" class="outline-2">
+<h2 id="org3116a20">PHP编码规范</h2>
+<div class="outline-text-2" id="text-org3116a20">
 <p>
    当前主流的PHP编码规范是由 <a href="https://www.php-fig.org/">PHP FIG</a> 组织制定的 <a href="https://www.php-fig.org/psr/">PSR</a> 系列规范，如 <code>PSR-1</code> , <code>PSR-2</code> , <code>PSR-4</code> 。
 当然还是有其他一些规范的存在，如 <a href="https://pear.php.net/manual/en/standards.php">PEAR规范</a> 和 <a href="https://symfony.com/doc/current/contributing/code/standards.html">Symfony规范</a>。我们使用的主要是 <code>PSR-2</code> 规范。
@@ -56,15 +56,15 @@
 </div>
 </div>
 
-<div id="outline-container-orgf881c50" class="outline-2">
-<h2 id="orgf881c50">Git钩子</h2>
-<div class="outline-text-2" id="text-orgf881c50">
+<div id="outline-container-org6060540" class="outline-2">
+<h2 id="org6060540">Git钩子</h2>
+<div class="outline-text-2" id="text-org6060540">
 <p>
    和其它版本控制系统一样，Git 能在特定的重要动作发生时触发自定义脚本。
 有两组这样的钩子：客户端的和服务器端的。
 客户端钩子由诸如提交和合并这样的操作所调用，而服务器端钩子作用于诸如接收被推送的提交这样的联网操作。
 钩子都被存储在 Git 目录下的 hooks 子目录中。 也即绝大部分项目中的 <code>.git/hooks</code> 。 
-查看一下你项目中的该目录, 就会看到诸如 <code>pre-commit.sample</code> <code>pre-push.sample</code> <code>pre-receive.sample</code> 等文件。
+查看一下你项目中的该目录, 就会看到诸如 <code>pre-commit.sample</code>, <code>pre-push.sample</code>, <code>pre-receive.sample</code> 等文件。
 要使用他们，只需要把 <code>.sample</code> 后缀去掉，然后编辑自己的代码即可。
 这里我们用的是 <code>pre-commit</code> 钩子，即在键入提交信息 <code>git commit</code> 前运行。
 它一般用于检查即将提交的快照，例如，检查是否有所遗漏，确保测试运行，以及核查代码。
@@ -73,9 +73,9 @@
 </div>
 </div>
 
-<div id="outline-container-orgc4412d5" class="outline-2">
-<h2 id="orgc4412d5">Show me the code</h2>
-<div class="outline-text-2" id="text-orgc4412d5">
+<div id="outline-container-org0f56ccf" class="outline-2">
+<h2 id="org0f56ccf">Show me the code</h2>
+<div class="outline-text-2" id="text-org0f56ccf">
 <p>
 废话不多说，直接上代码吧。 以下为 <code>.git/hooks/pre-commit</code> 的代码：
 </p>
@@ -128,7 +128,7 @@
 </div>
 
 <p>
-通过代码也能看出，我们直接使用了当前项目中的 <code>./vendor/bin/phpcs=，即需要我们在项目中加载 =PHP_CodeSniffer</code> 包。
+通过代码也能看出，我们直接使用了当前项目中的 <code>./vendor/bin/phpcs</code>, 即需要我们在项目中加载 <code>PHP_CodeSniffer</code> 包。
 执行 <code>composer require squizlabs/php_codesniffer --dev</code> 即可。
 另外，在hook中我们也没有具体指明phpcs要使用哪种规范标准，
 因为这更多是取决于我们自己的项目，具体的规则定义在项目根目录下的 <code>phpcs.xml</code> 配置文件中即可。
@@ -137,9 +137,9 @@
 </div>
 </div>
 
-<div id="outline-container-org9b73d2a" class="outline-2">
-<h2 id="org9b73d2a">安装的Git钩子无法加入版本库, 每个成员，每个环境都要重复装一遍?</h2>
-<div class="outline-text-2" id="text-org9b73d2a">
+<div id="outline-container-orga136cf2" class="outline-2">
+<h2 id="orga136cf2">安装的Git钩子无法加入版本库, 每个成员，每个环境都要重复装一遍?</h2>
+<div class="outline-text-2" id="text-orga136cf2">
 <p>
    <code>.git</code> 目录下的文件无法加入版本库，这就导致了团队成员中的每个人都要手动安装一次钩子，或者你的多套环境也要重复安装钩子，这当然是很不方便的。
 为了解决这个问题，我们可以利用 <code>composer</code> 的钩子来自动完成安装git钩子的过程。
@@ -197,9 +197,9 @@
 </div>
 </div>
 
-<div id="outline-container-org690668c" class="outline-2">
-<h2 id="org690668c">结束语</h2>
-<div class="outline-text-2" id="text-org690668c">
+<div id="outline-container-org1867cf8" class="outline-2">
+<h2 id="org1867cf8">结束语</h2>
+<div class="outline-text-2" id="text-org1867cf8">
 <p>
    我们日常用到的一些工具类确实都很强大，只是平时我们都只满足于最简单的日常使用。也许多看一眼文档，就能学习一些更高阶的用法。
 希望自己能对日常使用的一些工具能较深入的了解学习一下，也许学习会花一些时间，但是更能为以后的开发节约不少时间，避免重复劳动。
@@ -207,9 +207,9 @@
 </div>
 </div>
 
-<div id="outline-container-org845d2c2" class="outline-2">
-<h2 id="org845d2c2">参考</h2>
-<div class="outline-text-2" id="text-org845d2c2">
+<div id="outline-container-org4e407ac" class="outline-2">
+<h2 id="org4e407ac">参考</h2>
+<div class="outline-text-2" id="text-org4e407ac">
 <ol class="org-ol">
 <li><a href="http://psr.phphub.org/">PHP编码规范</a></li>
 

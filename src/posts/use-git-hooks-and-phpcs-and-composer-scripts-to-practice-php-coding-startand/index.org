@@ -1,4 +1,4 @@
-#+TITLE: 使用git-hooks+phpcs+composer-scripts践行PHP编码规范
+#+TITLE: 使用 git-hooks + phpcs + composer-scripts 践行PHP编码规范
 #+DATE: <2019-07-22 Mon>
 
 *** 背景
@@ -19,7 +19,7 @@
 有两组这样的钩子：客户端的和服务器端的。
 客户端钩子由诸如提交和合并这样的操作所调用，而服务器端钩子作用于诸如接收被推送的提交这样的联网操作。
 钩子都被存储在 Git 目录下的 hooks 子目录中。 也即绝大部分项目中的 =.git/hooks= 。 
-查看一下你项目中的该目录, 就会看到诸如 =pre-commit.sample= =pre-push.sample= =pre-receive.sample= 等文件。
+查看一下你项目中的该目录, 就会看到诸如 =pre-commit.sample=, =pre-push.sample=, =pre-receive.sample= 等文件。
 要使用他们，只需要把 =.sample= 后缀去掉，然后编辑自己的代码即可。
 这里我们用的是 =pre-commit= 钩子，即在键入提交信息 =git commit= 前运行。
 它一般用于检查即将提交的快照，例如，检查是否有所遗漏，确保测试运行，以及核查代码。
@@ -75,7 +75,7 @@
   exit $?
 #+END_SRC
 
-通过代码也能看出，我们直接使用了当前项目中的 =./vendor/bin/phpcs=，即需要我们在项目中加载 =PHP_CodeSniffer= 包。
+通过代码也能看出，我们直接使用了当前项目中的 =./vendor/bin/phpcs=, 即需要我们在项目中加载 =PHP_CodeSniffer= 包。
 执行 =composer require squizlabs/php_codesniffer --dev= 即可。
 另外，在hook中我们也没有具体指明phpcs要使用哪种规范标准，
 因为这更多是取决于我们自己的项目，具体的规则定义在项目根目录下的 =phpcs.xml= 配置文件中即可。
@@ -91,7 +91,7 @@
 就自动安装git钩子这个需求，我们可以使用 =post-install-cmd= 钩子，即当项目里有 =composer.lock= 文件的情况下调用 install 命令后执行安装脚本。
 安装脚本就用最简单的单行PHP脚本即可。
 同样，直接上代码：
- 
+
 1. 将git的pre-commit钩子脚本放在项目根目录下，命名为 =.git-pre-commit= , 并加入版本库;
 
 2. 编辑项目中的 =composer.json= 文件：

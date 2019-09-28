@@ -74,7 +74,6 @@ ul.share-buttons li {
 #content {
     border-left: 1px solid #eeeeee;
     border-right: 1px solid #eeeeee;
-    padding-left: 1rem;
 }
 #content header {
     text-align: center;
@@ -116,11 +115,14 @@ footer > a {
     fill: red;
 }
 /* Thanks to advent of code */
- em {
+em {
     text-shadow: 0 0 5px #555555;
 }
 h1, h2, h3, h4, h5, h6 {
     font-family:'Amaranth', sans-serif;
+}
+.title {
+    word-break: break-word;
 }
 .archive {
     list-style: none;
