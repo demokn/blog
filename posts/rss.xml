@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+     xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+     xmlns:georss="http://www.georss.org/georss"
+     xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+     xmlns:media="http://search.yahoo.com/mrss/"><channel>
+  <title>Sitemap for project rss.org</title>
+  <atom:link href="./rss.xml" rel="self" type="application/rss+xml" />
+  <link></link>
+  <description><![CDATA[]]></description>
+  <language>en</language>
+  <pubDate>Sat, 28 Sep 2019 16:37:22 +0800</pubDate>
+  <lastBuildDate>Sat, 28 Sep 2019 16:37:22 +0800</lastBuildDate>
+  <generator>Emacs 26.3 Org-mode 9.2.6</generator>
+  <webMaster>demo@Macy (demo)</webMaster>
+  <image>
+    <url>https://orgmode.org/img/org-mode-unicorn-logo.png</url>
+    <title>Sitemap for project rss.org</title>
+    <link></link>
+  </image>
+
+  <ul class="org-ul">
+    <li>7月 22, 2019 <a href="use-git-hooks-and-phpcs-and-composer-scripts-to-practice-php-coding-startand/index.html">使用git-hooks+phpcs+composer-scripts践行PHP编码规范</a></li>
+  </ul>
+</channel>
+</rss>
