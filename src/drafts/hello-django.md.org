@@ -1,0 +1,73 @@
+Title: Hello Django Date: 2017-04-18 20:00 Modified: 2017-04-18 20:00
+Tags: django, python Status: published
+
+** 简介
+   :PROPERTIES:
+   :CUSTOM_ID: 简介
+   :END:
+
+Django 是由 Python
+开发的免费、开源的WEB框架，可以用于快速搭建高性能、优雅的网站。
+官方简介为 "The web framework for perfectionists with deadlines." -
+完美主义者的WEB框架。
+
+Django最初被开发是用于管理以新闻内容为主的网站，发展至今,
+也早以能满足经验丰富的Web开发人员的艰巨需求。
+
+** Why Django
+   :PROPERTIES:
+   :CUSTOM_ID: why-django
+   :END:
+
+With Django, you can take Web applications from concept to launch in a
+matter of hours. Django takes care of much of the hassle of Web
+development, so you can focus on writing your app without needing to
+reinvent the wheel. It's free and open source.
+
+借助Django，你可以在数小时内实现Web应用程序并发布。
+Django省去了Web开发中的许多麻烦，所以你可以专注于编写应用程序，而无需重复造轮子。
+而且它是免费和开源的。
+
+*** 开发快速
+    :PROPERTIES:
+    :CUSTOM_ID: 开发快速
+    :END:
+
+Django起初被设计就是用来帮助开发人员尽可能快地将想法实现出来。
+
+*** 功能齐全
+    :PROPERTIES:
+    :CUSTOM_ID: 功能齐全
+    :END:
+
+Django包含数十个附加功能，可用于处理常见的Web开发任务。
+其中包括用户验证，内容管理，站点地图，RSS订阅和更多的任务 - 开箱即用。
+
+*** 安全性高
+    :PROPERTIES:
+    :CUSTOM_ID: 安全性高
+    :END:
+
+Django注重应用的安全性，帮助开发人员避免许多常见的安全问题，
+例如SQL注入，跨站点脚本，跨站点请求伪造和点击劫持等。
+其自带的用户认证系统也提供了一种安全的方式用于管理用户帐户和密码。
+
+*** 扩展性强
+    :PROPERTIES:
+    :CUSTOM_ID: 扩展性强
+    :END:
+
+此处指的是硬件可扩展。
+与开发时间相比，硬件更便宜，所以Django在设计上就考虑到了硬件的可扩展性。
+Django使用"无共享"架构，这意味着你可以在任何级别添加硬件 -
+数据库服务器，缓存服务器或Web/应用程序服务器。
+框架清晰地分离了其数据库层和应用层等组件。它还附带了一个简单但功能强大的缓存框架。
+
+*** 使用广泛
+    :PROPERTIES:
+    :CUSTOM_ID: 使用广泛
+    :END:
+
+公司，组织和政府已经使用Django来构建各种内容，从内容管理系统到社交网络到科学计算平台。
+
+Let's get started.

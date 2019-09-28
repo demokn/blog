@@ -1,0 +1,138 @@
+Title: Hello Ansible Date: 2017-05-22 20:00 Modified: 2017-05-22 20:00
+Tags: ansible, python Status: published
+
+** 什么鬼
+   :PROPERTIES:
+   :CUSTOM_ID: 什么鬼
+   :END:
+
+#+BEGIN_EXAMPLE
+  Ansible是一个完全简单的IT自动化平台，使您的应用程序和系统更易于部署。
+  避免编写脚本或自定义代码来部署和更新应用程序。
+  使用SSH, 通过最接近自然语言的语法来完成自动化管理，同时又无需在远程系统上安装代理。
+          ——摘自ansible github项目介绍
+#+END_EXAMPLE
+
+简言之, 就是一套自动化管理工具。
+
+** 安装
+   :PROPERTIES:
+   :CUSTOM_ID: 安装
+   :END:
+
+如何安装没什么好说的, 三种方式任选
+
+- python包安装工具 =pip install ansible=
+
+- 各平台下包管理工具 =yum=、=apt-get=、=brew= 等
+
+- 源码运行 =git clone=
+
+详情参见[[http://docs.ansible.com/ansible/intro_installation.html][官方文档]]
+## 使用 $ ansible --version
+
+#+BEGIN_EXAMPLE
+    ansible 2.3.0.0
+    config file =
+    configured module search path = Default w/o overrides
+    python version = 3.5.2 (default, Apr  6 2017, 17:06:00) [GCC 4.2.1 Compatible Apple LLVM 8.0.0 (clang-800.0.42.1)]
+#+END_EXAMPLE
+
+*** 新手上路
+    :PROPERTIES:
+    :CUSTOM_ID: 新手上路
+    :END:
+
+首先要了解Ansible是(但不只是)通过SSH与远程服务器连接的。 Ansible
+1.3及之后的版本默认会在本地的
+OpenSSH可用时会尝试用其进行远程通讯。这会启用=ControlPersist=(一个性能特性),
+=Kerberos=, 和在 =~/.ssh/config= 中的配置选项如 Jump Host setup。然而,
+当你使用Linux企业版6作为主控机(红帽企业版及其衍生版如CentOS),
+其OpenSSH版本可能过于老旧无法支持ControlPersist。在这些操作系统中,
+Ansible将会退回并采用 =paramiko= (由Python实现的高质量OpenSSH库).
+如果你希望能够使用像是=Kerberized SSH=之类的特性, 烦请考虑使用Fedora, OS
+X, 或 Ubuntu 作为你的主控机直到相关平台上有更新版本的OpenSSH可供使用,
+或者启用Ansible的=accelerated mode=。
+
+Ansible会默认假定你使用 SSH
+Key(我们推荐这种)但是密码也一样可以。通过在需要的地方添加 =–-ask-pass=
+选项来启用密码验证。如果使用了 =sudo= 特性, 当sudo需要密码时,
+也同样适当的提供了 =-–ask-become-pass= 选项(之前的 =--ask-sudo-pass=
+已经不推荐使用了)。
+
+作为一个进阶话题,
+Ansible不止支持SSH来远程连接。连接方式是插件化的而且还有许多本地化管理的选项诸如管理
+=chroot=, =lxc=, 和
+=jail containers=。一个叫做=ansible-pull=的模式能够反转主控关系并使远程系统通过定期从中央git目录检出并拉取配置指令来实现背景连接通信。
+
+*** 第一条命令
+    :PROPERTIES:
+    :CUSTOM_ID: 第一条命令
+    :END:
+
+首先配置(编辑或创建: 使用pip安装默认不会自动创建)Inventory文件
+=/etc/ansible/hosts=
+
+#+BEGIN_EXAMPLE
+  [vagrant]
+  192.168.10.10 ansible_ssh_user=vagrant  # ansible_ssh_port=22 默认端口为22则可以不设置
+
+  [demo]
+  # 192.168.10.11 ansible_ssh_user=demo ansible_ssh_port=2222
+  # 当然, 具体到每台服务器的别名、登录用户名和端口, 也可以在 ~/.ssh/config 中配置, 这里则可以直接使用
+  # 但是注意, 使用此种方式时, 再以指定用户名的方式(`-u username`)执行ansible时, 端口号会使用默认的22
+  demo-server
+#+END_EXAMPLE
+
+=demo-server= 在 ssh config 中的配置如下:
+
+#+BEGIN_EXAMPLE
+  $ cat ~/.ssh/config
+
+    Host demo-server
+      HostName 192.168.10.11
+      Port 2222
+      User demo
+#+END_EXAMPLE
+
+现在 ping 配置中的所有节点:
+
+#+BEGIN_EXAMPLE
+  $ ansible all -m ping
+
+    demo-server | SUCCESS => {
+        "changed": false,
+        "ping": "pong"
+    }
+    192.168.10.10 | SUCCESS => {
+        "changed": false,
+        "ping": "pong"
+    }
+#+END_EXAMPLE
+
+至此, 说明主控机与此两台服务器的连通性OK。Hello Ansible~
+
+开森, 再试试其他参数:
+
+#+BEGIN_EXAMPLE
+  # 以指定用户名, 密码方式执行
+  $ ansible vagrant -m ping -u demo --ask-pass
+
+    SSH password:
+    192.168.10.10 | SUCCESS => {
+        "changed": false,
+        "ping": "pong"
+    }
+
+  # 在远程主机执行指定命令
+  $ ansible vagrant -a 'ls -a ~'
+
+    192.168.10.10 | SUCCESS | rc=0 >>
+      .
+      ..
+      .bash_history
+      .bash_logout
+      .bashrc
+      .cache
+      .profile
+#+END_EXAMPLE

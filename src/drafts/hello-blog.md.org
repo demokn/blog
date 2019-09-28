@@ -1,0 +1,103 @@
+Title: Hello Blog Date: 2017-03-03 09:00 Modified: 2017-03-05 23:00
+Tags: pelican, python Status: published
+
+#+BEGIN_QUOTE
+  独孤求败的武学，一生境界分为利剑之境、软剑之境、重剑之境、木剑之境、无剑之境。
+
+  #+BEGIN_QUOTE
+    四十岁后，不滞于物，草木竹石，均可为剑。自此精修，渐而进于无剑胜有剑之境。
+  #+END_QUOTE
+#+END_QUOTE
+
+人在江湖，仗剑走天涯，身为一位"⚔"客，尚未达到无剑之境，手中岂能无"⚔"。
+
+个人博客作为程序员的技术学习、生活随想记录的一亩三分地和装逼利器，也算作coder的一个标配了吧。
+
+从入坑到现在，折腾过很多Blog:
+
+- 初学PHP时，从零搭建的学习型Blog项目；
+- [[https://wordpress.com][Wordpress]]
+- 基于[[https://www.slimframework.com][Slim]] +
+  [[https://www.doctrine-project.org/projects/orm.html][doctrine/orm]]自行搭建的Blog
+- 基于[[https://laravel.com/][Laravel]]自行搭建的Blog
+- 基于[[https://www.yiichina.com/doc/guide/1.1/index][Yii
+  1.x]]自行搭建的Blog
+
+如果以最终使用与否为衡量标准的话，以上均已失败告终。
+
+除了=wordpress=之外，其他几个其实均为=Hello World=型项目。
+真的要投入使用的时候，又懒得折腾frontend,
+况且自己真的一点设计美感都没有，也只能是各处copy；
+而对于backend，功能加少了觉得不够用、不方便，功能加多了又显得繁重，脱离了blog的本质；
+最终也是无奈选择了放弃。=理想很丰满，现实太骨感=
+
+而对于=wordpress=，当初也只是想见识一下这位传说中的Blog神奇，到底是有如何强大(确实很强大)。
+也是因为其太过于强大，搭建Blog零配置，出于程序员所要求的对其所用工具的完全掌控力，还是选择了暂时放弃。
+毕竟要完全掌控，耗费精力太多了。
+
+虽然放弃了以上诸多尝试，但这一装逼利器，终归还是要握在手里的，最终选择了现在的静态博客方案[[https://blog.getpelican.com][pelican]]
++ [[https://pages.github.com][GitHub Pages]]。
+
+工具终归是工具，太过于追求工具，反倒会忘记问题的初衷。
+而当前的解决方案，已经满足了我的初衷，一切都是刚刚好。
+
+1. 安装工具(基于Python 3.4.5)
+
+   #+BEGIN_EXAMPLE
+      #!sh
+      $ pip install pelican markdown
+   #+END_EXAMPLE
+
+2. 创建项目
+
+   #+BEGIN_EXAMPLE
+      #!sh
+      $ mkdir -p ~/code/pelican-blog
+      $ cd ~/code/pelican-blog
+      $ pelican-quickstart
+   #+END_EXAMPLE
+
+3. 添加文章
+
+   #+BEGIN_EXAMPLE
+      #!sh
+      $ vim content/hello-blog.md
+
+      Title: 你好, 博客
+      Date: 2017-03-03 09:00
+      Tags: Hello
+      Status: published
+
+      你好，博客！
+   #+END_EXAMPLE
+
+4. 生成静态HTML页面
+
+   #+BEGIN_EXAMPLE
+      #!sh
+      $ pelican content
+   #+END_EXAMPLE
+
+5. 预览博客
+
+   #+BEGIN_EXAMPLE
+      #!sh
+      $ cd ~/code/pelican-blog/output
+      $ python -m pelican.server
+   #+END_EXAMPLE
+
+   浏览器打开=http://127.0.0.1:8000=，一个活生生的站点就已经出现在你眼前了。
+
+6. 上传至GitHub.=username.github.io=，只要你用过=git=，部署=github pages=绝对零配置，一个面向世界的活生生的个人博客站点就这样出世了。So
+   Easy~
+
+可是，然而，But，但，万事开头容易，坚持难。
+尤其对于我这样一个几乎从来没有读过书的人来说，敲敲代码还是绝对可以的，要让我写一遍能够通读顺畅的文章来，着实有点难为我了。
+该篇=Hello World=断断续续用了9小时才完成，你能信_{
+况且，文中还夹杂了这些用于凑字数的，明明在官方文档里一眼就能看到的QuickStart教程}
+
+希望自己能一直坚持写下去吧！？！ 嗯~ 先这样吧。
+
+#+BEGIN_QUOTE
+  为学犹掘井，井愈深土愈难出，若不快心到底，岂得见泉源乎？
+#+END_QUOTE

@@ -1,0 +1,139 @@
+Title: Linux+Nginx部署静态博客 Slug:
+deploy-static-blog-in-my-own-server-with-nginx Date: 2017-07-20 00:55
+Modified: 2017-07-20 00:55 Tags: nginx, seo Status: published
+
+** 缘起
+   :PROPERTIES:
+   :CUSTOM_ID: 缘起
+   :END:
+
+使用 github pages + pelican 搭建起来的个人博客, 发布也有一段时间了,
+就连域名申请及使用也有快一个月了,
+但搜索引擎竟没有本博存在的任何痕迹。虽然博客还没写几篇, 但当本博不存在,
+这怎么能忍, 毕竟博名还是万导帮忙取的~
+
+遂决定来把玩一下 =google search console= 和 =百度站长平台=。躲不起,
+咱还惹不起嘛~
+
+先剧个透, 效果很SIX。
+
+使用 google search console 一切顺利。 =Crawl > Fetch as Google=
+手动抓取页面, =Crawl > Sitemaps= 提交站点地图后, 24小时见分晓。
+
+但使用 百度站长平台 时却踩了坑。 =网页抓取 > 链接提交= 提交站点地图后,
+却显示抓取失败。 点开查看详情, 发现http状态码为=403 Forbidden=。使用
+=网页抓取 > 抓取诊断= 测试抓取结果, 依旧抓取失败。 这就比较郁闷了,
+直接访问正常, google抓取正常, 百度抓取失败。 google一下才发现, 原来是
+github pages 禁止了百度爬虫。 github官网并没有找到明确的声明,
+但从http状态码可以确定, 确实是服务器拒绝了本次请求。
+
+百度爬虫被禁的原因, 暂不深究了。 只是, 怎么可以让
+"全球最大的中文搜索引擎" 放弃本博呢。 于是乎,
+便想到自己那台本想用来部署个人小项目, 现在却只是用来科学上网的服务器。
+开个Nginx服务, 部署个静态博客, 给百度爬虫开个小窗口, 还不是分分钟的事。
+二话不多说, 就是干。
+
+** 部署
+   :PROPERTIES:
+   :CUSTOM_ID: 部署
+   :END:
+
+1. clone 博客源码到服务器
+
+   #+BEGIN_EXAMPLE
+      ;; clone 到指定目录
+      git clone https://github.com/demokn/demokn.github.io.git /path/to/demokn.github.io
+      ;; 切换到特定分支: 因为此处配置的域名与github pages中使用的域名不同, 所以使用不同的分支区分
+      ;; github pages中使用的是 根域 和 www子域
+      ;; 自有服务器配置的是 blog子域; 使用 blog 分支区分
+      git checkout -b blog origin/blog
+   #+END_EXAMPLE
+
+2. 安装nginx
+
+   #+BEGIN_EXAMPLE
+      ;; 上面说了分分钟的事嘛, 此处就不用源码编译的高逼格方式了
+      ;; 备注: 系统为 Debian 8
+      sudo apt-get install nginx
+   #+END_EXAMPLE
+
+3. 配置并启动nginx
+
+   #+BEGIN_EXAMPLE
+      ;; 新建针对该项目的配置文件
+      ;; 备注: /etc/nginx/sites-enabled/ 为上述安装方式server配置文件的默认路径
+      vim /etc/nginx/sites-enabled/blog.demokn.com.conf
+
+      # 这算是最简的配置方式了, 没有做任何的优化。行家记得自行优化
+      server {
+          # 监听80端口
+          listen 80;
+          # 域名
+          server_name blog.demokn.com;
+
+          location / {
+              # 博客根目录
+              root /path/to/demokn.github.io/;
+              # 首页访问文件
+              index index.html;
+          }
+      }
+
+      ;; 启动nginx服务
+      sudo service nginx start
+   #+END_EXAMPLE
+
+4. 配置hosts
+
+   #+BEGIN_EXAMPLE
+      ;; 其实自己购买了域名的话, 这一步完全可以省略的
+      ;; 只是习惯了配下, 也方便在DNS解析未生效前先做测试
+      ;; 同时也加速了本地访问, 无需走DNS解析了
+      vim /etc/hosts
+
+        # 添加如下行
+        127.0.0.0 blog.demokn.com
+   #+END_EXAMPLE
+
+5. 大功告成, 测试一下吧
+
+   #+BEGIN_EXAMPLE
+      curl http://blog.demokn.com -vvv
+   #+END_EXAMPLE
+
+没问题的话, 在域名解析中新增一条A记录, 指向服务器IP,
+稍等几分钟待解析生效后即可正常访问了。
+
+再然后, 就可以在 百度站长平台 愉快的玩耍了。 记住, 你只能玩 刚刚配置的
+blog子域。 当然, 也可以把指向 github pages 的根域 和 www子域
+也都指向自己的服务器, 这样就完全没有限制了。 只不过,
+我暂时还没这么做的打算。好像也只是单纯的不想, 我还真想不出是为什么???
+
+** 附图
+   :PROPERTIES:
+   :CUSTOM_ID: 附图
+   :END:
+
+1. 百度站长抓取站点地图时报错
+
+   #+CAPTION: 百度站长爬取失败
+   [[/images/baidu-zhanzhang-crawl-failed.png]]
+
+   #+CAPTION: 百度站长爬取失败详情
+   [[/images/baidu-zhanzhang-crawl-failed-detail.png]]
+
+2. 百度站长抓取诊断详情
+
+   #+CAPTION: 百度站长爬取诊断详情
+   [[/images/baidu-zhanzhang-crawl-diagnose-detail.png]]
+
+3. 搜索结果展示(优化前, 真的是翻了几十页, 不是珊瑚礁, 就是程序员,
+   唯独没有=珊瑚礁上的程序员=)
+
+   #+CAPTION: 百度搜索结果
+   [[/images/baidu-search-results.png]]
+
+   #+CAPTION: 谷歌搜索结果
+   [[/images/google-search-results.png]]
+
+Best wishes!

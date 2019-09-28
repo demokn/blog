@@ -1,0 +1,164 @@
+Title: 使用git-hooks+phpcs践行代码编码规范 Slug:
+use-git-hooks-and-phpcs-to-practice-coding-standard Date: 2019-07-22
+08:00 Modified: 2019-07-22 08:00 Tags: git, phpcs, composer, php Status:
+published
+
+** 背景
+   :PROPERTIES:
+   :CUSTOM_ID: 背景
+   :END:
+
+关于代码规范的重要性，诸如=促进团队合作=，=降低维护成本=，=有助于代码审查=，=有助于自身成长=等，这里就不详细赘述了，直接进入正题。
+
+** PHP编码规范
+   :PROPERTIES:
+   :CUSTOM_ID: php编码规范
+   :END:
+
+当前主流的PHP编码规范是由[[https://www.php-fig.org/][=PHP FIG=]]组织制定的[[https://www.php-fig.org/psr/][PSR]]系列规范，
+如=PSR-1=, =PSR-2=,
+=PSR-4=。当然还是有其他一些规范的存在，如[[https://pear.php.net/manual/en/standards.php][=PEAR规范=]]和[[https://symfony.com/doc/current/contributing/code/standards.html][=Symfony规范=]]。我们使用的主要是=PSR-2=规范。
+
+用于检查和修复代码规范的工具主要有[[https://github.com/squizlabs/PHP_CodeSniffer][=PHP_CodeSniffer=]]和[[https://github.com/FriendsOfPHP/PHP-CS-Fixer][=PHP-CS-Fixer=]]。如果你还想了解这两个工具的差异，可以看下这个[[https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/3459][ISSUE]]。我们本次使用的是=PHP_CodeSniffer=。
+
+** Git钩子
+   :PROPERTIES:
+   :CUSTOM_ID: git钩子
+   :END:
+
+和其它版本控制系统一样，Git 能在特定的重要动作发生时触发自定义脚本。
+有两组这样的钩子：客户端的和服务器端的。
+客户端钩子由诸如提交和合并这样的操作所调用，而服务器端钩子作用于诸如接收被推送的提交这样的联网操作。
+钩子都被存储在 Git 目录下的 hooks 子目录中。 也即绝大部分项目中的
+=.git/hooks= 。 查看一下你项目中的该目录,
+就会看到诸如=pre-commit.sample= =pre-push.sample= =pre-receive.sample=
+等文件。 要使用他们，只需要把=.sample=后缀去掉，然后编辑自己的代码即可。
+这里我们用的是=pre-commit=钩子，即在键入提交信息=git commit=前运行。
+它一般用于检查即将提交的快照，例如，检查是否有所遗漏，确保测试运行，以及核查代码。
+如果该钩子以非零值退出，Git 将放弃此次提交，不过也可以用
+=git commit --no-verify= 来绕过这个环节。
+
+** Show me the code
+   :PROPERTIES:
+   :CUSTOM_ID: show-me-the-code
+   :END:
+
+废话不多说，直接上代码吧。 以下为 =.git/hooks/pre-commit= 的代码：
+
+#+BEGIN_EXAMPLE
+  #!/bin/sh
+
+  PROJECT=`php -r "echo dirname(dirname(dirname(realpath('$0'))));"`
+  STAGED_FILES_CMD=`git diff --cached --name-only --diff-filter=ACMR HEAD | grep \\\\.php`
+
+  # Determine if a file list is passed
+  if [ "$#" -eq 1 ]
+  then
+      oIFS=$IFS
+      IFS='
+      '
+      SFILES="$1"
+      IFS=$oIFS
+  fi
+  SFILES=${SFILES:-$STAGED_FILES_CMD}
+
+  echo "Checking PHP Lint..."
+  for FILE in $SFILES
+  do
+      php -l -d display_errors=0 $PROJECT/$FILE
+      if [ $? != 0 ]
+      then
+          echo "Fix the error before commit."
+          exit 1
+      fi
+      FILES="$FILES $PROJECT/$FILE"
+  done
+
+  if [ "$FILES" != "" ]
+  then
+      echo "Running Code Sniffer..."
+      ./vendor/bin/phpcs $FILES
+      if [ $? != 0 ]
+      then
+          echo "Fix the error before commit!"
+          echo "Run"
+          echo "  ./vendor/bin/phpcbf $FILES"
+          echo "for automatic fix or fix it manually."
+          exit 1
+      fi
+  fi
+
+  exit $?
+#+END_EXAMPLE
+
+通过代码也能看出，我们直接使用了当前项目中的 =./vendor/bin/phpcs=
+，即需要我们在项目中加载=PHP_CodeSniffer=包。
+执行=composer require squizlabs/php_codesniffer --dev=即可。另外，在hook中我们也没有具体指明phpcs要使用哪种规范标准，
+因为这更多是取决于我们自己的项目，具体的规则定义在项目根目录下的
+=phpcs.xml= 配置文件中即可。
+如果你想参考的话，[[https://github.com/demokn/phpcs-pre-commit-hook/blob/master/phpcs.xml-yii2][这里]]是一个我们使用的关于=yii2=的规则。
+
+** 安装的Git钩子无法加入版本库, 每个成员，每个环境都要重复装一遍?
+   :PROPERTIES:
+   :CUSTOM_ID: 安装的git钩子无法加入版本库-每个成员每个环境都要重复装一遍
+   :END:
+
+=.git=目录下的文件无法加入版本库，这就导致了团队成员中的每个人都要手动安装一次钩子，或者你的多套环境也要重复安装钩子，这当然是很不方便的。
+为了解决这个问题，我们可以利用=composer=的钩子来自动完成安装git钩子的过程。
+
+Composer
+在执行的过程中会触发一些事件，我们可以通过监控这些事件来自动触发一些脚本的执行。
+就自动安装git钩子这个需求，我们可以使用=post-install-cmd=钩子，即当项目里有
+composer.lock 文件的情况下调用 install 命令后执行安装脚本。
+安装脚本就用最简单的单行PHP脚本即可。同样，直接上代码： 1.
+将git的pre-commit钩子脚本放在项目根目录下，命名为=.git-pre-commit=,
+并加入版本库;
+
+2. 编辑项目中的=composer.json=文件：
+
+#+BEGIN_EXAMPLE
+  {
+      "scripts": {
+          "post-install-cmd": [
+              "php -r \"is_dir('.git/hooks') && !is_file('.git/hooks/pre-commit') && copy('.git-pre-commit', '.git/hooks/pre-commit');\""
+          ]
+      }
+  }
+#+END_EXAMPLE
+
+加入如上代码后，当执行=composer install=后，会自动执行那行php代码，即简单的将
+=.git-pre-commit=钩子脚本复制到=.git/hooks/pre-commit=。
+
+当然了，借助=composer=的脚本特性，你也可以继续定义其他的一些常用命令，比如：执行编码规范检查、执行编码规范修复等。代码简单如下：
+
+#+BEGIN_EXAMPLE
+  {
+      "scripts": {
+          "cs": "phpcs .",
+          "cbf": "phpcbf ."
+      }
+  }
+#+END_EXAMPLE
+
+定义好之后，在项目根目录下执行 =composer cs=
+即可对全项目进行编码规范检查，执行 =composer cbf=
+即可对全项目进行编码规范修复。
+
+** 结束语
+   :PROPERTIES:
+   :CUSTOM_ID: 结束语
+   :END:
+
+我们日常用到的一些工具类确实都很强大，只是平时我们都只满足于最简单的日常使用。也许多看一眼文档，就能发现一片不一样的天地。
+希望自己能对日常使用的一些工具能较深入的了解学习一下，也许学习会花一些时间，但是更能为以后的开发节约不少时间，避免重复劳动。
+
+1. [[http://psr.phphub.org/][PHP编码规范]]
+
+2. [[https://git-scm.com/book/zh/v2/%E8%87%AA%E5%AE%9A%E4%B9%89-Git-Git-%E9%92%A9%E5%AD%90][Git钩子]]
+
+3. [[https://learnku.com/docs/composer/2018/scripts/2095][Composer事件和自定义脚本]]
+
+4. [[https://phptherightway.com/][PHP The Right Way]]
+   [[http://laravel-china.github.io/php-the-right-way/][中文版]]
+
+

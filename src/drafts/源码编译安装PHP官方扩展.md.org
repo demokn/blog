@@ -1,0 +1,98 @@
+Title: 源码编译安装PHP官方扩展 Slug:
+install-php-official-extension-from-source-code Date: 2017-06-13 20:00
+Modified: 2017-06-13 20:00 Tags: php Status: published
+
+** 起始
+   :PROPERTIES:
+   :CUSTOM_ID: 起始
+   :END:
+
+需要从第三方FTP服务器下载文件, 然而, 线上服务器PHP版本并未安装 =ftp=
+扩展, 没办法, 只好自己编译安装了。
+
+** 前提
+   :PROPERTIES:
+   :CUSTOM_ID: 前提
+   :END:
+
+线上PHP版本也是通过自编译的方式安装的, 源码目录为 =/path/php-src=,
+安装目录为 =/path/php=。
+
+PHP的官方扩展源码均包含在 =/path/php-src/ext/= 路径下。
+
+#+BEGIN_EXAMPLE
+  $ php --version
+
+      PHP 5.6.30 (cli) (built: Feb 26 2017 15:18:42)
+      Copyright (c) 1997-2016 The PHP Group
+      Zend Engine v2.6.0, Copyright (c) 1998-2016 Zend Technologies
+#+END_EXAMPLE
+
+** 编译
+   :PROPERTIES:
+   :CUSTOM_ID: 编译
+   :END:
+
+1. 进入扩展源码所在目录
+
+   #+BEGIN_EXAMPLE
+      $ cd /path/php-src/ext/ftp
+   #+END_EXAMPLE
+
+2. 运行 =phpize= 生成configure
+
+   #+BEGIN_EXAMPLE
+      $ /path/php/bin/phpize
+   #+END_EXAMPLE
+
+3. 指定编译选项
+
+   #+BEGIN_EXAMPLE
+      $ ./configure --with-php-config=/path/php/bin/php-config
+   #+END_EXAMPLE
+
+4. 编译安装
+
+   #+BEGIN_EXAMPLE
+      $ make; make install
+   #+END_EXAMPLE
+
+5. 配置 =php.ini= 加载该模块
+
+   #+BEGIN_EXAMPLE
+      $ php -i | grep php.ini
+
+          Configuration File (php.ini) Path => /path/php/lib
+          Loaded Configuration File => /path/php/lib/php.ini
+
+      $ vim /path/php/lib/php.ini
+
+          ;; 加载ftp扩展(注意扩展是否安装在配置的extension_dir目录中)
+          extension=ftp.so
+   #+END_EXAMPLE
+
+6. 检查是否成功加载模块
+
+   #+BEGIN_EXAMPLE
+      $ php -m | grep ftp
+          ftp  # 说明成功加载
+
+      ;; 或
+      $ php -r "var_dump(extension_loaded('ftp'));"
+          bool(true)  # 说明成功加载
+   #+END_EXAMPLE
+
+** 结语
+   :PROPERTIES:
+   :CUSTOM_ID: 结语
+   :END:
+
+使用PHP两年多了, 却很少自己动手编译安装PHP及其扩展,
+一般都是直接使用系统自带的软件包管理工具=yum=、=apt-get=等简单安装。
+更不用说一些PHP较底层的实现原理等之类的东西。
+
+1. [[http://php.net/manual/en/install.pecl.phpize.php][phpize]]用于准备PHP扩展库编译环境的辅助命令
+
+2. [[http://php.net/manual/en/install.pecl.php-config.php][php-config]]用于获取所安装的PHP版本配置信息的辅助命令
+
+
