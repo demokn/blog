@@ -164,7 +164,7 @@
 <pre class="src src-json">{
     "scripts": {
 	"post-install-cmd": [
-	    "php -r \"is_dir('.git/hooks') &amp;&amp; !is_file('.git/hooks/pre-commit') &amp;&amp; copy('.git-pre-commit', '.git/hooks/pre-commit');\""
+	    "php -r \"is_dir('.git/hooks') &amp;&amp; !is_file('.git/hooks/pre-commit') &amp;&amp; copy('.git-pre-commit', '.git/hooks/pre-commit') &amp;&amp; chmod('.git/hooks/pre-commit', 0755);\""
 	]
     }
 }

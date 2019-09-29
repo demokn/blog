@@ -100,7 +100,7 @@
   {
       "scripts": {
           "post-install-cmd": [
-              "php -r \"is_dir('.git/hooks') && !is_file('.git/hooks/pre-commit') && copy('.git-pre-commit', '.git/hooks/pre-commit');\""
+              "php -r \"is_dir('.git/hooks') && !is_file('.git/hooks/pre-commit') && copy('.git-pre-commit', '.git/hooks/pre-commit') && chmod('.git/hooks/pre-commit', 0755);\""
           ]
       }
   }
