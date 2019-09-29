@@ -217,7 +217,10 @@
          :include '("rss.org")
 
          :publishing-directory (demo/project-pub-path "posts")
-         :publishing-function #'org-rss-publish-to-rss)
+         :publishing-function #'org-rss-publish-to-rss
+
+         :html-link-home "http://demokn.com/posts/"
+         :html-link-use-abs-url t)
 
    (list "assets"
          :base-directory demo/project-src-root

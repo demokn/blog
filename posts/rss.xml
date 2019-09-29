@@ -10,18 +10,18 @@
      xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
      xmlns:media="http://search.yahoo.com/mrss/"><channel>
   <title>Sitemap for project rss.org</title>
-  <atom:link href="./rss.xml" rel="self" type="application/rss+xml" />
-  <link></link>
+  <atom:link href="http://demokn.com/posts/rss.xml" rel="self" type="application/rss+xml" />
+  <link>http://demokn.com/posts/</link>
   <description><![CDATA[]]></description>
   <language>en</language>
-  <pubDate>Sat, 28 Sep 2019 23:14:02 +0800</pubDate>
-  <lastBuildDate>Sat, 28 Sep 2019 23:14:02 +0800</lastBuildDate>
+  <pubDate>Sun, 29 Sep 2019 13:51:14 +0800</pubDate>
+  <lastBuildDate>Sun, 29 Sep 2019 13:51:14 +0800</lastBuildDate>
   <generator>Emacs 26.3 Org-mode 9.2.6</generator>
   <webMaster>demo@Macy (demo)</webMaster>
   <image>
     <url>https://orgmode.org/img/org-mode-unicorn-logo.png</url>
     <title>Sitemap for project rss.org</title>
-    <link></link>
+    <link>http://demokn.com/posts/</link>
   </image>
 
   <ul class="org-ul">
