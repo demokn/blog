@@ -23,7 +23,7 @@
 <ul class="banner-links">
   <li><a href="/posts/archive.html"> Archive </a> </li>
   <li><a href="/posts/rss.xml"> RSS </a> </li>
-  <li><a href="/"> About </a> </li>
+  <li><a href="/about.html"> About </a> </li>
 </ul>
 <hr>
 </div>
@@ -32,18 +32,18 @@
 <h1 class="title">使用 git-hooks + phpcs + composer-scripts 践行PHP编码规范</h1>
 <p class="subtitle">Published on 7月 22, 2019</p>
 </header>
-<div id="outline-container-org7d98d70" class="outline-2">
-<h2 id="org7d98d70">背景</h2>
-<div class="outline-text-2" id="text-org7d98d70">
+<div id="outline-container-orgbc2d02d" class="outline-2">
+<h2 id="orgbc2d02d">背景</h2>
+<div class="outline-text-2" id="text-orgbc2d02d">
 <p>
 关于代码规范的重要性，诸如促进团队合作、降低维护成本、有助于代码审查、有助于自身成长等，这里就不详细赘述了，直接进入正题。
 </p>
 </div>
 </div>
 
-<div id="outline-container-org3116a20" class="outline-2">
-<h2 id="org3116a20">PHP编码规范</h2>
-<div class="outline-text-2" id="text-org3116a20">
+<div id="outline-container-org1195d33" class="outline-2">
+<h2 id="org1195d33">PHP编码规范</h2>
+<div class="outline-text-2" id="text-org1195d33">
 <p>
    当前主流的PHP编码规范是由 <a href="https://www.php-fig.org/">PHP FIG</a> 组织制定的 <a href="https://www.php-fig.org/psr/">PSR</a> 系列规范，如 <code>PSR-1</code> , <code>PSR-2</code> , <code>PSR-4</code> 。
 当然还是有其他一些规范的存在，如 <a href="https://pear.php.net/manual/en/standards.php">PEAR规范</a> 和 <a href="https://symfony.com/doc/current/contributing/code/standards.html">Symfony规范</a>。我们使用的主要是 <code>PSR-2</code> 规范。
@@ -56,9 +56,9 @@
 </div>
 </div>
 
-<div id="outline-container-org6060540" class="outline-2">
-<h2 id="org6060540">Git钩子</h2>
-<div class="outline-text-2" id="text-org6060540">
+<div id="outline-container-org64e36d5" class="outline-2">
+<h2 id="org64e36d5">Git钩子</h2>
+<div class="outline-text-2" id="text-org64e36d5">
 <p>
    和其它版本控制系统一样，Git 能在特定的重要动作发生时触发自定义脚本。
 有两组这样的钩子：客户端的和服务器端的。
@@ -73,9 +73,9 @@
 </div>
 </div>
 
-<div id="outline-container-org0f56ccf" class="outline-2">
-<h2 id="org0f56ccf">Show me the code</h2>
-<div class="outline-text-2" id="text-org0f56ccf">
+<div id="outline-container-orgf941b90" class="outline-2">
+<h2 id="orgf941b90">Show me the code</h2>
+<div class="outline-text-2" id="text-orgf941b90">
 <p>
 废话不多说，直接上代码吧。 以下为 <code>.git/hooks/pre-commit</code> 的代码：
 </p>
@@ -137,9 +137,9 @@
 </div>
 </div>
 
-<div id="outline-container-orga136cf2" class="outline-2">
-<h2 id="orga136cf2">安装的Git钩子无法加入版本库, 每个成员，每个环境都要重复装一遍?</h2>
-<div class="outline-text-2" id="text-orga136cf2">
+<div id="outline-container-org4a03936" class="outline-2">
+<h2 id="org4a03936">安装的Git钩子无法加入版本库, 每个成员，每个环境都要重复装一遍?</h2>
+<div class="outline-text-2" id="text-org4a03936">
 <p>
    <code>.git</code> 目录下的文件无法加入版本库，这就导致了团队成员中的每个人都要手动安装一次钩子，或者你的多套环境也要重复安装钩子，这当然是很不方便的。
 为了解决这个问题，我们可以利用 <code>composer</code> 的钩子来自动完成安装git钩子的过程。
@@ -197,9 +197,9 @@
 </div>
 </div>
 
-<div id="outline-container-org1867cf8" class="outline-2">
-<h2 id="org1867cf8">结束语</h2>
-<div class="outline-text-2" id="text-org1867cf8">
+<div id="outline-container-org78758ba" class="outline-2">
+<h2 id="org78758ba">结束语</h2>
+<div class="outline-text-2" id="text-org78758ba">
 <p>
    我们日常用到的一些工具类确实都很强大，只是平时我们都只满足于最简单的日常使用。也许多看一眼文档，就能学习一些更高阶的用法。
 希望自己能对日常使用的一些工具能较深入的了解学习一下，也许学习会花一些时间，但是更能为以后的开发节约不少时间，避免重复劳动。
@@ -207,9 +207,9 @@
 </div>
 </div>
 
-<div id="outline-container-org4e407ac" class="outline-2">
-<h2 id="org4e407ac">参考</h2>
-<div class="outline-text-2" id="text-org4e407ac">
+<div id="outline-container-orgb2358e4" class="outline-2">
+<h2 id="orgb2358e4">参考</h2>
+<div class="outline-text-2" id="text-orgb2358e4">
 <ol class="org-ol">
 <li><a href="http://psr.phphub.org/">PHP编码规范</a></li>
 
@@ -232,9 +232,50 @@
   </a>
 </footer>
 </div>
+<div id="disqus_thread"></div>
+<script>
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://demokn.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
 </div>
 </div>
 </div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code for 珊瑚礁上的程序员
+https://demokn.github.io -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
 </body>
 </html>

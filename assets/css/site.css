@@ -78,7 +78,7 @@ ul.share-buttons li {
 #content header {
     text-align: center;
 }
-#content div {
+#content .org-src-container {
     font-family:'Bree Serif', serif;
     background-color: floralwhite;
 }

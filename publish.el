@@ -55,8 +55,8 @@
   "获取项目发布子路径.  SUB-PATH."
   (expand-file-name sub-path demo/project-pub-root))
 
-(defun demo/org-html-publish-to-html (plist filename pub-dir)
-  "发布项目, 即org转换html.  PLIST, FILENAME, PUB-DIR."
+(defun demo/org-html-publish-post-to-html (plist filename pub-dir)
+  "PLIST, FILENAME, PUB-DIR."
   (let* ((project (cons 'blog plist)))
     (plist-put plist
                :subtitle nil)
@@ -75,7 +75,30 @@
                         "\n<div class=\"col-lg-8 col-md-10 mx-auto\">\n"))
         (goto-char (point-max))
         (search-backward "</body>")
+        (unless (equal "archive.org" (file-name-nondirectory filename))
+          (insert (demo--insert-snippet "disqus.js.html")))
         (insert "\n</div>\n</div>\n</div>\n")
+        (insert (demo--insert-snippet "analytics.js.html"))
+        (insert (demo--insert-snippet "statcounter.js.html"))
+        (save-buffer)
+        (kill-buffer)))
+    file-path))
+
+(defun demo/org-html-publish-site-to-html (plist filename pub-dir)
+  "PLIST, FILENAME, PUB-DIR."
+  (let* ((file-path (org-html-publish-to-html plist filename pub-dir)))
+    (save-window-excursion
+      (with-current-buffer (find-file-noselect file-path)
+        (goto-char (point-min))
+        (search-forward "<body>")
+        (insert (concat "\n<div class=\"content-wrapper container\">"
+                        "\n<div class=\"row\">"
+                        "\n<div class=\"col-lg-8 col-md-10 mx-auto\">\n"))
+        (goto-char (point-max))
+        (search-backward "</body>")
+        (insert "\n</div>\n</div>\n</div>\n")
+        (insert (demo--insert-snippet "analytics.js.html"))
+        (insert (demo--insert-snippet "statcounter.js.html"))
         (save-buffer)
         (kill-buffer)))
     file-path))
@@ -142,7 +165,7 @@
          :exclude (regexp-opt '("latest.org" "rss.org"))
 
          :publishing-directory (demo/project-pub-path "posts")
-         :publishing-function #'demo/org-html-publish-to-html
+         :publishing-function #'demo/org-html-publish-post-to-html
 
          :section-numbers nil
          :with-toc nil
@@ -221,6 +244,29 @@
 
          :html-link-home "http://demokn.com/posts/"
          :html-link-use-abs-url t)
+
+   (list "site"
+         :base-directory demo/project-src-root
+         :base-extension "org"
+         :recursive nil
+
+         :publishing-directory demo/project-pub-root
+         :publishing-function #'demo/org-html-publish-site-to-html
+
+         :section-numbers nil
+         :with-toc nil
+         :with-title t
+         :with-author nil
+         :with-creator nil
+         :html-doctype "html5"
+         :html-html5-fancy t
+         :html-head-include-scripts nil
+         :html-head-include-default-style nil
+         :html-head-extra demo/project-html-head
+         :html-preamble t
+         :html-preamble-format (demo--pre/postamble-format 'preamble)
+         :html-postamble t
+         :html-postamble-format (demo--pre/postamble-format 'postamble))
 
    (list "assets"
          :base-directory demo/project-src-root
