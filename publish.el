@@ -56,6 +56,41 @@
   "获取项目发布子路径.  SUB-PATH."
   (expand-file-name sub-path demo/project-pub-root))
 
+(defun demo--pre/postamble-format (name)
+  "读取snippets目录下的代码片段文件, 返回格式化的pre/postamble内容.  NAME."
+  `(("en" ,(with-temp-buffer
+             (insert-file-contents (expand-file-name (format "%s.html" name) (demo/project-src-path "snippets")))
+             (buffer-string)))))
+
+(defun demo--insert-snippet (filename)
+  "读取snippets目录下的代码片段文件, 返回文件内容.  FILENAME."
+  (with-temp-buffer
+    (insert-file-contents (expand-file-name filename (demo/project-src-path "snippets")))
+    (buffer-string)))
+
+(defun demo/org-html-publish-site-to-html (plist filename pub-dir)
+  "PLIST, FILENAME, PUB-DIR."
+  (let* ((file-path (org-html-publish-to-html plist filename pub-dir)))
+    (save-window-excursion
+      (with-current-buffer (find-file-noselect file-path)
+        (goto-char (point-min))
+        (search-forward "<body>")
+        (insert (concat "\n<div class=\"content-wrapper container\">"
+                        "\n<div class=\"row\">"
+                        "\n<div class=\"col-lg-8 col-md-10 mx-auto\">\n"))
+        (goto-char (point-max))
+        (search-backward "</body>")
+        (insert "\n</div>\n</div>\n</div>\n")
+        (insert (demo--insert-snippet "analytics.js.html"))
+        (insert (demo--insert-snippet "statcounter.js.html"))
+        (save-buffer)
+        (kill-buffer)))
+    file-path))
+
+(defun demo/org-publish-sitemap--valid-entries (entries)
+  "ENTRIES."
+  (-filter (lambda (x) (car x)) entries))
+
 (defun demo/org-html-publish-post-to-html (plist filename pub-dir)
   "PLIST, FILENAME, PUB-DIR."
   (let* ((project (cons 'blog plist)))
@@ -85,49 +120,7 @@
         (kill-buffer)))
     file-path))
 
-(defun demo/org-html-publish-site-to-html (plist filename pub-dir)
-  "PLIST, FILENAME, PUB-DIR."
-  (let* ((file-path (org-html-publish-to-html plist filename pub-dir)))
-    (save-window-excursion
-      (with-current-buffer (find-file-noselect file-path)
-        (goto-char (point-min))
-        (search-forward "<body>")
-        (insert (concat "\n<div class=\"content-wrapper container\">"
-                        "\n<div class=\"row\">"
-                        "\n<div class=\"col-lg-8 col-md-10 mx-auto\">\n"))
-        (goto-char (point-max))
-        (search-backward "</body>")
-        (insert "\n</div>\n</div>\n</div>\n")
-        (insert (demo--insert-snippet "analytics.js.html"))
-        (insert (demo--insert-snippet "statcounter.js.html"))
-        (save-buffer)
-        (kill-buffer)))
-    file-path))
-
-(defun demo--pre/postamble-format (name)
-  "读取snippets目录下的代码片段文件, 返回格式化的pre/postamble内容.  NAME."
-  `(("en" ,(with-temp-buffer
-             (insert-file-contents (expand-file-name (format "%s.html" name) (demo/project-src-path "snippets")))
-             (buffer-string)))))
-
-(defun demo--insert-snippet (filename)
-  "读取snippets目录下的代码片段文件, 返回文件内容.  FILENAME."
-  (with-temp-buffer
-    (insert-file-contents (expand-file-name filename (demo/project-src-path "snippets")))
-    (buffer-string)))
-
-(defun demo/org-publish-sitemap--valid-entries (entries)
-  "ENTRIES."
-  (-filter (lambda (x) (car x)) entries))
-
-(defun demo/org-publish-sitemap-latest-posts (title sitemap)
-  "TITLE, SITEMAP."
-  (let* ((posts (cdr sitemap))
-         (posts (demo/org-publish-sitemap--valid-entries posts))
-         (last-five (seq-subseq posts 0 (min (length posts) 5))))
-    (org-list-to-org (cons (car sitemap) last-five))))
-
-(defun demo/org-publish-sitemap-archive (title sitemap)
+(defun demo/org-publish-sitemap-publish-archive (title sitemap)
   "TITLE, SITEMAP."
   (let* ((title "Blog Archive")
          (posts (cdr sitemap))
@@ -140,30 +133,51 @@
                        "\n")
             "\n#+end_archive\n")))
 
-(defun demo/org-publish-sitemap-archive-entry (entry style project)
+(defun demo/org-publish-sitemap-format-archive-entry (entry style project)
   "ENTRY, STYLE, PROJECT."
   (format "@@html:<span class=\"archive-item\"><span class=\"archive-date\">@@ %s @@html:</span>@@ [[file:%s][%s]] @@html:</span>@@"
           (format-time-string "%h %d, %Y" (org-publish-find-date entry project))
           entry
           (org-publish-find-title entry project)))
 
-(defun demo/org-publish-sitemap-entry (entry style project)
+(defun demo/org-rss-publish-to-rss (plist filename pub-dir)
+  "PLIST, FILENAME, PUB-DIR."
+  (if (equal "rss.org" (file-name-nondirectory filename))
+      (org-rss-publish-to-rss plist filename pub-dir)))
+
+(defun demo/org-publish-sitemap-publish-rss (title sitemap)
+  "TITLE, SITEMAP."
+  (let* ((title "珊瑚礁上的程序员"))
+    (concat (format "#+TITLE: %s\n\n" title)
+            (org-list-to-subtree sitemap '(:icount "" :istart "")))))
+
+(defun demo/org-publish-sitemap-format-rss-entry (entry style project)
   "ENTRY, STYLE, PROJECT."
-  (let* ((base-directory (plist-get (cdr project) :base-directory))
-         (filename (expand-file-name entry (expand-file-name base-directory demo/project-src-root))))
-    (unless (equal entry "404.org")
-      (format "%s [[file:%s][%s]]"
-              (format-time-string "%h %d, %Y" (org-publish-find-date entry project))
-              entry
-              (org-publish-find-title entry project)))))
+  (cond ((not (directory-name-p entry))
+         (let* ((file (org-publish--expand-file-name entry project))
+                (title (org-publish-find-title entry project))
+                (date (format-time-string "%Y-%m-%d" (org-publish-find-date entry project)))
+                (link (concat (file-name-sans-extension entry) ".html")))
+           (with-temp-buffer
+             (insert (format "* [[file:%s][%s]]\n" file title))
+             (org-set-property "RSS_PERMALINK" link)
+             (org-set-property "PUBDATE" date)
+             ;; To avoid second update to rss.org by org-icalendar-create-uid
+             (org-id-get-create)
+             (insert-file-contents file)
+             (buffer-string))))
+        ((eq style 'tree)
+         ;; Return only last subdir.
+         (file-name-nondirectory (directory-file-name entry)))
+        (t entry)))
 
 (defvar demo/org-publish-project-alist
   (list
-   (list "blog"
+   (list "blog-posts"
          :base-directory (demo/project-src-path "posts")
          :base-extension "org"
          :recursive t
-         :exclude (regexp-opt '("latest.org" "rss.org"))
+         :exclude (regexp-opt '("archive.org" "rss.org"))
 
          :publishing-directory (demo/project-pub-path "posts")
          :publishing-function #'demo/org-html-publish-post-to-html
@@ -191,37 +205,22 @@
          :sitemap-sort-files 'anti-chronologically
          :sitemap-ignore-case nil
          :sitemap-date-format "%h %d, %Y"
-         :sitemap-format-entry #'demo/org-publish-sitemap-archive-entry
-         :sitemap-function #'demo/org-publish-sitemap-archive)
+         :sitemap-function #'demo/org-publish-sitemap-publish-archive
+         :sitemap-format-entry #'demo/org-publish-sitemap-format-archive-entry)
 
-   (list "latest.org"
+   (list "blog-rss"
          :base-directory (demo/project-src-path "posts")
          :base-extension "org"
          :recursive t
-         :exclude (regexp-opt '("latest.org" "archive.org" "rss.org"))
+         :exclude (regexp-opt '("archive.org" "rss.org"))
 
          :publishing-directory (demo/project-pub-path "posts")
-         :publishing-function 'ignore
+         :publishing-function #'demo/org-rss-publish-to-rss
 
-         :auto-sitemap t
-         :sitemap-style 'list
-         :sitemap-filename "latest.org"
-         :sitemap-title nil
-         :sitemap-sort-folders 'ignore
-         :sitemap-sort-files 'anti-chronologically
-         :sitemap-ignore-case nil
-         :sitemap-date-format "%h %d, %Y"
-         :sitemap-format-entry #'demo/org-publish-sitemap-entry
-         :sitemap-function #'demo/org-publish-sitemap-latest-posts)
-
-   (list "rss.org"
-         :base-directory (demo/project-src-path "posts")
-         :base-extension "org"
-         :recursive t
-         :exclude (regexp-opt '("latest.org" "archive.org" "rss.org"))
-
-         :publishing-directory (demo/project-pub-path "posts")
-         :publishing-function 'ignore
+         :html-link-home "http://demokn.com/posts/"
+         :html-home/up-format ""
+         :html-link-use-abs-url t
+         :html-link-org-files-as-html t
 
          :auto-sitemap t
          :sitemap-style 'list
@@ -230,21 +229,8 @@
          :sitemap-sort-folders 'ignore
          :sitemap-sort-files 'anti-chronologically
          :sitemap-ignore-case nil
-         :sitemap-date-format "%h %d, %Y"
-         :sitemap-format-entry #'demo/org-publish-sitemap-entry)
-
-   (list "rss.xml"
-         :base-directory (demo/project-src-path "posts")
-         :base-extension "org"
-         :recursive t
-         :exclude ".*"
-         :include '("rss.org")
-
-         :publishing-directory (demo/project-pub-path "posts")
-         :publishing-function #'org-rss-publish-to-rss
-
-         :html-link-home "http://demokn.com/posts/"
-         :html-link-use-abs-url t)
+         :sitemap-function #'demo/org-publish-sitemap-publish-rss
+         :sitemap-format-entry #'demo/org-publish-sitemap-format-rss-entry)
 
    (list "site"
          :base-directory demo/project-src-root
@@ -274,7 +260,10 @@
          :base-extension (regexp-opt '("jpg" "jpeg" "png" "gif" "svg" "css" "js"))
          :recursive t
          :publishing-directory demo/project-pub-root
-         :publishing-function #'org-publish-attachment)))
+         :publishing-function #'org-publish-attachment)
+
+   (list "all"
+         :components '("blog-posts" "blog-rss" "site" "assets"))))
 
 (defun demo/org-publish-all ()
   "发布博客."
@@ -284,6 +273,7 @@
    '((dot .t) (plantuml ,t)))
   (let ((make-backup-files nil)
         (org-publish-project-alist demo/org-publish-project-alist)
+        (org-publish-timestamp-directory "./.org-timestamps/")
         (org-publish-cache nil)
         (org-publish-use-timestamps-flag nil)
         (org-export-with-section-numbers nil)

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 9月 29, 2019 -->
+<!-- 10月 08, 2019 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>使用 git-hooks + phpcs + composer-scripts 践行PHP编码规范</title>
@@ -33,18 +33,18 @@
 <h1 class="title">使用 git-hooks + phpcs + composer-scripts 践行PHP编码规范</h1>
 <p class="subtitle">Published on 7月 22, 2019</p>
 </header>
-<div id="outline-container-orgbc2d02d" class="outline-2">
-<h2 id="orgbc2d02d">背景</h2>
-<div class="outline-text-2" id="text-orgbc2d02d">
+<div id="outline-container-orgb3638e4" class="outline-2">
+<h2 id="orgb3638e4">背景</h2>
+<div class="outline-text-2" id="text-orgb3638e4">
 <p>
 关于代码规范的重要性，诸如促进团队合作、降低维护成本、有助于代码审查、有助于自身成长等，这里就不详细赘述了，直接进入正题。
 </p>
 </div>
 </div>
 
-<div id="outline-container-org1195d33" class="outline-2">
-<h2 id="org1195d33">PHP编码规范</h2>
-<div class="outline-text-2" id="text-org1195d33">
+<div id="outline-container-org3d99ef8" class="outline-2">
+<h2 id="org3d99ef8">PHP编码规范</h2>
+<div class="outline-text-2" id="text-org3d99ef8">
 <p>
    当前主流的PHP编码规范是由 <a href="https://www.php-fig.org/">PHP FIG</a> 组织制定的 <a href="https://www.php-fig.org/psr/">PSR</a> 系列规范，如 <code>PSR-1</code> , <code>PSR-2</code> , <code>PSR-4</code> 。
 当然还是有其他一些规范的存在，如 <a href="https://pear.php.net/manual/en/standards.php">PEAR规范</a> 和 <a href="https://symfony.com/doc/current/contributing/code/standards.html">Symfony规范</a>。我们使用的主要是 <code>PSR-2</code> 规范。
@@ -57,9 +57,9 @@
 </div>
 </div>
 
-<div id="outline-container-org64e36d5" class="outline-2">
-<h2 id="org64e36d5">Git钩子</h2>
-<div class="outline-text-2" id="text-org64e36d5">
+<div id="outline-container-org44fa3ed" class="outline-2">
+<h2 id="org44fa3ed">Git钩子</h2>
+<div class="outline-text-2" id="text-org44fa3ed">
 <p>
    和其它版本控制系统一样，Git 能在特定的重要动作发生时触发自定义脚本。
 有两组这样的钩子：客户端的和服务器端的。
@@ -74,9 +74,9 @@
 </div>
 </div>
 
-<div id="outline-container-orgf941b90" class="outline-2">
-<h2 id="orgf941b90">Show me the code</h2>
-<div class="outline-text-2" id="text-orgf941b90">
+<div id="outline-container-orgf60c32d" class="outline-2">
+<h2 id="orgf60c32d">Show me the code</h2>
+<div class="outline-text-2" id="text-orgf60c32d">
 <p>
 废话不多说，直接上代码吧。 以下为 <code>.git/hooks/pre-commit</code> 的代码：
 </p>
@@ -138,9 +138,9 @@
 </div>
 </div>
 
-<div id="outline-container-org4a03936" class="outline-2">
-<h2 id="org4a03936">安装的Git钩子无法加入版本库, 每个成员，每个环境都要重复装一遍?</h2>
-<div class="outline-text-2" id="text-org4a03936">
+<div id="outline-container-orgf504dbc" class="outline-2">
+<h2 id="orgf504dbc">安装的Git钩子无法加入版本库, 每个成员，每个环境都要重复装一遍?</h2>
+<div class="outline-text-2" id="text-orgf504dbc">
 <p>
    <code>.git</code> 目录下的文件无法加入版本库，这就导致了团队成员中的每个人都要手动安装一次钩子，或者你的多套环境也要重复安装钩子，这当然是很不方便的。
 为了解决这个问题，我们可以利用 <code>composer</code> 的钩子来自动完成安装git钩子的过程。
@@ -198,9 +198,9 @@
 </div>
 </div>
 
-<div id="outline-container-org78758ba" class="outline-2">
-<h2 id="org78758ba">结束语</h2>
-<div class="outline-text-2" id="text-org78758ba">
+<div id="outline-container-orgbeb0791" class="outline-2">
+<h2 id="orgbeb0791">结束语</h2>
+<div class="outline-text-2" id="text-orgbeb0791">
 <p>
    我们日常用到的一些工具类确实都很强大，只是平时我们都只满足于最简单的日常使用。也许多看一眼文档，就能学习一些更高阶的用法。
 希望自己能对日常使用的一些工具能较深入的了解学习一下，也许学习会花一些时间，但是更能为以后的开发节约不少时间，避免重复劳动。
@@ -208,9 +208,9 @@
 </div>
 </div>
 
-<div id="outline-container-orgb2358e4" class="outline-2">
-<h2 id="orgb2358e4">参考</h2>
-<div class="outline-text-2" id="text-orgb2358e4">
+<div id="outline-container-org6967671" class="outline-2">
+<h2 id="org6967671">参考</h2>
+<div class="outline-text-2" id="text-org6967671">
 <ol class="org-ol">
 <li><a href="http://psr.phphub.org/">PHP编码规范</a></li>
 

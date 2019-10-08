@@ -9,23 +9,144 @@
      xmlns:georss="http://www.georss.org/georss"
      xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
      xmlns:media="http://search.yahoo.com/mrss/"><channel>
-  <title>Sitemap for project rss.org</title>
+  <title>珊瑚礁上的程序员</title>
   <atom:link href="http://demokn.com/posts/rss.xml" rel="self" type="application/rss+xml" />
   <link>http://demokn.com/posts/</link>
   <description><![CDATA[]]></description>
   <language>en</language>
-  <pubDate>Sun, 29 Sep 2019 17:10:19 +0800</pubDate>
-  <lastBuildDate>Sun, 29 Sep 2019 17:10:19 +0800</lastBuildDate>
+  <pubDate>Tue, 08 Oct 2019 22:04:51 +0800</pubDate>
+  <lastBuildDate>Tue, 08 Oct 2019 22:04:51 +0800</lastBuildDate>
   <generator>Emacs 26.3 Org-mode 9.2.6</generator>
   <webMaster>demo@Macy (demo)</webMaster>
   <image>
     <url>https://orgmode.org/img/org-mode-unicorn-logo.png</url>
-    <title>Sitemap for project rss.org</title>
+    <title>珊瑚礁上的程序员</title>
     <link>http://demokn.com/posts/</link>
   </image>
 
-  <ul class="org-ul">
-    <li>7月 22, 2019 <a href="use-git-hooks-and-phpcs-and-composer-scripts-to-practice-php-coding-startand/index.html">使用 git-hooks + phpcs + composer-scripts 践行PHP编码规范</a></li>
-  </ul>
+
+  <item>
+    <title>使用 git-hooks + phpcs + composer-scripts 践行PHP编码规范</title>
+    <link>http://demokn.com/posts/use-git-hooks-and-phpcs-and-composer-scripts-to-practice-php-coding-startand/index.html</link>
+    <author>demo@Macy (demo)</author>
+    <guid isPermaLink="false">http://demokn.com/posts/use-git-hooks-and-phpcs-and-composer-scripts-to-practice-php-coding-startand/index.html</guid>
+    <pubDate>Mon, 22 Jul 2019 00:00:00 +0800</pubDate>
+
+    <description><![CDATA[<div id="outline-container-org42c5482" class="outline-4">
+    <h4 id="org42c5482">背景</h4>
+    <div class="outline-text-4" id="text-org42c5482">
+    <p>
+    关于代码规范的重要性，诸如促进团队合作、降低维护成本、有助于代码审查、有助于自身成长等，这里就不详细赘述了，直接进入正题。
+    </p>
+    </div>
+    </div>
+
+    <div id="outline-container-org5f0216e" class="outline-4">
+    <h4 id="org5f0216e">PHP编码规范</h4>
+    <div class="outline-text-4" id="text-org5f0216e">
+    <p>
+    当前主流的PHP编码规范是由 <a href="https://www.php-fig.org/">PHP FIG</a> 组织制定的 <a href="https://www.php-fig.org/psr/">PSR</a> 系列规范，如 <code>PSR-1</code> , <code>PSR-2</code> , <code>PSR-4</code> 。
+    当然还是有其他一些规范的存在，如 <a href="https://pear.php.net/manual/en/standards.php">PEAR规范</a> 和 <a href="https://symfony.com/doc/current/contributing/code/standards.html">Symfony规范</a>。我们使用的主要是 <code>PSR-2</code> 规范。
+    </p>
+
+    <p>
+    用于检查和修复代码规范的工具主要有 <a href="https://github.com/squizlabs/PHP_CodeSniffer">PHP_CodeSniffer</a> 和 <a href="https://github.com/FriendsOfPHP/PHP-CS-Fixer">PHP-CS-Fixer</a>。
+    如果你还想了解这两个工具的差异，可以看下这个 <a href="https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/3459">ISSUE</a>。我们本次使用的是 <code>PHP_CodeSniffer</code> 。
+    </p>
+    </div>
+    </div>
+
+    <div id="outline-container-org6df7a97" class="outline-4">
+    <h4 id="org6df7a97">Git钩子</h4>
+    <div class="outline-text-4" id="text-org6df7a97">
+    <p>
+    和其它版本控制系统一样，Git 能在特定的重要动作发生时触发自定义脚本。
+    有两组这样的钩子：客户端的和服务器端的。
+    客户端钩子由诸如提交和合并这样的操作所调用，而服务器端钩子作用于诸如接收被推送的提交这样的联网操作。
+    钩子都被存储在 Git 目录下的 hooks 子目录中。 也即绝大部分项目中的 <code>.git/hooks</code> 。 
+    查看一下你项目中的该目录, 就会看到诸如 <code>pre-commit.sample</code>, <code>pre-push.sample</code>, <code>pre-receive.sample</code> 等文件。
+    要使用他们，只需要把 <code>.sample</code> 后缀去掉，然后编辑自己的代码即可。
+    这里我们用的是 <code>pre-commit</code> 钩子，即在键入提交信息 <code>git commit</code> 前运行。
+    它一般用于检查即将提交的快照，例如，检查是否有所遗漏，确保测试运行，以及核查代码。
+    如果该钩子以非零值退出，Git 将放弃此次提交，不过也可以用 <code>git commit --no-verify</code> 来绕过这个环节。
+    </p>
+    </div>
+    </div>
+
+    <div id="outline-container-orgf2abdc6" class="outline-4">
+    <h4 id="orgf2abdc6">Show me the code</h4>
+    <div class="outline-text-4" id="text-orgf2abdc6">
+    <p>
+    废话不多说，直接上代码吧。 以下为 <code>.git/hooks/pre-commit</code> 的代码：
+    </p>
+
+    <div class="org-src-container">
+    <pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">sh</span>
+
+    <span class="org-variable-name">PROJECT</span>=<span class="org-sh-quoted-exec">`php -r "echo dirname(dirname(dirname(realpath('$0'))));"`</span>
+    <span class="org-variable-name">STAGED_FILES_CMD</span>=<span class="org-sh-quoted-exec">`git diff --cached --name-only --diff-filter=ACMR HEAD | grep \\\\.php`</span>
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Determine if a file list is passed</span>
+    <span class="org-keyword">if</span> [ <span class="org-string">"$#"</span> -eq 1 ]
+    <span class="org-keyword">then</span>
+    <span class="org-variable-name">oIFS</span>=$<span class="org-variable-name">IFS</span>
+    <span class="org-variable-name">IFS</span>=<span class="org-string">'</span>
+    <span class="org-string">    '</span>
+    <span class="org-variable-name">SFILES</span>=<span class="org-string">"$1"</span>
+    <span class="org-variable-name">IFS</span>=$<span class="org-variable-name">oIFS</span>
+    <span class="org-keyword">fi</span>
+    <span class="org-variable-name">SFILES</span>=${<span class="org-variable-name">SFILES</span>:-$<span class="org-variable-name">STAGED_FILES_CMD</span>}
+
+    <span class="org-builtin">echo</span> <span class="org-string">"Checking PHP Lint..."</span>
+    <span class="org-keyword">for</span> FILE<span class="org-keyword"> in</span> $<span class="org-variable-name">SFILES</span>
+    <span class="org-keyword">do</span>
+    php -l -d <span class="org-variable-name">display_errors</span>=0 $<span class="org-variable-name">PROJECT</span>/$<span class="org-variable-name">FILE</span>
+    <span class="org-keyword">if</span> [ $<span class="org-variable-name">?</span> != 0 ]
+    <span class="org-keyword">then</span>
+    <span class="org-builtin">echo</span> <span class="org-string">"Fix the error before commit."</span>
+    <span class="org-keyword">exit</span> 1
+    <span class="org-keyword">fi</span>
+    <span class="org-variable-name">FILES</span>=<span class="org-string">"$FILES $PROJECT/$FILE"</span>
+    <span class="org-keyword">done</span>
+
+    <span class="org-keyword">if</span> [ <span class="org-string">"$FILES"</span> != <span class="org-string">""</span> ]
+    <span class="org-keyword">then</span>
+    <span class="org-builtin">echo</span> <span class="org-string">"Running Code Sniffer..."</span>
+    ./vendor/bin/phpcs $<span class="org-variable-name">FILES</span>
+    <span class="org-keyword">if</span> [ $<span class="org-variable-name">?</span> != 0 ]
+    <span class="org-keyword">then</span>
+    <span class="org-builtin">echo</span> <span class="org-string">"Fix the error before commit!"</span>
+    <span class="org-builtin">echo</span> <span class="org-string">"Run"</span>
+    <span class="org-builtin">echo</span> <span class="org-string">"  ./vendor/bin/phpcbf $FILES"</span>
+    <span class="org-builtin">echo</span> <span class="org-string">"for automatic fix or fix it manually."</span>
+    <span class="org-keyword">exit</span> 1
+    <span class="org-keyword">fi</span>
+    <span class="org-keyword">fi</span>
+
+    <span class="org-keyword">exit</span> $<span class="org-variable-name">?</span>
+    </pre>
+    </div>
+
+    <p>
+    通过代码也能看出，我们直接使用了当前项目中的 <code>./vendor/bin/phpcs</code>, 即需要我们在项目中加载 <code>PHP_CodeSniffer</code> 包。
+    执行 <code>composer require squizlabs/php_codesniffer --dev</code> 即可。
+    另外，在hook中我们也没有具体指明phpcs要使用哪种规范标准，
+    因为这更多是取决于我们自己的项目，具体的规则定义在项目根目录下的 <code>phpcs.xml</code> 配置文件中即可。
+    如果你想参考的话，<a href="https://github.com/demokn/phpcs-pre-commit-hook/blob/master/phpcs.xml-yii2">这里</a> 是一个我们使用的关于 <code>yii2</code> 的规则。
+    </p>
+    </div>
+    </div>
+
+    <div id="outline-container-org8ada422" class="outline-4">
+    <h4 id="org8ada422">安装的Git钩子无法加入版本库, 每个成员，每个环境都要重复装一遍?</h4>
+    <div class="outline-text-4" id="text-org8ada422">
+    <p>
+    <code>.git</code> 目录下的文件无法加入版本库，这就导致了团队成员中的每个人都要手动安装一次钩子，或者你的多套环境也要重复安装钩子，这当然是很不方便的。
+    为了解决这个问题，我们可以利用 <code>composer</code> 的钩子来自动完成安装git钩子的过程。
+    </p>
+    </div>
+    </div>
+    ]]></description>
+</item>
 </channel>
 </rss>
