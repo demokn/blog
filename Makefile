@@ -2,10 +2,10 @@ all: build
 
 build:
 	./build.sh
-	cp posts/archive.html posts/index.html
+	cp public/posts/archive.html public/posts/index.html
 
 clean:
-	rm -rf assets/
-	rm -rf posts/
+	rm -rf public/
 	rm -rf .org-timestamps/
-	rm -f *.html
+	rm src/posts/archive.org
+	rm src/posts/rss.org

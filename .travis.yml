@@ -1,0 +1,17 @@
+languages: minimal
+
+before_install:
+  - sudo add-apt-repository ppa:kelleyk/emacs -y
+  - sudo apt-get update -q
+  - sudo apt-get install emacs26 -y
+  - sudo apt-get install make
+
+script: make
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  local_dir: ./public
+  target_branch: gh-pages

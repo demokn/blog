@@ -37,7 +37,7 @@
 
 (defvar demo/project-src-root (expand-file-name "src/" (file-name-directory (or load-file-name buffer-file-name)))
   "项目源码根目录.")
-(defvar demo/project-pub-root (expand-file-name "./" (file-name-directory (or load-file-name buffer-file-name)))
+(defvar demo/project-pub-root (expand-file-name "public/" (file-name-directory (or load-file-name buffer-file-name)))
   "项目发布根目录.")
 
 (defvar demo/project-html-head
@@ -259,6 +259,8 @@
          :base-directory demo/project-src-root
          :base-extension (regexp-opt '("jpg" "jpeg" "png" "gif" "svg" "css" "js"))
          :recursive t
+         :include '("CNAME")
+
          :publishing-directory demo/project-pub-root
          :publishing-function #'org-publish-attachment)
 
