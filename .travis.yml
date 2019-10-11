@@ -13,6 +13,8 @@ before_install:
   - sudo apt-get install emacs26 -y
   - sudo apt-get install make
 
+install: skip
+
 script: make
 
 deploy:

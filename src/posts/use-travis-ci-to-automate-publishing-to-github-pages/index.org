@@ -1,0 +1,117 @@
+#+TITLE: 使用 Travis-CI 自动化部署 GitHub Pages
+#+DATE: <2019-10-11 Fri>
+
+一直听闻 =持续集成= 的大名, 这次借着在 =GitHub Pages= 部署博客来体验一下。
+目前已实现当推送一个新的 =commit= 到 [[https://github.com/demokn/blog][我的GitHub仓库]] =master= 分支, [[https://travis-ci.org/][Travis-CI]] 就会自动执行构建,
+并在构建完成后将生成的 HTML 等内容发布到 =gh-pages= 分支。
+
+大致流程如下:
+
+[[./github-travis-flow.png]]
+
+所谓借助 =Travis-CI= 自动构建，无非就是把原本需要自己手动执行的命令或脚本，
+通过 =.travis.yml= 配置文件告诉 =Travis-CI= 该如何一步步执行。
+
+*** 博客仓库
+
+我是用 =Emacs Org-mode= 来写博客的，源码在 [[https://github.com/demokn/blog][demokn/blog]] 的 =master= 分支。
+自己手动执行构建也非常简单，因为借助了 =Makefile=, 只需要执行一下 =make= 命令即可完成构建。
+当然还有个前提就是我已经安装了新版的 Emacs.
+这里借助 =Makefile= 并不是使用 =Travis-CI= 必须的, 我只是提一下本项目手动构建的步骤, 为下面配置 =.travis.yml= 做准备。
+我们也可以把构建所需执行的命令写成一个或多个 =shell 脚本=, 如本例中的 =build.sh=.
+甚至也可以把这些命令直接逐条写在 =.travis.yml= 配置文件中（当然不推荐就是了）。
+
+再说明一下， =GitHub Pages= 是有 [[https://help.github.com/en/articles/about-github-pages#types-of-github-pages-sites][三种类型]] 的，分别是 project, user, 和 organization.
+最常见到的 =<username>/<username>.github.io= 仓库, 属于 user 或 organization 类型。
+而我用的是 =project pages=, 所以仓库名可以随便起, 主要有两个分支:
+
+- master: 项目源码, 包含构建脚本, Makefile, .travis.yml, org 格式文章等
+- gh-pages: 构建完成后的 HTML 等文件, 也即是 project pages 通过 =https://<user>.github.io/<project>= 访问时的默认分支
+
+
+*** Travis-CI 配置
+
+因为我也是第一次接触 =Travis-CI=, 只是经常有在开源库中看到过 =.travis.yml= 文件。
+无疑，这个就是 =Travis-CI= 的配置文件了，告诉 =Travis-CI= 当仓库有新的提交时需要做什么事情。
+
+至于配置文件该怎么用，格式怎么写，内容怎么配，呵呵，谁还没有过第一次嘛，干就完了。
+这里也记录下面对一个对自己来说全新的工具/知识点, 我是怎么学习的, 仅供参考：
+
+1. 先找2-3篇 =中文教程= 简单过一下，对 =Travis-CI= 有个入门级的了解, 是什么, 能做什么, 怎么做；（谁让咱英语不行呢）
+2. 打开官网, 随便看看, 随便点点, 然后, =看官方文档=, =看官方文档=, =看官方文档=, 当然不用一次看完, 拣本次需要用到的知识点看；
+3. 开始实践, 同步 GitHub 仓库, 配置 Token, 写 =.travis.yml= 配置文件, 然后尝试构建。
+
+我就直接呈上 =.travis.yml= 配置文件内容了, 在注释里进行必要的解释。
+
+PS: 注释加的有点多, 配置文件显得有点冗长, 别害怕, 其实真的很简单的, 不带注释的参考源文件 [[https://github.com/demokn/blog/blob/master/.travis.yml][.travis.yml]].
+
+#+BEGIN_SRC yaml
+# Travis-CI 支持很多编程语言, 但永远不可能支持全部.
+# 就像本项目并不是依赖某种特定的语言, 而是基于 Emacs 的 Org-mode, 这也就要求我们要自己安装依赖.
+# language: minimal 和 language: generic 只是基于 Ubuntu 的基础镜像, 未对任何编程语言做特殊的定制和优化.
+# 详情可参见: https://docs.travis-ci.com/user/languages/minimal-and-generic/
+# 接下来，我们就要在此基础上自行安装依赖了
+languages: minimal
+
+git:
+  # 指定 git clone --depth=1, 默认是 50
+  # 详情参见: https://docs.travis-ci.com/user/customizing-the-build/#git-clone-depth
+  depth: 1
+
+branches:
+  # 指定仅当 master 分支上有新的提交时才执行构建
+  only:
+    - master
+
+# 自行安装依赖, 其实就是在 Ubuntu 上装个新版 Emacs 和 make 工具
+# 如果依赖安装失败, 构建过程也会立即中断
+# 详情参见: https://docs.travis-ci.com/user/customizing-the-build/#installing-a-second-programming-language
+# 详情参见: https://docs.travis-ci.com/user/job-lifecycle#the-job-lifecycle
+before_install:
+  - sudo add-apt-repository ppa:kelleyk/emacs -y
+  - sudo apt-get update -q
+  - sudo apt-get install emacs26 -y
+  - sudo apt-get install make
+
+# 跳过 Travis-CI 针对特定的语言自动安装依赖
+# 因为本项目不依赖于任何特定的语言, 依赖项我们自己安装了, 所以这里跳过以节省构建时间
+# 详情参见: https://docs.travis-ci.com/user/job-lifecycle#customizing-the-installation-phase
+install: skip
+
+# 正式开始执行项目构建, 上面已经介绍过了, 本项目只需简单的执行一个 make 命令即可
+# 详情参见: https://docs.travis-ci.com/user/job-lifecycle#customizing-the-build-phase
+script: make
+
+# 构建完成后自动部署项目
+# 同样 Travis-CI 支持部署到的平台有很多, 本项目只需部署到 GitHub Pages
+# 详情参见: https://docs.travis-ci.com/user/deployment/
+deploy:
+  # 指定部署到 GitHub Pages
+  # 详情参见: https://docs.travis-ci.com/user/deployment/pages/
+  provider: pages
+  # 如果设为false, Travis-CI 会删除构建过程中生成的所有文件.
+  # 我们的目的就是把生成的HTML文件上传到 GitHub Pages, 所以肯定是不希望被删除的.
+  skip_cleanup: true
+  # 配置访问 GitHub 的 Token
+  # 要想 Travis-CI 向 GitHub 仓库提交内容, 就需要配置一个 GitHub 的 personal access token
+  # 注意 Token 是绝对私密的东西, 一定要注意保密, 千万不能直接写死在公开仓库中
+  # $GITHUB_TOKEN 就是通过变量的形式获取在 Travis-CI 后台配置好的 Token, 以避免泄漏
+  github_token: $GITHUB_TOKEN
+  # 部署时是否保留提交历史记录, 如果为 false, 则每次部署都仅包含当前提交, 会用 git push --force 强制覆盖
+  keep_history: true
+  # 指定需要推送到 GitHub Pages 的文件目录, 默认就是当前项目根目录
+  local_dir: ./public
+  # 推送 local_dir 下的文件到 target_branch 指定的分支
+  # 因为本项目使用的是 project pages, 所以推送到 gh-pages 分支
+  target_branch: gh-pages
+#+END_SRC
+
+*** 参考
+
+1. [[https://github.com/nukc/how-to-use-travis-ci][如何简单入门使用Travis-CI持续集成]]
+
+2. [[https://juejin.im/post/5c52c47ae51d453f45615c41][Travis CI持续集成GitHub个人博客]]
+
+3. [[https://docs.travis-ci.com/user/tutorial/][Travis-CI 官方入门教程]]
+
+4. [[https://help.github.com/en/articles/about-github-pages][GitHub Pages 官方介绍]]
