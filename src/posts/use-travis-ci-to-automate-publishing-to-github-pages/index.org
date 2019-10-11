@@ -28,7 +28,6 @@
 - master: 项目源码, 包含构建脚本, Makefile, .travis.yml, org 格式文章等
 - gh-pages: 构建完成后的 HTML 等文件, 也即是 project pages 通过 =https://<user>.github.io/<project>= 访问时的默认分支
 
-
 *** Travis-CI 配置
 
 因为我也是第一次接触 =Travis-CI=, 只是经常有在开源库中看到过 =.travis.yml= 文件。
