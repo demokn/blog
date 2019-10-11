@@ -1,5 +1,12 @@
 languages: minimal
 
+git:
+  depth: 1
+
+branches:
+  only:
+    - master
+
 before_install:
   - sudo add-apt-repository ppa:kelleyk/emacs -y
   - sudo apt-get update -q
