@@ -44,7 +44,7 @@
   "项目发布根目录.")
 
 (defvar demo/project-html-head
-  "
+  "<link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\">
 <link rel=\"stylesheet\" href=\"https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css\">
 <link rel=\"stylesheet\" href=\"https://cdn.staticfile.org/font-awesome/5.11.2/css/all.min.css\">
 <link rel=\"stylesheet\" type=\"text/css\" href=\"https://fonts.googleapis.com/css?family=Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek\"/>
@@ -261,7 +261,7 @@
 
    (list "assets"
          :base-directory demo/project-src-root
-         :base-extension (regexp-opt '("jpg" "jpeg" "png" "gif" "svg" "css" "js"))
+         :base-extension (regexp-opt '("ico" "jpg" "jpeg" "png" "gif" "svg" "css" "js"))
          :recursive t
          :include '("CNAME")
 
