@@ -35,6 +35,9 @@
 ;;                 (demo/hash-for-filename (expand-file-name asset (org-publish-property :base-directory assets-project))))
 ;;       pub-asset pub-asset-relative-name)))
 
+(defvar demo/project-name "珊瑚礁上的程序员"
+  "项目/站点名称.")
+
 (defvar demo/project-src-root (expand-file-name "src/" (file-name-directory (or load-file-name buffer-file-name)))
   "项目源码根目录.")
 (defvar demo/project-pub-root (expand-file-name "public/" (file-name-directory (or load-file-name buffer-file-name)))
@@ -122,10 +125,11 @@
 
 (defun demo/org-publish-sitemap-publish-archive (title sitemap)
   "TITLE, SITEMAP."
-  (let* ((title "Blog Archive")
+  (let* ((title  (format "%s - Archive" demo/project-name))
          (posts (cdr sitemap))
          (posts (demo/org-publish-sitemap--valid-entries posts)))
-    (concat (format "#+TITLE: %s\n\n" title)
+    (concat (format "#+TITLE: %s\n#+KEYWORDS:%s, Archive\n#+OPTIONS: title:nil\n\n" title demo/project-name)
+            "#+HTML: <header><h1>Blog Archive</h1></header>"
             "\n#+begin_archive\n"
             (mapconcat (lambda (li)
                          (format "@@html:<li>@@ %s @@html:</li>@@" (car li)))
@@ -147,7 +151,7 @@
 
 (defun demo/org-publish-sitemap-publish-rss (title sitemap)
   "TITLE, SITEMAP."
-  (let* ((title "珊瑚礁上的程序员"))
+  (let* ((title demo/project-name))
     (concat (format "#+TITLE: %s\n\n" title)
             (org-list-to-subtree sitemap '(:icount "" :istart "")))))
 
@@ -242,7 +246,7 @@
 
          :section-numbers nil
          :with-toc nil
-         :with-title t
+         :with-title nil
          :with-author nil
          :with-creator nil
          :html-doctype "html5"
