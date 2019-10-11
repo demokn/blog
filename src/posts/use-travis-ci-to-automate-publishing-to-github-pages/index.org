@@ -7,6 +7,7 @@
 
 大致流程如下:
 
+#+ATTR_HTML: :class mx-auto d-block mw-100
 [[./github-travis-flow.png]]
 
 所谓借助 =Travis-CI= 自动构建，无非就是把原本需要自己手动执行的命令或脚本，
