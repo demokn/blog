@@ -5,10 +5,10 @@
 (require 'package)
 (package-initialize)
 (unless package-archive-contents
-  ;;(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
-  ;;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/") t)
-  (add-to-list 'package-archives '("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/") t)
+  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  ;; (add-to-list 'package-archives '("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/") t)
+  ;; (add-to-list 'package-archives '("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/") t)
   (package-refresh-contents))
 (dolist (pkg '(dash org-plus-contrib htmlize))
   (unless (package-installed-p pkg)
@@ -221,7 +221,7 @@
          :publishing-directory (demo/project-pub-path "posts")
          :publishing-function #'demo/org-rss-publish-to-rss
 
-         :html-link-home "http://demokn.com/posts/"
+         :html-link-home "https://demokn.com/posts/"
          :html-home/up-format ""
          :html-link-use-abs-url t
          :html-link-org-files-as-html t
