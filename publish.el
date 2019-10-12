@@ -72,7 +72,13 @@
     (buffer-string)))
 
 (defun demo/org-html-publish-site-to-html (plist filename pub-dir)
-  "PLIST, FILENAME, PUB-DIR."
+  "Publish site's non-post org file to HTML.
+
+FILENAME is the filename of the Org file to be published.  PLIST
+is the property list for the given project.  PUB-DIR is the
+publishing directory.
+
+Return output file name."
   (let* ((file-path (org-html-publish-to-html plist filename pub-dir)))
     (save-window-excursion
       (with-current-buffer (find-file-noselect file-path)
@@ -95,7 +101,13 @@
   (-filter (lambda (x) (car x)) entries))
 
 (defun demo/org-html-publish-post-to-html (plist filename pub-dir)
-  "PLIST, FILENAME, PUB-DIR."
+  "Publish site's post org file to HTML.
+
+FILENAME is the filename of the Org file to be published.  PLIST
+is the property list for the given project.  PUB-DIR is the
+publishing directory.
+
+Return output file name."
   (let* ((project (cons 'blog plist)))
     (plist-put plist
                :subtitle nil)
@@ -124,7 +136,11 @@
     file-path))
 
 (defun demo/org-publish-sitemap-publish-archive (title sitemap)
-  "TITLE, SITEMAP."
+  "Default posts archive site map, as a string.
+
+TITLE is the the title of the site map.  SITEMAP is an internal
+representation for the files to include, as returned by
+‘org-list-to-lisp’.  PROJECT is the current project."
   (let* ((title  (format "%s - Archive" demo/project-name))
          (posts (cdr sitemap))
          (posts (demo/org-publish-sitemap--valid-entries posts)))
@@ -138,25 +154,41 @@
             "\n#+end_archive\n")))
 
 (defun demo/org-publish-sitemap-format-archive-entry (entry style project)
-  "ENTRY, STYLE, PROJECT."
+  "Default format for posts archive site map ENTRY, as a string.
+
+ENTRY is a file name.  STYLE is the style of the sitemap.
+PROJECT is the current project."
   (format "@@html:<span class=\"archive-item\"><span class=\"archive-date\">@@ %s @@html:</span>@@ [[file:%s][%s]] @@html:</span>@@"
           (format-time-string "%h %d, %Y" (org-publish-find-date entry project))
           entry
           (org-publish-find-title entry project)))
 
 (defun demo/org-rss-publish-to-rss (plist filename pub-dir)
-  "PLIST, FILENAME, PUB-DIR."
+  "Publish an org file to RSS.
+
+FILENAME is the filename of the Org file to be published.  PLIST
+is the property list for the given project.  PUB-DIR is the
+publishing directory.
+
+Return output file name."
   (if (equal "rss.org" (file-name-nondirectory filename))
       (org-rss-publish-to-rss plist filename pub-dir)))
 
 (defun demo/org-publish-sitemap-publish-rss (title sitemap)
-  "TITLE, SITEMAP."
+  "Default posts rss site map, as a string.
+
+TITLE is the the title of the site map.  SITEMAP is an internal
+representation for the files to include, as returned by
+‘org-list-to-lisp’.  PROJECT is the current project."
   (let* ((title demo/project-name))
     (concat (format "#+TITLE: %s\n\n" title)
             (org-list-to-subtree sitemap '(:icount "" :istart "")))))
 
 (defun demo/org-publish-sitemap-format-rss-entry (entry style project)
-  "ENTRY, STYLE, PROJECT."
+  "Default format for posts rss site map ENTRY, as a string.
+
+ENTRY is a file name.  STYLE is the style of the sitemap.
+PROJECT is the current project."
   (cond ((not (directory-name-p entry))
          (let* ((file (org-publish--expand-file-name entry project))
                 (title (org-publish-find-title entry project))
