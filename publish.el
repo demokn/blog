@@ -373,7 +373,7 @@ Return output file name."
          :base-directory demo/project-src-root
          :base-extension (regexp-opt '("ico" "jpg" "jpeg" "png" "gif" "svg" "css" "js"))
          :recursive t
-         :include '("CNAME")
+         :include '("CNAME" "404.html")
 
          :publishing-directory demo/project-pub-root
          :publishing-function #'org-publish-attachment)
