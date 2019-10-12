@@ -7,5 +7,6 @@ build:
 clean:
 	rm -rf public/
 	rm -rf .org-timestamps/
-	rm src/posts/archive.org
-	rm src/posts/rss.org
+	rm -f src/sitemap.org
+	rm -f src/posts/archive.org
+	rm -f src/posts/rss.org

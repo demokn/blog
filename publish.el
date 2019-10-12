@@ -207,6 +207,60 @@ PROJECT is the current project."
          (file-name-nondirectory (directory-file-name entry)))
         (t entry)))
 
+(org-export-define-derived-backend 'demo/sitemap 'rss
+  :translate-alist
+  '((headline . demo/org-sitemap-headline)
+    (template . demo/org-sitemap-template)))
+
+(defun demo/org-sitemap-headline (headline contents info)
+  "Transcode HEADLINE element into sitemap format.
+
+CONTENTS is the headline contents.  INFO is a plist used as a
+communication channel."
+  (let* ((htmlext (plist-get info :html-extension))
+         (hl-number (org-export-get-headline-number headline info))
+         (hl-home (file-name-as-directory (plist-get info :html-link-home)))
+         (hl-pdir (plist-get info :publishing-directory))
+         (hl-perm (org-element-property :RSS_PERMALINK headline))
+         (publink
+          (or (and hl-perm (concat (or hl-home hl-pdir) hl-perm))
+              (concat
+               (or hl-home hl-pdir)
+               (file-name-nondirectory
+                (file-name-sans-extension
+                 (plist-get info :input-file))) "." htmlext)))
+         (moddate (format-time-string "%Y-%m-%d" (current-time))))
+    (format (concat
+             "<url>\n"
+             "<loc>%s</loc>\n"
+             "<lastmod>%s</lastmod>\n"
+             "</url>\n")
+            publink moddate)))
+
+(defun demo/org-sitemap-template (contents info)
+  "Return complete document string after SITEMAP conversion.
+
+CONTENTS is the transcoded contents string.  INFO is a plist used
+as a communication channel."
+  (concat
+   (format "<?xml version=\"1.0\" encoding=\"%s\"?>"
+           (symbol-name org-html-coding-system))
+   "\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
+   contents
+   "</urlset>"))
+
+(defun demo/org-sitemap-publish-to-sitemap (plist filename pub-dir)
+  "Publish org file to SITEMAP.
+
+FILENAME is the filename of the Org file to be published.  PLIST
+is the property list for the given project.  PUB-DIR is the
+publishing directory.
+
+Return output file name."
+  (if (equal "sitemap.org" (file-name-nondirectory filename))
+      (org-publish-org-to
+       'demo/sitemap filename ".xml" plist pub-dir)))
+
 (defvar demo/org-publish-project-alist
   (list
    (list "blog-posts"
@@ -272,6 +326,7 @@ PROJECT is the current project."
          :base-directory demo/project-src-root
          :base-extension "org"
          :recursive nil
+         :exclude (regexp-opt '("sitemap.org"))
 
          :publishing-directory demo/project-pub-root
          :publishing-function #'demo/org-html-publish-site-to-html
@@ -291,6 +346,29 @@ PROJECT is the current project."
          :html-postamble t
          :html-postamble-format (demo--pre/postamble-format 'postamble))
 
+   (list "sitemap"
+         :base-directory demo/project-src-root
+         :base-extension "org"
+         :recursive t
+         :exclude (regexp-opt '("drafts/" "posts/rss.org" "sitemap.org"))
+
+         :publishing-directory demo/project-pub-root
+         :publishing-function #'demo/org-sitemap-publish-to-sitemap
+
+         :html-link-home "https://demokn.com/"
+         :html-home/up-format ""
+         :html-link-use-abs-url t
+         :html-link-org-files-as-html t
+
+         :auto-sitemap t
+         :sitemap-style 'list
+         :sitemap-title nil
+         :sitemap-sort-folders 'ignore
+         :sitemap-sort-files 'anti-chronologically
+         :sitemap-ignore-case nil
+         :sitemap-function #'demo/org-publish-sitemap-publish-rss
+         :sitemap-format-entry #'demo/org-publish-sitemap-format-rss-entry)
+
    (list "assets"
          :base-directory demo/project-src-root
          :base-extension (regexp-opt '("ico" "jpg" "jpeg" "png" "gif" "svg" "css" "js"))
@@ -301,7 +379,7 @@ PROJECT is the current project."
          :publishing-function #'org-publish-attachment)
 
    (list "all"
-         :components '("blog-posts" "blog-rss" "site" "assets"))))
+         :components '("blog-posts" "blog-rss" "site" "sitemap" "assets"))))
 
 (defun demo/org-publish-all ()
   "发布博客."
