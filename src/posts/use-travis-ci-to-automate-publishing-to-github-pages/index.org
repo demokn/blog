@@ -1,4 +1,5 @@
 #+TITLE: 使用 Travis-CI 自动化部署 GitHub Pages
+#+KEYWORDS: 珊瑚礁上的程序员, 持续集成, 持续发布, 自动部署, Travis-CI, GitHub Pages
 #+DATE: <2019-10-11 Fri>
 
 一直听闻 =持续集成= 的大名, 这次借着在 =GitHub Pages= 部署博客来体验一下。
