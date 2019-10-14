@@ -10,3 +10,6 @@ clean:
 	rm -f src/sitemap.org
 	rm -f src/posts/archive.org
 	rm -f src/posts/rss.org
+
+serve:
+	php -S 0.0.0.0:8001 -t public/
