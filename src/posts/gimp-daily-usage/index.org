@@ -1,0 +1,89 @@
+#+TITLE: GIMP 日常应用
+#+KEYWORDS: 珊瑚礁上的程序员, GIMP 教程, GIMP 应用
+
+#+BEGIN_VERSE
+/[[https://www.gimp.org/][GIMP]]/ means *GNU Image Manipulation Program*.
+
+/And also is/ *The Free & Open Source Image Editor*.
+#+END_VERSE
+
+*** 剪切并校正使用手机拍摄的证件照片
+
+*应用场景：*
+
+要复印身份证，可身边只有一台小型打印机，不支持复印。
+于是就需要 =从手机拍摄的照片中提取身份证= ，再进行简单的矫正后导出。
+然后在 =Word= 中排版并打印。
+
+*处理效果：*
+
+下面依次为原图、单纯提取后的图、和提取并修正后的图（身份证由公交卡代替）:
+
+#+BEGIN_EXPORT html
+<div class="row">
+<figure class="col-md-4 col-6">
+  <img src="./20191015-01-original-photo.jpg" class="col-8 d-block mx-auto" alt="手机拍摄原图" title="手机拍摄原图">
+</figure>
+<figure class="col-md-4 col-6">
+  <img src="./20191015-01-after-cut.jpg" class="col-8 d-block mx-auto" alt="单纯提取后的图" title="单纯提取后的图">
+</figure>
+<figure class="col-md-4 col-6">
+  <img src="./20191015-01-after-cut-and-fix.jpg" class="col-8 d-block mx-auto" alt="提取并修正后的图" title="提取并修正后的图">
+</figure>
+</div>
+#+END_EXPORT
+
+*操作步骤：*
+1. 描点选中卡片整体轮廓
+
+   使用 =自由选区(套索)= 工具, 沿着图中卡片边界描画出卡片的轮廓, 按 =Enter= 键确认选中;
+
+   #+ATTR_HTML: :class d-block mw-100 mx-auto
+   [[./20191015-01-step-1.jpg]]
+
+2. 增加透明图层
+
+   依次点击菜单栏 =图层= > =透明= > =添加透明通道= ;
+
+3. 删除卡片轮廓外的所有内容
+
+   =选择= > =反选=: 步骤1中已经选中了卡片区域, 通过反选来实现选中卡片以外的其他部分;
+
+   =编辑= > =清除=: 删除卡片以外的所有部分, 步骤2中已经添加了透明图层, 所以删除后的区域全部变为透明部分;
+
+   #+ATTR_HTML: :class d-block mw-100 mx-auto
+   [[./20191015-01-step-2.jpg]]
+
+4. 再次反选选中卡片整体轮廓
+
+   =选择= > =反选=: 再次使用反选, 选中步骤1中选中的卡片区域;
+
+5. 卡片校正
+
+   使用 =透视= 工具, 按住其四个角进行拖动, 多次重复直到将卡片变换为卡片本身的方形, 按 =Enter= 键确认变换;
+
+   #+ATTR_HTML: :class d-block mw-100 mx-auto
+   [[./20191015-01-step-3.jpg]]
+
+6. 删除卡片区域以外多余的透明部分
+
+   方形校正完成后, 可能会存在多余的透明图层, 需要将其删除, 只保留卡片本身的部分;
+
+   =编辑= > =复制=: 因卡片区域一直在选中状态, 直接复制的就是调整后的卡片区域;
+
+   =文件= > =新建= > =从剪贴板=: 此操作是新建一个Tab, 编辑剪贴板中复制的内容/区域, 而图层的大小和剪贴板复制区域的大小完全一致;
+
+7. 导出或保存即可
+
+   =文件= > =导出为= > 选择你需要的格式
+
+8. 正反面都处理后, 在 =Word= 文档中排版后直接打印即可
+
+   温馨提示: 二代身份证的尺寸约是 8.56cm x 5.40cm(长x宽)
+
+   最后再放上处理前后在 =Word= 中的对比差异图:
+
+   #+ATTR_HTML: :class d-block mw-100 mx-auto
+   [[./20191015-01-compare-in-word-document.jpg]]
+
+*** To be continued...
