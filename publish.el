@@ -47,7 +47,7 @@
   "<link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\">
 <link rel=\"stylesheet\" href=\"https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css\">
 <link rel=\"stylesheet\" href=\"https://cdn.staticfile.org/font-awesome/5.11.2/css/all.min.css\">
-<link rel=\"stylesheet\" type=\"text/css\" href=\"https://fonts.googleapis.com/css?family=Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek\"/>
+<link rel=\"stylesheet\" type=\"text/css\" href=\"https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek\"/>
 <link rel=\"stylesheet\" href=\"/assets/css/site.css\">
 ")
 
