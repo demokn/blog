@@ -21,14 +21,14 @@
 
 #+BEGIN_EXPORT html
 <div class="row">
-<figure class="col-md-4 col-6">
-  <img src="./20191015-01-original-photo.jpg" class="col-8 d-block mx-auto" alt="手机拍摄原图" title="手机拍摄原图">
+<figure class="col-4">
+  <img src="./20191015-01-original-photo.jpg" class="col-md-8 d-block mx-auto" alt="手机拍摄原图" title="手机拍摄原图">
 </figure>
-<figure class="col-md-4 col-6">
-  <img src="./20191015-01-after-cut.jpg" class="col-8 d-block mx-auto" alt="单纯提取后的图" title="单纯提取后的图">
+<figure class="col-4">
+  <img src="./20191015-01-after-cut.jpg" class="col-md-8 d-block mx-auto" alt="单纯提取后的图" title="单纯提取后的图">
 </figure>
-<figure class="col-md-4 col-6">
-  <img src="./20191015-01-after-cut-and-fix.jpg" class="col-8 d-block mx-auto" alt="提取并修正后的图" title="提取并修正后的图">
+<figure class="col-4">
+  <img src="./20191015-01-after-cut-and-fix.jpg" class="col-md-8 d-block mx-auto" alt="提取并修正后的图" title="提取并修正后的图">
 </figure>
 </div>
 #+END_EXPORT
@@ -85,5 +85,59 @@
 
    #+ATTR_HTML: :class d-block mw-100 mx-auto
    [[./20191015-01-compare-in-word-document.jpg]]
+
+*** 制作九宫格大头贴
+*应用场景*
+
+经常看到朋友圈有人晒九宫格大头贴，虽然咱不晒，但保不齐哪天你有了女朋友呢？
+
+*处理效果*
+
+#+ATTR_HTML: :class d-block mw-100 mx-auto
+[[./20191016-01-after-slice.png]]
+
+*操作步骤*
+
+1. 打开女朋友发你的照片，切出一个 =正方形=
+   为什么要用方形的，因为朋友圈的图片是正方形的缩略图
+
+   =图像= > =缩放图像=, 调整高宽中较小的那个，调整为一个易计算的整数, 比如本例中高度调整为的 =600px= ；
+
+   #+ATTR_HTML: :class d-block mw-100 mx-auto :alt 缩放图像 :title 缩放图像
+   [[./20191016-01-step-1.png]]
+
+   调整完成后，复制当前图像；
+
+   =文件= > =新建=, 创建一个新的图像编辑Tab, 高宽设置为 =600x600px= ；
+
+   #+ATTR_HTML: :class d-block mw-100 mx-auto :alt 新建图像 :title 新建图像
+   [[./20191016-01-step-2.png]]
+
+   粘贴复制的图片到新的图像编辑窗口，拖动图片到合适的位置；
+
+   =图层= > =固定图层=, 将图片固定到 =600x600px= 的图层上；
+
+   #+ATTR_HTML: :class d-block mw-100 mx-auto :alt 固定图层 :title 固定图层
+   [[./20191016-01-step-3.png]]
+
+   至此, 正方形图片剪切完成。
+   如果不怕手抖的话，也可以直接在原图上用 =矩形选择工具= 圈出一个你想要的正方形；
+   然后复制选中内容，点击 =文件= > =新建= > =剪贴板= ，创建一个新的包含选中方形区域图片的编辑窗口。
+
+1. 创建标记切割位置的 =参考线=
+   =图像= > =参考线= > =新建参考线=, 需要创建4条，位置分别为 =水平200px=, =水平400px=, =垂直200px=, =垂直400px=;
+
+   当然也可以通过 =新建参考线 (按百分比)= 的方式创建参考线, 位置分别为 =水平33.33%=, =水平66.66%=, =垂直33.33%=, =垂直66.66%=;
+
+   或者直接从主编辑区的上方和左方的标尺位置拖出这几条线;
+
+   #+ATTR_HTML: :class d-block mw-100 mx-auto :alt 添加参考线 :title 添加参考线
+   [[./20191016-01-step-4.png]]
+
+1. 按照添加好的参考线切割并导出
+   =滤镜= > =网络= > =切片=, 选好导出目录确定即可;
+
+   #+ATTR_HTML: :class d-block mw-100 mx-auto :alt 切片导出 :title 切片导出
+   [[./20191016-01-step-5.png]]
 
 *** To be continued...
