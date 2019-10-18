@@ -86,7 +86,6 @@ ul.share-buttons li {
     /* Remove Handlee and keep Libre Baskerville if you want something less*/
     /* fancy and maybe more readable. */
     font-family: Libre Baskerville;
-    color: #125;
 }
 #postamble > footer {
     width: 40%;
