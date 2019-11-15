@@ -1,0 +1,118 @@
+#+TITLE: 通过 Chrome Console 填写表单内容未生效
+#+KEYWORDS: 珊瑚礁上的程序员, Chrome Console, React, Javascript, Autofill, Event Bubbles
+#+DATE: <2019-11-15 Fri>
+
+出于某些原因，需要通过浏览器插件的方式实现自动登录某平台。
+这里选择 =Google Chrome= 浏览器。
+
+方案设想很简单，无非就是通过 JS 找到表单元素，自动填入用户名、密码，再触发一下登录按钮的 click 事件。完事。
+
+在开始写插件之前，总要先通过 =Chrome Console= 验证一下方案的可行性吧。代码也是相当简单。
+
+#+BEGIN_SRC javascript
+$("#username").value = "USERNAME"
+$("#password").value = "PASSWORD"
+$("#submit").click()
+#+END_SRC
+
+然而，“卧槽，无情” 的一幕出现了，页面上竟然提示我 “请输入账号”。
+可明明已经给你赋值了呀，输入框里不还填充着明明赋值的内容呢，难道你是盲僧吗？
+
+#+ATTR_HTML: :class d-block mw-100 mx-auto :alt 页面提示请输入账号 :title 页面提示请输入账号
+[[./页面提示请输入账号.png]]
+
+没办法，只能开启我的漫漫 debug 之路了。
+
+- 手动输入用户名密码，手动点击登录； *成功*
+- 手动输入用户名密码，脚本触发登录； *成功*
+- 脚本输入用户名密码，手动点击登录； *失败*
+- 使用其他网站(我用的 =GitHub=)尝试，脚本输入用户名密码，脚本触发登录； *成功了，成功了，成功了*
+
+- 脚本输入用户名密码，并分别点击用户名密码输入框，使其获取焦点，手动点击登录； *失败*
+- 脚本输入用户名密码，并分别点击用户名密码输入框，并再追加输入内容，手动点击登录； *成功*
+- 脚本输入用户名密码，并分别点击用户名密码输入框，并再追加输入内容，脚本点击登录； *成功*
+
+哦，对了，还有一种成功的情况是使用浏览器的密码自动填充功能，也是可以正常登录的。
+
+根据以上测试情况，初步猜想应该是使用脚本直接赋值的时候，输入框DOM元素上的某个事件没触发。
+
+接着，用 Chrome 开发者工具的 =search= 功能，查找报错内容 “请输入账号”，找到了定义在某个js文件里的代码:
+
+#+BEGIN_SRC javascript
+_this.validation = {
+  login: [{ f: _validator.isEmpty, msg: '请输入账号' }],
+  password: [{ f: _validator.isEmpty, msg: '请输入密码' }],
+};
+#+END_SRC
+
+继续猜测，报错“请输入账号”是因为验证器为空，验证器为空的原因应该是验证方法没有执行，
+而验证方法没被执行的原因还是因为没有监听到某个指定的事件。
+至于到底是什么事件，我也不知道，也没从代码里找到什么有用的线索。
+不过倒是从代码里看出这是用 =react= 框架写的，在后面google的时候也算是一个用得到的关键词吧。
+
+接下来就是通过 =Chrome Console= 脚本触发事件，逐一验证了。
+根据上面的测试结果 =脚本输入用户名密码，并分别点击用户名密码输入框，并再追加输入内容，手动点击登录； 成功= 。
+我选择了几个可能性比较大的事件： =onchange, oninput, onkeydown, onkeyup, onkeypress= 。
+测试代码如下：
+
+#+BEGIN_SRC javascript
+var change = document.createEvent("HTMLEvents")
+change.initEvent("change")
+
+var input = document.createEvent("HTMLEvents")
+input.initEvent("input")
+
+var focus = document.createEvent("HTMLEvents")
+focus.initEvent("focus")
+
+var blur = document.createEvent("HTMLEvents")
+blur.initEvent("blur")
+
+var keydown = document.createEvent("KeyboardEvent")
+keydown.initKeyboardEvent("keydown")
+
+var keyup = document.createEvent("KeyboardEvent")
+keyup.initKeyboardEvent("keyup")
+
+var keypress = document.createEvent("KeyboardEvent")
+keypress.initKeyboardEvent("keypress")
+
+var el = $("#username")
+el.value = "USERNAME"
+el.dispatchEvent(change)
+el.dispatchevent(input)
+el.dispatchEvent(keydown)
+el.dispatchEvent(keyup)
+el.dispatchEvent(keypress)
+#+END_SRC
+
+然而，又是“卧槽，无情”的一幕，还是不行。
+
+继续尝试，google，尝试，此处省略半小时。。。
+
+最终发现，确实是 =oninput= 事件的问题，至于上面的事件测试中明明有 =oninput= 事件，
+确没生效的原因是初始化事件时，没有明确指定事件的冒泡属性为 true，即 =input.initEvent("input", {bubbles: true})= 。
+至于，这之中涉及到的 DOM事件, 事件监听, 事件触发, 事件冒泡 和 React组件State 等，我也不是专业前端，很难讲明白，有兴趣的就自行 google 吧。
+
+完整的代码如下：
+
+#+BEGIN_SRC javascript
+var input = document.createEvent("HTMLEvents")
+input.initEvent("input")
+
+$("#username").value = "USERNAME"
+$("#username").dispatchEvent(input)
+$("#password").value = "PASSWORD"
+$("#password").dispatchEvent(input)
+$("#submit").click()
+#+END_SRC
+
+**** 参考
+
+     1. [[https://www.runoob.com/jsref/dom-obj-event.html][HTML DOM 事件]]
+
+     2. [[https://stackoverflow.com/questions/41166005/modify-react-components-state-using-jquery-plain-javascript-from-chrome-extensi][Modify React Component's State using jQuery/Plain Javascript from Chrome Extension]]
+
+     3. [[https://stackoverflow.com/questions/50035325/filling-a-react-form-from-the-google-chrome-console][Filling a react form from the Google Chrome console]]
+
+     4. [[https://javascript.info/bubbling-and-capturing][Event bubbling and capturing]]
