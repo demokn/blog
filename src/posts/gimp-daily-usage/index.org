@@ -1,5 +1,6 @@
 #+TITLE: GIMP 日常应用
 #+KEYWORDS: 珊瑚礁上的程序员, GIMP 教程, GIMP 应用
+#+DATE: <2019-11-15 Fri>
 
 #+BEGIN_VERSE
 /[[https://www.gimp.org/][GIMP]]/ means *GNU Image Manipulation Program*.
