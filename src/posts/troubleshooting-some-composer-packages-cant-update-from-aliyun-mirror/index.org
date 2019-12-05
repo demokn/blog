@@ -1,0 +1,183 @@
+#+TITLE: 项目中个别 Composer 依赖包安装版本与已发布最新版不符且无法更新的问题
+#+KEYWORDS: composer
+#+DATE: <2019-12-05 Thu>
+
+项目中使用了 `overtrue/wechat` 微信开发相关SDK包，最近需要用的个别接口，SDK中竟然没有封装。
+想想应该不会呀，毕竟这个包这么好用，而且开发一直很活跃。
+
+下面以 开放平台 > 第三方平台 > [[https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Mini_Programs/code/query_quota.html][查询服务商的当月提审限额(quota)和加急次数]] 接口为例。
+
+- 在本地项目中全局搜了一下接口请求地址 `wxa/queryquota`，确实没有搜到；
+- 更新一下本地的包 `composer update overtrue/wechat -vvv` ， 再搜一遍，依旧没有；（新接口还没接入？）
+- 在该包的 [[https://github.com/overtrue/wechat][Github 仓库]] 同样也搜一下接口请求地址，竟然搜到了；（新增的代码还没发布？）
+- 切换到该包的 [[https://github.com/overtrue/wechat/tree/4.2.11][最新Tag 4.2.11]], 这段代码依旧存在，说明已经发布了啊；
+- 再到 [[https://packagist.org/packages/overtrue/wechat][packagist.org]] 确认一下，该包的最新稳定版确实是 4.2.11 啊，确认已经成功发布了；
+
+那就说明是我本地代码的问题了，继续排查本地
+
+- 查看 `composer.json` 中指定的包版本是 `"overtrue/wechat": "^4.2"` ，这也没毛病啊；
+- 查看 `composer.lock` 中安装的具体版本是 `"version": "4.3.0"` ，这下把我整懵了（哪来的 4.3.0 的版本？比Github上的最新版还要新？）；
+- 再看 `composer.lock` ， `"time": "2019-08-13T11:53:50+00:00"` 表示本地安装版本的最后更新时间是 `2019-08-13` ，这也不对啊，最新版4.2.11的最后更新时间是 `2019-11-27` 才对；
+- 再看 `composer.lock` ， `"reference": "426ea825664bcb1078f59a060ac07645e1e6fd9f"` 表示本地安装版本的 `commit hash` 是 `426ea825664bcb1078f59a060ac07645e1e6fd9f` ，这和仓库中的最新版的 commit hash 也对不上；
+- 在Github仓库中查了一下这个 commit hash [[https://github.com/overtrue/wechat/tree/426ea825664bcb1078f59a060ac07645e1e6fd9f][426ea825664bcb1078f59a060ac07645e1e6fd9f]], 确实查到了, 而且更新时间也跟这个 commit hash 对上了；
+- 因为本地使用的是 [[https://developer.aliyun.com/composer][阿里云的composer镜像]] ，就怀疑是不是镜像出了问题；那就试试从源码更新 `composer update overtrue/wechat --prefer-source -vvv` ，更新后还是没变化；
+- 删除本地已安装的代码 `rm -rf vendor/overtrue` ，再试一次从源码更新 `composer update overtrue/wechat --prefer-source -vvv` ，成功安装了 4.2.11 的版本，`composer.lock` 中显示的最后更新时间和commit hash都对上了，新接口相关的代码也出现了；
+- 然后又试了一下，删除本地已安装的代码，还是从镜像安装 `composer update overtrue/wechat -vvv` ，依旧成功安装了 4.2.11 的版本；
+- 至此，问题解决，原因不详~
+
+贴一下成功前后的 `composer.lock` 关于该包的信息描述。
+
+*更新成功前：*
+#+BEGIN_SRC json
+{
+    "name": "overtrue/wechat",
+    "version": "4.3.0",
+    "source": {
+        "type": "git",
+        "url": "https://github.com/overtrue/wechat.git",
+        "reference": "426ea825664bcb1078f59a060ac07645e1e6fd9f"
+    },
+    "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/overtrue/wechat/zipball/426ea825664bcb1078f59a060ac07645e1e6fd9f",
+        "reference": "426ea825664bcb1078f59a060ac07645e1e6fd9f",
+        "shasum": "",
+        "mirrors": [
+            {
+                "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                "preferred": true
+            }
+        ]
+    },
+    "require": {
+        "easywechat-composer/easywechat-composer": "^1.1",
+        "ext-fileinfo": "*",
+        "ext-openssl": "*",
+        "ext-simplexml": "*",
+        "guzzlehttp/guzzle": "^6.2",
+        "monolog/monolog": "^1.22",
+        "overtrue/socialite": "~2.0",
+        "php": ">=7.1",
+        "pimple/pimple": "^3.0",
+        "psr/simple-cache": "^1.0",
+        "symfony/cache": "^3.3 || ^4.3",
+        "symfony/http-foundation": "^2.7 || ^3.0 || ^4.0",
+        "symfony/psr-http-message-bridge": "^0.3 || ^1.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.15",
+        "mikey179/vfsstream": "^1.6",
+        "mockery/mockery": "^1.0",
+        "phpstan/phpstan": "^0.11.12",
+        "phpunit/phpunit": "~6.5",
+        "symfony/event-dispatcher": "^4.0"
+    },
+    "suggest": {
+        "symfony/event-dispatcher": "Required to use EasyWeChat events component (^4.0)."
+    },
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "EasyWeChat\\": "src/"
+        },
+        "files": [
+            "src/Kernel/Support/Helpers.php",
+            "src/Kernel/Helpers.php"
+        ]
+    },
+    "notification-url": "https://packagist.org/downloads/",
+    "license": [
+        "MIT"
+    ],
+    "authors": [
+        {
+            "name": "overtrue",
+            "email": "anzhengchao@gmail.com"
+        }
+    ],
+    "description": "微信SDK",
+    "keywords": [
+        "sdk",
+        "wechat",
+        "weixin",
+        "weixin-sdk"
+    ],
+    "time": "2019-08-13T11:53:50+00:00"
+}
+#+END_SRC
+
+*更新成功后：*
+#+BEGIN_SRC json
+{
+    "name": "overtrue/wechat",
+    "version": "4.2.11",
+    "source": {
+        "type": "git",
+        "url": "https://github.com/overtrue/wechat.git",
+        "reference": "853e0772e6aa53a71edf1b5d251c7ff1e6b2a2bf"
+    },
+    "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/overtrue/wechat/zipball/853e0772e6aa53a71edf1b5d251c7ff1e6b2a2bf",
+        "reference": "853e0772e6aa53a71edf1b5d251c7ff1e6b2a2bf",
+        "shasum": "",
+        "mirrors": [
+            {
+                "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                "preferred": true
+            }
+        ]
+    },
+    "require": {
+        "easywechat-composer/easywechat-composer": "^1.1",
+        "ext-fileinfo": "*",
+        "ext-openssl": "*",
+        "ext-simplexml": "*",
+        "guzzlehttp/guzzle": "^6.2",
+        "monolog/monolog": "^1.22 || ^2.0",
+        "overtrue/socialite": "~2.0",
+        "php": ">=7.1",
+        "pimple/pimple": "^3.0",
+        "psr/simple-cache": "^1.0",
+        "symfony/cache": "^3.3 || ^4.3",
+        "symfony/event-dispatcher": "^4.3",
+        "symfony/http-foundation": "^2.7 || ^3.0 || ^4.0",
+        "symfony/psr-http-message-bridge": "^0.3 || ^1.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.15",
+        "mikey179/vfsstream": "^1.6",
+        "mockery/mockery": "^1.2.3",
+        "phpstan/phpstan": "^0.11.12",
+        "phpunit/phpunit": "^7.5"
+    },
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "EasyWeChat\\": "src/"
+        },
+        "files": [
+            "src/Kernel/Support/Helpers.php",
+            "src/Kernel/Helpers.php"
+        ]
+    },
+    "notification-url": "https://packagist.org/downloads/",
+    "license": [
+        "MIT"
+    ],
+    "authors": [
+        {
+            "name": "overtrue",
+            "email": "anzhengchao@gmail.com"
+        }
+    ],
+    "description": "微信SDK",
+    "keywords": [
+        "sdk",
+        "wechat",
+        "weixin",
+        "weixin-sdk"
+    ],
+    "time": "2019-11-27T16:38:00+00:00"
+}
+#+END_SRC
