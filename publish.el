@@ -182,7 +182,7 @@ representation for the files to include, as returned by
 ‘org-list-to-lisp’.  PROJECT is the current project."
   (let* ((title demo/project-name))
     (concat (format "#+TITLE: %s\n\n" title)
-            (org-list-to-subtree sitemap '(:icount "" :istart "")))))
+            (org-list-to-subtree sitemap '()))))
 
 (defun demo/org-publish-sitemap-format-rss-entry (entry style project)
   "Default format for posts rss site map ENTRY, as a string.
@@ -199,7 +199,7 @@ PROJECT is the current project."
              (org-set-property "RSS_PERMALINK" link)
              (org-set-property "PUBDATE" date)
              ;; To avoid second update to rss.org by org-icalendar-create-uid
-             (org-id-get-create)
+             ;; (org-id-get-create)
              (insert-file-contents file)
              (buffer-string))))
         ((eq style 'tree)
