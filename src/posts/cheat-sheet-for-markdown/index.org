@@ -3,5 +3,9 @@
 #+DATE: <2020-01-06 Mon>
 
 #+BEGIN_EXPORT html
-<embed src="markdown_cheat_sheet_opensource.com.pdf" class="w-100" style="min-height: 100vh" />
+<object data="markdown_cheat_sheet_opensource.com.pdf" type="application/pdf" class="w-100" style="min-height: 100vh">
+  <p>Your web browser doesn't have a PDF plugin.
+  Instead you can <a href="markdown_cheat_sheet_opensource.com.pdf" download>click here</a>
+  to download the PDF file.</p>
+</object>
 #+END_EXPORT
