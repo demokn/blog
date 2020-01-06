@@ -371,7 +371,7 @@ Return output file name."
 
    (list "assets"
          :base-directory demo/project-src-root
-         :base-extension (regexp-opt '("ico" "jpg" "jpeg" "png" "gif" "svg" "css" "js"))
+         :base-extension (regexp-opt '("ico" "jpg" "jpeg" "png" "gif" "svg" "css" "js" "pdf"))
          :recursive t
          :include '("CNAME" "robots.txt" "404.html")
 
