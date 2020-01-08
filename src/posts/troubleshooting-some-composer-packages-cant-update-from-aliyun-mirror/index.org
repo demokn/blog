@@ -1,5 +1,5 @@
-#+TITLE: 项目中个别 Composer 依赖包安装版本与已发布最新版不符且无法更新的问题
-#+KEYWORDS: composer, overtrue/wechat, 版本不符
+#+TITLE: Composer 依赖包安装版本与已发布最新版不符且无法更新
+#+KEYWORDS: 珊瑚礁上的程序员, composer, overtrue/wechat, 版本不符
 #+DATE: <2019-12-05 Thu>
 
 项目中使用了 =overtrue/wechat= 微信开发相关SDK包，最近需要用的个别接口，SDK中竟然没有封装。
