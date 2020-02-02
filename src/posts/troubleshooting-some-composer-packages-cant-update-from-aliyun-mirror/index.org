@@ -17,11 +17,11 @@
 
 - 查看 =composer.json= 中指定的包版本是 ="overtrue/wechat": "^4.2"= ，这也没毛病啊；
 - 查看 =composer.lock= 中安装的具体版本是 ="version": "4.3.0"= ，这下把我整懵了（哪来的 4.3.0 的版本？比Github上的最新版还要新？）；
-- 再看 =composer.lock= ， ="time": "2019-08-13T11:53:50+00:00"= 表示本地安装版本的最后更新时间是 =2019-08-13= ，这也不对啊，最新版4.2.11的最后更新时间是 =2019-11-27= 才对；
-- 再看 =composer.lock= ， ="reference": "426ea825664bcb1078f59a060ac07645e1e6fd9f"= 表示本地安装版本的 =commit hash= 是 =426ea825664bcb1078f59a060ac07645e1e6fd9f= ，这和仓库中的最新版的 commit hash 也对不上；
+- 再看 =composer.lock= ， ="time": "2019-08-13T11:53:50+00:00"= 表示本地安装版本的最后更新时间，这也不对啊，最新版4.2.11的最后更新时间是 =2019-11-27= 才对；
+- 再看 =composer.lock= ， ="reference": "426ea825664bcb1078f59a060ac07645e1e6fd9f"= 表示本地安装版本的 =commit hash= ，这和仓库中的最新版的 commit hash 也对不上；
 - 在Github仓库中查了一下这个 commit hash [[https://github.com/overtrue/wechat/tree/426ea825664bcb1078f59a060ac07645e1e6fd9f][426ea825664bcb1078f59a060ac07645e1e6fd9f]], 确实查到了, 而且更新时间也跟这个 commit hash 对上了；
 - 因为本地使用的是 [[https://developer.aliyun.com/composer][阿里云的composer镜像]] ，就怀疑是不是镜像出了问题；那就试试从源码更新 =composer update overtrue/wechat --prefer-source -vvv= ，更新后还是没变化；
-- 删除本地已安装的代码 =rm -rf vendor/overtrue= ，再试一次从源码更新 =composer update overtrue/wechat --prefer-source -vvv= ，成功安装了 4.2.11 的版本，=composer.lock= 中显示的最后更新时间和commit hash都对上了，新接口相关的代码也出现了；
+- 删除本地已安装的代码 =rm -rf vendor/overtrue= ，再试一次从源码更新 =composer update overtrue/wechat --prefer-source -vvv= ，成功安装了 4.2.11 的版本， =composer.lock= 中显示的最后更新时间和commit hash都对上了，新接口相关的代码也出现了；
 - 然后又试了一下，删除本地已安装的代码，还是从镜像安装 =composer update overtrue/wechat -vvv= ，依旧成功安装了 4.2.11 的版本；
 - 至此，问题解决，原因不详~
 
