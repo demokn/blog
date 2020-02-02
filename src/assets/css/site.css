@@ -158,3 +158,12 @@ div.outline-2, div.outline-3 {
     font-style: italic;
     font-size: xx-small;
 }
+
+.org-src-container > pre {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+div.info > p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
