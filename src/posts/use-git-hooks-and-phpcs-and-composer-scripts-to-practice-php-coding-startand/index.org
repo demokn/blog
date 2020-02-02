@@ -31,49 +31,49 @@
     废话不多说，直接上代码吧。 以下为 =.git/hooks/pre-commit= 的代码：
 
     #+BEGIN_SRC sh
-  #!/bin/sh
+      #!/bin/sh
 
-  PROJECT=`php -r "echo dirname(dirname(dirname(realpath('$0'))));"`
-  STAGED_FILES_CMD=`git diff --cached --name-only --diff-filter=ACMR HEAD | grep \\\\.php`
+      PROJECT=`php -r "echo dirname(dirname(dirname(realpath('$0'))));"`
+      STAGED_FILES_CMD=`git diff --cached --name-only --diff-filter=ACMR HEAD | grep \\\\.php`
 
-  # Determine if a file list is passed
-  if [ "$#" -eq 1 ]
-  then
-      oIFS=$IFS
-      IFS='
-      '
-      SFILES="$1"
-      IFS=$oIFS
-  fi
-  SFILES=${SFILES:-$STAGED_FILES_CMD}
-
-  echo "Checking PHP Lint..."
-  for FILE in $SFILES
-  do
-      php -l -d display_errors=0 $PROJECT/$FILE
-      if [ $? != 0 ]
+      # Determine if a file list is passed
+      if [ "$#" -eq 1 ]
       then
-          echo "Fix the error before commit."
-          exit 1
+          oIFS=$IFS
+          IFS='
+          '
+          SFILES="$1"
+          IFS=$oIFS
       fi
-      FILES="$FILES $PROJECT/$FILE"
-  done
+      SFILES=${SFILES:-$STAGED_FILES_CMD}
 
-  if [ "$FILES" != "" ]
-  then
-      echo "Running Code Sniffer..."
-      ./vendor/bin/phpcs $FILES
-      if [ $? != 0 ]
+      echo "Checking PHP Lint..."
+      for FILE in $SFILES
+      do
+          php -l -d display_errors=0 $PROJECT/$FILE
+          if [ $? != 0 ]
+          then
+              echo "Fix the error before commit."
+              exit 1
+          fi
+          FILES="$FILES $PROJECT/$FILE"
+      done
+
+      if [ "$FILES" != "" ]
       then
-          echo "Fix the error before commit!"
-          echo "Run"
-          echo "  ./vendor/bin/phpcbf $FILES"
-          echo "for automatic fix or fix it manually."
-          exit 1
+          echo "Running Code Sniffer..."
+          ./vendor/bin/phpcs $FILES
+          if [ $? != 0 ]
+          then
+              echo "Fix the error before commit!"
+              echo "Run"
+              echo "  ./vendor/bin/phpcbf $FILES"
+              echo "for automatic fix or fix it manually."
+              exit 1
+          fi
       fi
-  fi
 
-  exit $?
+      exit $?
     #+END_SRC
 
     通过代码也能看出，我们直接使用了当前项目中的 =./vendor/bin/phpcs=, 即需要我们在项目中加载 =PHP_CodeSniffer= 包。
@@ -97,13 +97,13 @@
     2. 编辑项目中的 =composer.json= 文件：
 
     #+BEGIN_SRC json
-  {
-      "scripts": {
-          "post-install-cmd": [
-              "php -r \"is_dir('.git/hooks') && !is_file('.git/hooks/pre-commit') && copy('.git-pre-commit', '.git/hooks/pre-commit') && chmod('.git/hooks/pre-commit', 0755);\""
-          ]
+      {
+          "scripts": {
+              "post-install-cmd": [
+                  "php -r \"is_dir('.git/hooks') && !is_file('.git/hooks/pre-commit') && copy('.git-pre-commit', '.git/hooks/pre-commit') && chmod('.git/hooks/pre-commit', 0755);\""
+              ]
+          }
       }
-  }
     #+END_SRC
 
     加入如上代码后，当执行 =composer install= 后，会自动执行那行php代码，
@@ -113,12 +113,12 @@
     代码简单如下：
 
     #+BEGIN_SRC json
-  {
-      "scripts": {
-          "cs": "phpcs .",
-          "cbf": "phpcbf ."
+      {
+          "scripts": {
+              "cs": "phpcs .",
+              "cbf": "phpcbf ."
+          }
       }
-  }
     #+END_SRC
 
     定义好之后，在项目根目录下执行 =composer cs= 即可对全项目进行编码规范检查，执行 =composer cbf= 即可对全项目进行编码规范修复。

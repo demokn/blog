@@ -4,74 +4,74 @@
 
 *** 善用帮助文档
 
-- =pacman -h= 简要帮助信息
+    - =pacman -h= 简要帮助信息
 
-- =man pacman= 详细帮助文档
+    - =man pacman= 详细帮助文档
 
 *** 查看相关文件
 
-#+BEGIN_SRC sh
-  $ pacman -v
-  Root      : /
-  Conf File : /etc/pacman.conf
-  DB Path   : /var/lib/pacman/
-  Cache Dirs: /var/cache/pacman/pkg/
-  Hook Dirs : /usr/share/libalpm/hooks/  /etc/pacman.d/hooks/
-  Lock File : /var/lib/pacman/db.lck
-  Log File  : /var/log/pacman.log
-  GPG Dir   : /etc/pacman.d/gnupg/
-  Targets   : None
-#+END_SRC
+    #+BEGIN_SRC sh
+      $ pacman -v
+      Root      : /
+      Conf File : /etc/pacman.conf
+      DB Path   : /var/lib/pacman/
+      Cache Dirs: /var/cache/pacman/pkg/
+      Hook Dirs : /usr/share/libalpm/hooks/  /etc/pacman.d/hooks/
+      Lock File : /var/lib/pacman/db.lck
+      Log File  : /var/log/pacman.log
+      GPG Dir   : /etc/pacman.d/gnupg/
+      Targets   : None
+    #+END_SRC
 
 *** 操作选项(operation)
 
-pacman 在使用时通常是一个操作选项(大写字母)加上一些额外的参数(小写字母)。
-相同的小写字母跟在不同的大写字母后面表示的含义可能不同。
-那么多选项和组合只需要记住几个最常用的就可以， 其余的善用 =Tab 补全= 可以查看操作选项后可跟的额外参数和其简要作用描述。
+    pacman 在使用时通常是一个操作选项(大写字母)加上一些额外的参数(小写字母)。
+    相同的小写字母跟在不同的大写字母后面表示的含义可能不同。
+    那么多选项和组合只需要记住几个最常用的就可以， 其余的善用 =Tab 补全= 可以查看操作选项后可跟的额外参数和其简要作用描述。
 
-#+BEGIN_SRC sh
-  $ pacman -h
-  usage:  pacman <operation> [...]
-  operations:
-      pacman {-h --help}                             查看pacman使用帮助
-      pacman {-V --version}                          查看pacman版本
-      pacman {-D --database} <options> <package(s)>  操作软件包数据库
-      pacman {-F --files}    [options] [package(s)]  查询文件数据库
-      pacman {-Q --query}    [options] [package(s)]  查询已安装包信息
-      pacman {-R --remove}   [options] <package(s)>  删除已安装包
-      pacman {-S --sync}     [options] [package(s)]  同步（安装）包
-      pacman {-T --deptest}  [options] [package(s)]  检查包依赖
-      pacman {-U --upgrade}  [options] <file(s)>     更新或安装包
-#+END_SRC
+    #+BEGIN_SRC sh
+      $ pacman -h
+      usage:  pacman <operation> [...]
+      operations:
+          pacman {-h --help}                             查看pacman使用帮助
+          pacman {-V --version}                          查看pacman版本
+          pacman {-D --database} <options> <package(s)>  操作软件包数据库
+          pacman {-F --files}    [options] [package(s)]  查询文件数据库
+          pacman {-Q --query}    [options] [package(s)]  查询已安装包信息
+          pacman {-R --remove}   [options] <package(s)>  删除已安装包
+          pacman {-S --sync}     [options] [package(s)]  同步（安装）包
+          pacman {-T --deptest}  [options] [package(s)]  检查包依赖
+          pacman {-U --upgrade}  [options] <file(s)>     更新或安装包
+    #+END_SRC
 
 *** 一些常用命令
 
-- 搜索
-  - =pacman -Ss curl= 搜索指定软件
+    - 搜索
+      - =pacman -Ss curl= 搜索指定软件
 
-- 安装
-  - =pacman -S curl= 安装指定软件
+    - 安装
+      - =pacman -S curl= 安装指定软件
 
-- 查看
-  - =pacman -Q= 查看所有已安装的包
-  - =pacman -Qe= 查看所有被明确指定安装的包（而不是作为依赖项被安装）
-  - =pacman -Qd= 查看所有仅作为依赖项而被安装的包
-  - =pacman -Qi= 查看已安装包的详细信息
-  - =pacman -Qdt= 查看孤立包(仅作为依赖被安装, 且当前没有被其他包依赖)
+    - 查看
+      - =pacman -Q= 查看所有已安装的包
+      - =pacman -Qe= 查看所有被明确指定安装的包（而不是作为依赖项被安装）
+      - =pacman -Qd= 查看所有仅作为依赖项而被安装的包
+      - =pacman -Qi= 查看已安装包的详细信息
+      - =pacman -Qdt= 查看孤立包(仅作为依赖被安装, 且当前没有被其他包依赖)
 
-- 删除
-  - =pacman -Rs curl= 删除指定软件，并删除所有不被其他软件依赖的依赖包
-  - =pacman -Rsc curl= 删除指定软件，并删除所有不被其他软件依赖的依赖包, 并删除所有依赖该软件的包
+    - 删除
+      - =pacman -Rs curl= 删除指定软件，并删除所有不被其他软件依赖的依赖包
+      - =pacman -Rsc curl= 删除指定软件，并删除所有不被其他软件依赖的依赖包, 并删除所有依赖该软件的包
 
-- 更新
-  - =pacman -Syu= 更新所有包
+    - 更新
+      - =pacman -Syu= 更新所有包
 
 *** 好玩的配置
 
-#+BEGIN_SRC sh
-   # https://www.linux.com/news/10-truly-amusing-easter-eggs-linux
-   # pacman输出内容变为彩色
-   grep "^Color" /etc/pacman.conf >/dev/null || sudo sed -i "s/^#Color/Color/" /etc/pacman.conf
-   # pacman进度条吃糖果动画
-   grep "ILoveCandy" /etc/pacman.conf >/dev/null || sudo sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
-#+END_SRC
+    #+BEGIN_SRC sh
+      # https://www.linux.com/news/10-truly-amusing-easter-eggs-linux
+      # pacman输出内容变为彩色
+      grep "^Color" /etc/pacman.conf >/dev/null || sudo sed -i "s/^#Color/Color/" /etc/pacman.conf
+      # pacman进度条吃糖果动画
+      grep "ILoveCandy" /etc/pacman.conf >/dev/null || sudo sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
+    #+END_SRC

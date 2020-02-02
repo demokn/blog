@@ -10,9 +10,9 @@
 在开始写插件之前，总要先通过 =Chrome Console= 验证一下方案的可行性吧。代码也是相当简单。
 
 #+BEGIN_SRC javascript
-$("#username").value = "USERNAME"
-$("#password").value = "PASSWORD"
-$("#submit").click()
+  $("#username").value = "USERNAME"
+  $("#password").value = "PASSWORD"
+  $("#submit").click()
 #+END_SRC
 
 然而，“卧槽，无情” 的一幕出现了，页面上竟然提示我 “请输入账号”。
@@ -39,10 +39,10 @@ $("#submit").click()
 接着，用 Chrome 开发者工具的 =search= 功能，查找报错内容 “请输入账号”，找到了定义在某个js文件里的代码:
 
 #+BEGIN_SRC javascript
-_this.validation = {
-  login: [{ f: _validator.isEmpty, msg: '请输入账号' }],
-  password: [{ f: _validator.isEmpty, msg: '请输入密码' }],
-};
+  _this.validation = {
+    login: [{ f: _validator.isEmpty, msg: '请输入账号' }],
+    password: [{ f: _validator.isEmpty, msg: '请输入密码' }],
+  };
 #+END_SRC
 
 继续猜测，报错“请输入账号”是因为验证器为空，验证器为空的原因应该是验证方法没有执行，
@@ -56,34 +56,34 @@ _this.validation = {
 测试代码如下：
 
 #+BEGIN_SRC javascript
-var change = document.createEvent("HTMLEvents")
-change.initEvent("change")
+  var change = document.createEvent("HTMLEvents")
+  change.initEvent("change")
 
-var input = document.createEvent("HTMLEvents")
-input.initEvent("input")
+  var input = document.createEvent("HTMLEvents")
+  input.initEvent("input")
 
-var focus = document.createEvent("HTMLEvents")
-focus.initEvent("focus")
+  var focus = document.createEvent("HTMLEvents")
+  focus.initEvent("focus")
 
-var blur = document.createEvent("HTMLEvents")
-blur.initEvent("blur")
+  var blur = document.createEvent("HTMLEvents")
+  blur.initEvent("blur")
 
-var keydown = document.createEvent("KeyboardEvent")
-keydown.initKeyboardEvent("keydown")
+  var keydown = document.createEvent("KeyboardEvent")
+  keydown.initKeyboardEvent("keydown")
 
-var keyup = document.createEvent("KeyboardEvent")
-keyup.initKeyboardEvent("keyup")
+  var keyup = document.createEvent("KeyboardEvent")
+  keyup.initKeyboardEvent("keyup")
 
-var keypress = document.createEvent("KeyboardEvent")
-keypress.initKeyboardEvent("keypress")
+  var keypress = document.createEvent("KeyboardEvent")
+  keypress.initKeyboardEvent("keypress")
 
-var el = $("#username")
-el.value = "USERNAME"
-el.dispatchEvent(change)
-el.dispatchevent(input)
-el.dispatchEvent(keydown)
-el.dispatchEvent(keyup)
-el.dispatchEvent(keypress)
+  var el = $("#username")
+  el.value = "USERNAME"
+  el.dispatchEvent(change)
+  el.dispatchevent(input)
+  el.dispatchEvent(keydown)
+  el.dispatchEvent(keyup)
+  el.dispatchEvent(keypress)
 #+END_SRC
 
 然而，又是“卧槽，无情”的一幕，还是不行。
@@ -97,14 +97,14 @@ el.dispatchEvent(keypress)
 完整的代码如下：
 
 #+BEGIN_SRC javascript
-var input = document.createEvent("HTMLEvents")
-input.initEvent("input")
+  var input = document.createEvent("HTMLEvents")
+  input.initEvent("input")
 
-$("#username").value = "USERNAME"
-$("#username").dispatchEvent(input)
-$("#password").value = "PASSWORD"
-$("#password").dispatchEvent(input)
-$("#submit").click()
+  $("#username").value = "USERNAME"
+  $("#username").dispatchEvent(input)
+  $("#password").value = "PASSWORD"
+  $("#password").dispatchEvent(input)
+  $("#submit").click()
 #+END_SRC
 
 **** 参考
