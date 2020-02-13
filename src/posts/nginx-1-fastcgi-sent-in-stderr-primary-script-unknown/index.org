@@ -150,29 +150,29 @@
 
 ***** 2) 目录和文件权限
 
-       nginx 和 php-fpm 进程运行用户对 php 入口文件必须要有 =可读(r)= 权限，对入口文件所在目录（逐级目录）必须要有 =可执行(x)= 权限。
+      nginx 和 php-fpm 进程运行用户对 php 入口文件必须要有 =可读(r)= 权限，对入口文件所在目录（逐级目录）必须要有 =可执行(x)= 权限。
 
-       #+ATTR_HTML: :class alert alert-primary
-       #+BEGIN_info
-       通常，目录无可执行权限，页面报错为 =File not found.=
+      #+ATTR_HTML: :class alert alert-primary
+      #+BEGIN_info
+      通常，目录无可执行权限，页面报错为 =File not found.=
 
-       文件无可读权限，页面报错为 =Access denied.=
-       #+END_info
+      文件无可读权限，页面报错为 =Access denied.=
+      #+END_info
 
 
-       逐级检查目录和文件权限，我的结果如下：
-       #+BEGIN_EXAMPLE
-       drwxr-xr-x  3 root root 4.0K  1月 20  2019 /home
-       drwx------ 58 demo demo 4.0K  2月 13 14:33 /home/demo
-       drwxr-xr-x  6 demo demo 4.0K  2月  9 16:37 /home/demo/Code
-       drwxr-xr-x 10 demo demo 4.0K 11月 11 21:39 /home/demo/Code/coco
-       drwxr-xr-x 11 demo demo 4.0K  2月 12 22:19 /home/demo/Code/coco/dl
-       drwxr-xr-x 11 demo demo 4.0K  2月  3 11:00 /home/demo/Code/coco/dl/frontend
-       drwxr-xr-x  4 demo demo 4.0K  2月 12 22:18 /home/demo/Code/coco/dl/frontend/web
-       -rw-r--r--  1 demo demo 611   8月 14  2019 /home/demo/Code/coco/dl/frontend/web/index.php
-       #+END_EXAMPLE
+      逐级检查目录和文件权限，我的结果如下：
+      #+BEGIN_EXAMPLE
+      drwxr-xr-x  3 root root 4.0K  1月 20  2019 /home
+      drwx------ 58 demo demo 4.0K  2月 13 14:33 /home/demo
+      drwxr-xr-x  6 demo demo 4.0K  2月  9 16:37 /home/demo/Code
+      drwxr-xr-x 10 demo demo 4.0K 11月 11 21:39 /home/demo/Code/coco
+      drwxr-xr-x 11 demo demo 4.0K  2月 12 22:19 /home/demo/Code/coco/dl
+      drwxr-xr-x 11 demo demo 4.0K  2月  3 11:00 /home/demo/Code/coco/dl/frontend
+      drwxr-xr-x  4 demo demo 4.0K  2月 12 22:18 /home/demo/Code/coco/dl/frontend/web
+      -rw-r--r--  1 demo demo 611   8月 14  2019 /home/demo/Code/coco/dl/frontend/web/index.php
+      #+END_EXAMPLE
 
-       从结果来看，目录和文件的权限都是正常的。如果你发现自己的目录或文件权限异常，可使用 =chown= 和 =chmod= 修改。
+      从结果来看，目录和文件的权限都是正常的。如果你发现自己的目录或文件权限异常，可使用 =chown= 和 =chmod= 修改。
 
 *** 继续排查
     以上列出的常见问题全部排查过了，没有发现什么异常，这却难住我了。
