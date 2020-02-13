@@ -1,0 +1,312 @@
+#+TITLE: Nginx + PHP-FPM: "Primary script unknown" 问题排查
+#+KEYWORDS: 珊瑚礁上的程序员, nginx, php, php-fpm, fastcgi, primary script unknown
+#+DATE: <2020-02-09 Sun 23:55>
+
+前几天在笔记本上开发PHP项目的时候，想调试接口，浏览器上却无情的出现了 "File not found" 的空白页面。
+笔记本上的开发环境是早就配置好了的，而且一直都是正常在用的，当时又是急着调试，却出现这种情况，顿时脑瓜子嗡嗡的。
+简单排查了一下 =访问url是否正确=, =hosts文件是否正常=, =nginx root路径是否正确= ，并没有找到原因。
+因为急着调试，这个问题就暂时放在一边了，先使用php内置的Web服务新起一个Server(=php -S 127.0.0.1:8001 -t /PATH/PROJECT/public=)继续调试。
+今天抽时间把这个问题解决并记录一下。
+
+*** 先说现象
+
+    浏览器访问页面时，页面"报错" =File not found= 。
+
+    查看 nginx 日志， 访问日志(access_log)如下：
+
+    #+BEGIN_EXAMPLE
+    127.0.0.1 - - [09/Feb/2020:22:20:48 +0800] "GET /api HTTP/1.1" 404 27 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) C
+    hrome/80.0.3987.87 Safari/537.36"
+    #+END_EXAMPLE
+
+    错误日志(error_log)如下：
+
+    #+BEGIN_EXAMPLE
+    2020/02/09 22:20:48 [error] 12451#12451: *1 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 127.0.0
+    .1, server: dl.dev.com, request: "GET /api HTTP/1.1", upstream: "fastcgi://unix:/run/php-fpm/php-fpm.sock:", host: "dl.dev.com"
+    #+END_EXAMPLE
+
+*** 开发环境
+
+    #+BEGIN_EXAMPLE
+    OS: 4.19.102-1-MANJARO(Arch Linux)
+    PHP Version: 7.4.2
+    Nginx Version: 1.16.1
+    Service Manager: Systemd 242
+    #+END_EXAMPLE
+
+*** 常见原因
+
+    出现这个错误的原因一般有两个，一个是nginx或php-fpm确实找不到php文件，一个是php-fpm没有权限读取和执行php文件。
+
+**** 1. 找不到文件问题
+
+***** 1) 排查 nginx 是否访问到正确的文件路径
+
+      可以通过 nginx 访问日志查看文件路径是否正确。
+
+      打开 nginx 主配置文件（我的是 =/etc/nginx/nginx.conf= ）,在http代码块中增加：
+      #+BEGIN_SRC sh
+        # $document_root$fastcgi_script_name 其实就是 server 代码块中的 fastcgi_param SCRIPT_NAME 的值
+        log_format scripts '$document_root$fastcgi_script_name > $request';
+      #+END_SRC
+
+      继续打开 nginx server 配置文件（我的是 =/etc/nginx/sites-enabled/dl.dev.com.conf= ）,在server代码块增加：
+      #+BEGIN_SRC sh
+        access_log /var/log/nginx/scripts.log scripts;
+      #+END_SRC
+
+      重启nginx服务（ =systemctl restart nginx.service= ），再次访问接口，可以在日志文件中看到：
+      #+BEGIN_EXAMPLE
+      /home/demo/Code/coco/dl/frontend/web/index.php > GET /api HTTP/1.1
+      #+END_EXAMPLE
+
+      再次确认日志文件中的文件路径，确实没错。
+
+***** 2) 排查 php-fpm 是否访问到正确的文件
+
+      同样是通过 php-fpm 的访问日志排查。
+
+      编辑 php-fpm 配置文件（我的是 =/etc/php/php-fpm.d/www.conf= ）：
+      #+BEGIN_SRC sh
+        access.log = /var/log/php-fpm/$pool.access.log
+      #+END_SRC
+
+      重启php-fpm（ =systemctl restart php-fpm.service= ），再次访问接口，可以在日志文件中看到：
+      #+BEGIN_EXAMPLE
+      - -  09/Feb/2020:17:19:50 +0800 "GET /index.php" 404
+      #+END_EXAMPLE
+
+      可以看到 nginx 传递给 php-fpm 的文件确实是 =index.php=, 但 php-fpm 响应的是 404, 说明是 php-fpm 无法(无权限)访问到文件。
+      #+ATTR_HTML: :class alert alert-primary
+      #+BEGIN_info
+      如果日志显示 =GET /= 或 =GET /api= 则说明 nginx 传递给 php-fpm 的文件名是错误的。
+
+      如果一切正常，日志显示应该是 ="GET /index.php" 200= 。
+      #+END_info
+
+**** 2. 权限问题
+
+***** 1) 进程用户
+
+      nginx 进程 和 php-fpm 进程要是同一个用户。
+
+      查看 nginx 和 php-fpm 进程信息:
+      #+BEGIN_SRC sh
+        ps -ef | grep nginx
+        ps -ef | grep php-fpm
+      #+END_SRC
+
+      #+BEGIN_EXAMPLE
+      ➜ ps -ef | grep nginx
+      root     13038     1  0 12:05 ?        00:00:00 nginx: master process /usr/bin/nginx -g pid /run/nginx.pid; error_log stderr;
+      demo     13039 13038  0 12:05 ?        00:00:00 nginx: worker process
+      demo     13040 13038  0 12:05 ?        00:00:00 nginx: worker process
+      #+END_EXAMPLE
+
+      #+BEGIN_EXAMPLE
+      ➜ ps -ef | grep php-fpm
+      root     13022     1  0 12:05 ?        00:00:00 php-fpm: master process (/etc/php/php-fpm.conf)
+      demo     13041 13022  0 12:05 ?        00:00:00 php-fpm: pool www
+      demo     13042 13022  0 12:05 ?        00:00:00 php-fpm: pool www
+      #+END_EXAMPLE
+
+      可以看到 nginx 和 php-fpm 进程所属用户都是 =demo=, 说明配置没有问题。
+
+      如果两个进程所属用户不同，需要修改如下配置文件：
+
+      =nginx.conf= :
+      #+BEGIN_SRC sh
+        user demo;
+      #+END_SRC
+
+      =php-fpm.d/www.conf= :
+      #+BEGIN_SRC sh
+        ; Unix user/group of processes
+        ; Note: The user is mandatory. If the group is not set, the default user's group
+        ;       will be used.
+        user = demo
+        group = demo
+
+        ; Set permissions for unix socket, if one is used. In Linux, read/write
+        ; permissions must be set in order to allow connections from a web server. Many
+        ; BSD-derived systems allow connections regardless of permissions.
+        ; Default Values: user and group are set as the running user
+        ;                 mode is set to 0660
+        listen.owner = demo
+        listen.group = demo
+        ;listen.mode = 0660
+      #+END_SRC
+
+      #+ATTR_HTML: :class alert alert-primary
+      #+BEGIN_info
+      在开发环境下，建议进程用户配置为当前登录用户即可，可以避免处理一些目录和文件权限问题，省心。
+      #+END_info
+
+      记得配置修改后，需要重启服务才能生效。
+      #+BEGIN_SRC sh
+        systemctl restart nginx.service php-fpm.service
+      #+END_SRC
+
+***** 2) 目录和文件权限
+
+       nginx 和 php-fpm 进程运行用户对 php 入口文件必须要有 =可读(r)= 权限，对入口文件所在目录（逐级目录）必须要有 =可执行(x)= 权限。
+
+       #+ATTR_HTML: :class alert alert-primary
+       #+BEGIN_info
+       通常，目录无可执行权限，页面报错为 =File not found.=
+
+       文件无可读权限，页面报错为 =Access denied.=
+       #+END_info
+
+
+       逐级检查目录和文件权限，我的结果如下：
+       #+BEGIN_EXAMPLE
+       drwxr-xr-x  3 root root 4.0K  1月 20  2019 /home
+       drwx------ 58 demo demo 4.0K  2月 13 14:33 /home/demo
+       drwxr-xr-x  6 demo demo 4.0K  2月  9 16:37 /home/demo/Code
+       drwxr-xr-x 10 demo demo 4.0K 11月 11 21:39 /home/demo/Code/coco
+       drwxr-xr-x 11 demo demo 4.0K  2月 12 22:19 /home/demo/Code/coco/dl
+       drwxr-xr-x 11 demo demo 4.0K  2月  3 11:00 /home/demo/Code/coco/dl/frontend
+       drwxr-xr-x  4 demo demo 4.0K  2月 12 22:18 /home/demo/Code/coco/dl/frontend/web
+       -rw-r--r--  1 demo demo 611   8月 14  2019 /home/demo/Code/coco/dl/frontend/web/index.php
+       #+END_EXAMPLE
+
+       从结果来看，目录和文件的权限都是正常的。如果你发现自己的目录或文件权限异常，可使用 =chown= 和 =chmod= 修改。
+
+*** 继续排查
+    以上列出的常见问题全部排查过了，没有发现什么异常，这却难住我了。
+
+    回想一下，这套开发环境早就部署好了，而且一直都是正常在使用的，为什么会突然出现这个问题呢。
+    上一次正常使用到现在突然出现问题这段时间，我干了什么"坏事"吗？
+    记不清了，如果有的话，那可能就是升级了系统和软件。
+    莫不是因为php版本或nginx版本升级的问题。
+    反正暂时也没其他思路了，软件降级试试吧。
+
+    先从php入手，因为生产版本使用的是 =php 7.2= ，那就再安装个 php 7.2 吧。
+    #+BEGIN_SRC sh
+      yay -S php72 php72-fpm php72-gd php72-intl --removemake --nodiffmenu --noconfirm
+    #+END_SRC
+
+    #+ATTR_HTML: :class alert alert-primary
+    #+BEGIN_info
+    不同的操作系统安装方式不尽相同，我这里只是给自己做下记录，请结合自己的系统自行安装。
+
+    具体配置就不再赘述了，记得配置好 php72-fpm 后把 nginx server 代码块中的 =fastcgi_pass= 指向 php72-fpm，然后重启服务。
+    #+END_info
+
+    服务重启后，神奇的事情发生了，问题解决了。
+
+    diff 一下两个版本下的 =php-fpm.conf= 和 =php-fpm.d/www.conf= 配置文件，除了新增的几个配置项外，并没有发现什么特别的差异。
+    难不成是 php 7.4 的锅？ 不幸的是还真的搜到了一个类似的还处于open状态的bug提交记录 [[https://bugs.php.net/bug.php?id=79014][Bug #79014 PHP-FPM & Primary script unknown | no more PHP Render]] 。
+    难道就这样放弃吗，等着这个 ISSUE 更新？可又不甘心啊，如果真的是php 7.4.2 的bug，那应该早就被重视并解决了啊。Google 上也没找到更多关于 php-fpm 7.4 的类似bug报告。
+    那就继续再找找问题吧。
+
+    现在可以确定的是问题确实和php版本有关，去看源码找bug是不可能的了，这辈子都不可能[手动狗头]。
+    那就还是只能试着找找本机上两个版本配置上的差异。
+
+    使用 =systemctl status= 查看一下 php-fpm 和 php72-fpm 两个进程的状态：
+    #+BEGIN_EXAMPLE
+    ➜ systemctl status php-fpm.service
+    ● php-fpm.service - The PHP FastCGI Process Manager
+       Loaded: loaded (/usr/lib/systemd/system/php-fpm.service; disabled; vendor preset: disabled)
+       Active: active (running) since Thu 2020-02-13 12:05:44 CST; 3h 12min ago
+     Main PID: 13022 (php-fpm)
+       Status: "Processes active: 0, idle: 2, Requests: 95, slow: 0, Traffic: 0req/sec"
+        Tasks: 3 (limit: 4915)
+       Memory: 36.3M
+       CGroup: /system.slice/php-fpm.service
+               ├─13022 php-fpm: master process (/etc/php/php-fpm.conf)
+               ├─13041 php-fpm: pool www
+               └─13042 php-fpm: pool www
+
+    2月 13 12:05:43 Macy systemd[1]: Starting The PHP FastCGI Process Manager...
+    2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] fpm is running, pid 13022
+    2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] ready to handle connections
+    2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] systemd monitor interval set to 10000ms
+    2月 13 12:05:44 Macy systemd[1]: Started The PHP FastCGI Process Manager.
+    #+END_EXAMPLE
+
+    #+BEGIN_EXAMPLE
+    ➜ systemctl status php72-fpm.service
+    ● php72-fpm.service - The PHP FastCGI Process Manager
+       Loaded: loaded (/usr/lib/systemd/system/php72-fpm.service; disabled; vendor preset: disabled)
+       Active: active (running) since Thu 2020-02-13 12:05:43 CST; 3h 13min ago
+     Main PID: 13024 (php-fpm72)
+       Status: "Processes active: 0, idle: 2, Requests: 0, slow: 0, Traffic: 0req/sec"
+        Tasks: 3 (limit: 4915)
+       Memory: 13.9M
+       CGroup: /system.slice/php72-fpm.service
+               ├─13024 php-fpm: master process (/etc/php72/php-fpm.conf)
+               ├─13027 php-fpm: pool www
+               └─13028 php-fpm: pool www
+
+    2月 13 12:05:43 Macy systemd[1]: Starting The PHP FastCGI Process Manager...
+    2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] fpm is running, pid 13024
+    2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] ready to handle connections
+    2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] systemd monitor interval set to 10000ms
+    2月 13 12:05:43 Macy systemd[1]: Started The PHP FastCGI Process Manager.
+    #+END_EXAMPLE
+
+    进程状态都是正常的，但是我好像又发现了两个可以对比的配置文件，。
+    =/usr/lib/systemd/system/php-fpm.service= 和 =/usr/lib/systemd/system/php72-fpm.service= 。
+    虽然没抱多大希望，但也没其他思路，就当随便看看吧。
+    然而，猜猜我发现了什么，此处必须加“握操”。
+    php 7.4.2 的 systemd service 配置文件中多出了这么几个配置项，注释也是清晰明了：
+    #+BEGIN_SRC sh
+      # Set up a new file system namespace and mounts private /tmp and /var/tmp directories
+      # so this service cannot access the global directories and other processes cannot
+      # access this service's directories.
+      PrivateTmp=true
+
+      # The directories /home, /root and /run/user are made inaccessible and empty for processes
+      # invoked by this unit.
+      ProtectHome=true
+
+      # Mounts the /usr, /boot, and /etc directories read-only for processes invoked by this unit.
+      ProtectSystem=full
+
+      # Sets up a new /dev namespace for the executed processes and only adds API pseudo devices
+      # such as /dev/null, /dev/zero or /dev/random (as well as the pseudo TTY subsystem) to it,
+      # but no physical devices such as /dev/sda.
+      PrivateDevices=true
+
+       Explicit module loading will be denied. This allows to turn off module load and unload
+      # operations on modular kernels. It is recommended to turn this on for most services that
+      # do not need special file systems or extra kernel modules to work.
+      ProtectKernelModules=true
+
+      # Kernel variables accessible through /proc/sys, /sys, /proc/sysrq-trigger, /proc/latency_stats,
+      # /proc/acpi, /proc/timer_stats, /proc/fs and /proc/irq will be made read-only to all processes
+      # of the unit. Usually, tunable kernel variables should only be written at boot-time, with the
+      # sysctl.d(5) mechanism. Almost no services need to write to these at runtime; it is hence
+      # recommended to turn this on for most services.
+      ProtectKernelTunables=true
+
+      # The Linux Control Groups (cgroups(7)) hierarchies accessible through /sys/fs/cgroup will be
+      # made read-only to all processes of the unit. Except for container managers no services should
+      # require write access to the control groups hierarchies; it is hence recommended to turn this on
+      # for most services
+      ProtectControlGroups=true
+
+      # Any attempts to enable realtime scheduling in a process of the unit are refused.
+      RestrictRealtime=true
+
+      # Restricts the set of socket address families accessible to the processes of this unit.
+      # Protects against vulnerabilities such as CVE-2016-8655
+      RestrictAddressFamilies=AF_INET AF_INET6 AF_NETLINK AF_UNIX
+
+      # Takes away the ability to create or manage any kind of namespace
+      RestrictNamespaces=true
+    #+END_SRC
+
+    对我来说最值得注意的是 =ProtectHome=true= ，因为我的代码是放在了 =$HOME= 目录下。
+    真相就要浮出水面了，抓紧改成 false，重启一下 php-fpm 试试。“握草”，好了。
+
+    我也不知道说什么好了，只是给大家提供一个思路。
+    如果你碰到了和我一样的情况，基本情况都排查完了，问题还是没解决，可以再查看一下 =php-fpm.service= 配置里是不是把代码所在目录设为保护了。
+    这个真的是没曾想到过的问题，也是因为对 =systemd service manager= 的不熟悉吧，只是知道使用 =systemctl [start|stop|restart]= 。
+
+    当然，这个原因总结下来，还是因为 php-fpm 进程找不到文件，而找不到文件的原因并不是文件不存在，而是文件被服务管理器 =systemd= 保护起来了。
+
+    再强行结个尾，不要轻言放弃。
