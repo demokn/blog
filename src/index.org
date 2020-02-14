@@ -1,4 +1,23 @@
 #+TITLE: 珊瑚礁上的程序员
 #+KEYWORDS: 珊瑚礁上的程序员, 博客, 首页, Homepage
 
-There is nothing in homepage, not yet.
+** DONE 基础功能 [4/4]
+   CLOSED: [2020-02-14 Fri 15:49]
+   :LOGBOOK:
+   - State "DONE"       from              [2020-02-14 Fri 15:49]
+   :END:
+   - [X] 文章详情(org2html)
+   - [X] 文章列表(archive)
+   - [X] 网站地图(sitemap)
+   - [X] 博客订阅(rss)
+** DONE 三方插件 [3/3]
+   CLOSED: [2020-02-14 Fri 15:49]
+   :LOGBOOK:
+   - State "DONE"       from              [2020-02-14 Fri 15:49]
+   :END:
+   - [X] 评论插件(disqus)
+   - [X] Google Analytics
+   - [X] StatCounter
+** TODO 补充页面 [1/2]
+   - [X] 首页
+   - [ ] 关于

@@ -159,6 +159,34 @@ div.outline-2, div.outline-3 {
     font-size: xx-small;
 }
 
+.todo {
+    font-family: monospace;
+    color: red;
+}
+.done {
+    font-family: monospace;
+    color: green;
+}
+.priority {
+    font-family: monospace;
+    color: orange;
+}
+.tag {
+    background-color: #eee;
+    font-family: monospace;
+    padding: 2px;
+    font-size: 80%;
+    font-weight: normal;
+}
+.timestamp {
+    color: #bebebe;
+}
+.timestamp-kwd {
+    color: #5f9ea0;
+}
+.underline {
+    text-decoration: underline;
+}
 .org-src-container > pre {
     margin-top: 0;
     margin-bottom: 0;
