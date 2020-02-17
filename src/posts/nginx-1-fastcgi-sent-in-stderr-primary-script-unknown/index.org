@@ -159,7 +159,6 @@
       文件无可读权限，页面报错为 =Access denied.=
       #+END_info
 
-
       逐级检查目录和文件权限，我的结果如下：
       #+BEGIN_EXAMPLE
       drwxr-xr-x  3 root root 4.0K  1月 20  2019 /home
