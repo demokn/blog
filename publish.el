@@ -146,12 +146,12 @@ representation for the files to include, as returned by
          (posts (demo/org-publish-sitemap--valid-entries posts)))
     (concat (format "#+TITLE: %s\n#+KEYWORDS:%s, Archive\n#+OPTIONS: title:nil\n\n" title demo/project-name)
             "#+HTML: <header><h1>Blog Archive</h1></header>"
-            "\n#+begin_archive\n"
+            "\n#+BEGIN_archive\n"
             (mapconcat (lambda (li)
                          (format "@@html:<li>@@ %s @@html:</li>@@" (car li)))
                        (seq-filter #'car posts)
                        "\n")
-            "\n#+end_archive\n")))
+            "\n#+END_archive\n")))
 
 (defun demo/org-publish-sitemap-format-archive-entry (entry style project)
   "Default format for posts archive site map ENTRY, as a string.
@@ -181,8 +181,9 @@ TITLE is the the title of the site map.  SITEMAP is an internal
 representation for the files to include, as returned by
 ‘org-list-to-lisp’.  PROJECT is the current project."
   (let* ((title demo/project-name))
-    (concat (format "#+TITLE: %s\n\n" title)
-            (org-list-to-subtree sitemap '()))))
+    (concat (format "#+TITLE: %s\n" title)
+            (format "#+KEYWORDS: %s\n\n" title)
+            (org-list-to-subtree sitemap nil '(:istart "" :icount "")))))
 
 (defun demo/org-publish-sitemap-format-rss-entry (entry style project)
   "Default format for posts rss site map ENTRY, as a string.
@@ -195,7 +196,9 @@ PROJECT is the current project."
                 (date (format-time-string "%Y-%m-%d" (org-publish-find-date entry project)))
                 (link (concat (file-name-sans-extension entry) ".html")))
            (with-temp-buffer
-             (insert (format "* [[file:%s][%s]]\n" file title))
+             ;; 用链接的方式, title 会取成文件路径
+             ;; (insert (format "* [[file:%s][%s]]\n" file title))
+             (insert (format "* %s\n" title))
              (org-set-property "RSS_PERMALINK" link)
              (org-set-property "PUBDATE" date)
              ;; To avoid second update to rss.org by org-icalendar-create-uid
