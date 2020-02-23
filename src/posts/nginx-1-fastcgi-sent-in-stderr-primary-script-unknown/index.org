@@ -15,24 +15,22 @@
     查看 nginx 日志， 访问日志(access_log)如下：
 
     #+BEGIN_EXAMPLE
-    127.0.0.1 - - [09/Feb/2020:22:20:48 +0800] "GET /api HTTP/1.1" 404 27 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) C
-    hrome/80.0.3987.87 Safari/537.36"
+      127.0.0.1 - - [09/Feb/2020:22:20:48 +0800] "GET /api HTTP/1.1" 404 27 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36"
     #+END_EXAMPLE
 
     错误日志(error_log)如下：
 
     #+BEGIN_EXAMPLE
-    2020/02/09 22:20:48 [error] 12451#12451: *1 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 127.0.0
-    .1, server: dl.dev.com, request: "GET /api HTTP/1.1", upstream: "fastcgi://unix:/run/php-fpm/php-fpm.sock:", host: "dl.dev.com"
+      2020/02/09 22:20:48 [error] 12451#12451: *1 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 127.0.0.1, server: dl.dev.com, request: "GET /api HTTP/1.1", upstream: "fastcgi://unix:/run/php-fpm/php-fpm.sock:", host: "dl.dev.com"
     #+END_EXAMPLE
 
 *** 开发环境
 
     #+BEGIN_EXAMPLE
-    OS: 4.19.102-1-MANJARO(Arch Linux)
-    PHP Version: 7.4.2
-    Nginx Version: 1.16.1
-    Service Manager: Systemd 242
+      OS: 4.19.102-1-MANJARO(Arch Linux)
+      PHP Version: 7.4.2
+      Nginx Version: 1.16.1
+      Service Manager: Systemd 242
     #+END_EXAMPLE
 
 *** 常见原因
@@ -58,7 +56,7 @@
 
       重启nginx服务（ =systemctl restart nginx.service= ），再次访问接口，可以在日志文件中看到：
       #+BEGIN_EXAMPLE
-      /home/demo/Code/coco/dl/frontend/web/index.php > GET /api HTTP/1.1
+        /home/demo/Code/coco/dl/frontend/web/index.php > GET /api HTTP/1.1
       #+END_EXAMPLE
 
       再次确认日志文件中的文件路径，确实没错。
@@ -74,7 +72,7 @@
 
       重启php-fpm（ =systemctl restart php-fpm.service= ），再次访问接口，可以在日志文件中看到：
       #+BEGIN_EXAMPLE
-      - -  09/Feb/2020:17:19:50 +0800 "GET /index.php" 404
+        - -  09/Feb/2020:17:19:50 +0800 "GET /index.php" 404
       #+END_EXAMPLE
 
       可以看到 nginx 传递给 php-fpm 的文件确实是 =index.php=, 但 php-fpm 响应的是 404, 说明是 php-fpm 无法(无权限)访问到文件。
@@ -98,17 +96,17 @@
       #+END_SRC
 
       #+BEGIN_EXAMPLE
-      ➜ ps -ef | grep nginx
-      root     13038     1  0 12:05 ?        00:00:00 nginx: master process /usr/bin/nginx -g pid /run/nginx.pid; error_log stderr;
-      demo     13039 13038  0 12:05 ?        00:00:00 nginx: worker process
-      demo     13040 13038  0 12:05 ?        00:00:00 nginx: worker process
+        ➜ ps -ef | grep nginx
+        root     13038     1  0 12:05 ?        00:00:00 nginx: master process /usr/bin/nginx -g pid /run/nginx.pid; error_log stderr;
+        demo     13039 13038  0 12:05 ?        00:00:00 nginx: worker process
+        demo     13040 13038  0 12:05 ?        00:00:00 nginx: worker process
       #+END_EXAMPLE
 
       #+BEGIN_EXAMPLE
-      ➜ ps -ef | grep php-fpm
-      root     13022     1  0 12:05 ?        00:00:00 php-fpm: master process (/etc/php/php-fpm.conf)
-      demo     13041 13022  0 12:05 ?        00:00:00 php-fpm: pool www
-      demo     13042 13022  0 12:05 ?        00:00:00 php-fpm: pool www
+        ➜ ps -ef | grep php-fpm
+        root     13022     1  0 12:05 ?        00:00:00 php-fpm: master process (/etc/php/php-fpm.conf)
+        demo     13041 13022  0 12:05 ?        00:00:00 php-fpm: pool www
+        demo     13042 13022  0 12:05 ?        00:00:00 php-fpm: pool www
       #+END_EXAMPLE
 
       可以看到 nginx 和 php-fpm 进程所属用户都是 =demo=, 说明配置没有问题。
@@ -161,14 +159,14 @@
 
       逐级检查目录和文件权限，我的结果如下：
       #+BEGIN_EXAMPLE
-      drwxr-xr-x  3 root root 4.0K  1月 20  2019 /home
-      drwx------ 58 demo demo 4.0K  2月 13 14:33 /home/demo
-      drwxr-xr-x  6 demo demo 4.0K  2月  9 16:37 /home/demo/Code
-      drwxr-xr-x 10 demo demo 4.0K 11月 11 21:39 /home/demo/Code/coco
-      drwxr-xr-x 11 demo demo 4.0K  2月 12 22:19 /home/demo/Code/coco/dl
-      drwxr-xr-x 11 demo demo 4.0K  2月  3 11:00 /home/demo/Code/coco/dl/frontend
-      drwxr-xr-x  4 demo demo 4.0K  2月 12 22:18 /home/demo/Code/coco/dl/frontend/web
-      -rw-r--r--  1 demo demo 611   8月 14  2019 /home/demo/Code/coco/dl/frontend/web/index.php
+        drwxr-xr-x  3 root root 4.0K  1月 20  2019 /home
+        drwx------ 58 demo demo 4.0K  2月 13 14:33 /home/demo
+        drwxr-xr-x  6 demo demo 4.0K  2月  9 16:37 /home/demo/Code
+        drwxr-xr-x 10 demo demo 4.0K 11月 11 21:39 /home/demo/Code/coco
+        drwxr-xr-x 11 demo demo 4.0K  2月 12 22:19 /home/demo/Code/coco/dl
+        drwxr-xr-x 11 demo demo 4.0K  2月  3 11:00 /home/demo/Code/coco/dl/frontend
+        drwxr-xr-x  4 demo demo 4.0K  2月 12 22:18 /home/demo/Code/coco/dl/frontend/web
+        -rw-r--r--  1 demo demo 611   8月 14  2019 /home/demo/Code/coco/dl/frontend/web/index.php
       #+END_EXAMPLE
 
       从结果来看，目录和文件的权限都是正常的。如果你发现自己的目录或文件权限异常，可使用 =chown= 和 =chmod= 修改。
@@ -206,45 +204,45 @@
 
     使用 =systemctl status= 查看一下 php-fpm 和 php72-fpm 两个进程的状态：
     #+BEGIN_EXAMPLE
-    ➜ systemctl status php-fpm.service
-    ● php-fpm.service - The PHP FastCGI Process Manager
-       Loaded: loaded (/usr/lib/systemd/system/php-fpm.service; disabled; vendor preset: disabled)
-       Active: active (running) since Thu 2020-02-13 12:05:44 CST; 3h 12min ago
-     Main PID: 13022 (php-fpm)
-       Status: "Processes active: 0, idle: 2, Requests: 95, slow: 0, Traffic: 0req/sec"
-        Tasks: 3 (limit: 4915)
-       Memory: 36.3M
-       CGroup: /system.slice/php-fpm.service
-               ├─13022 php-fpm: master process (/etc/php/php-fpm.conf)
-               ├─13041 php-fpm: pool www
-               └─13042 php-fpm: pool www
+      ➜ systemctl status php-fpm.service
+      ● php-fpm.service - The PHP FastCGI Process Manager
+         Loaded: loaded (/usr/lib/systemd/system/php-fpm.service; disabled; vendor preset: disabled)
+         Active: active (running) since Thu 2020-02-13 12:05:44 CST; 3h 12min ago
+       Main PID: 13022 (php-fpm)
+         Status: "Processes active: 0, idle: 2, Requests: 95, slow: 0, Traffic: 0req/sec"
+          Tasks: 3 (limit: 4915)
+         Memory: 36.3M
+         CGroup: /system.slice/php-fpm.service
+                 ├─13022 php-fpm: master process (/etc/php/php-fpm.conf)
+                 ├─13041 php-fpm: pool www
+                 └─13042 php-fpm: pool www
 
-    2月 13 12:05:43 Macy systemd[1]: Starting The PHP FastCGI Process Manager...
-    2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] fpm is running, pid 13022
-    2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] ready to handle connections
-    2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] systemd monitor interval set to 10000ms
-    2月 13 12:05:44 Macy systemd[1]: Started The PHP FastCGI Process Manager.
+      2月 13 12:05:43 Macy systemd[1]: Starting The PHP FastCGI Process Manager...
+      2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] fpm is running, pid 13022
+      2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] ready to handle connections
+      2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] systemd monitor interval set to 10000ms
+      2月 13 12:05:44 Macy systemd[1]: Started The PHP FastCGI Process Manager.
     #+END_EXAMPLE
 
     #+BEGIN_EXAMPLE
-    ➜ systemctl status php72-fpm.service
-    ● php72-fpm.service - The PHP FastCGI Process Manager
-       Loaded: loaded (/usr/lib/systemd/system/php72-fpm.service; disabled; vendor preset: disabled)
-       Active: active (running) since Thu 2020-02-13 12:05:43 CST; 3h 13min ago
-     Main PID: 13024 (php-fpm72)
-       Status: "Processes active: 0, idle: 2, Requests: 0, slow: 0, Traffic: 0req/sec"
-        Tasks: 3 (limit: 4915)
-       Memory: 13.9M
-       CGroup: /system.slice/php72-fpm.service
-               ├─13024 php-fpm: master process (/etc/php72/php-fpm.conf)
-               ├─13027 php-fpm: pool www
-               └─13028 php-fpm: pool www
+      ➜ systemctl status php72-fpm.service
+      ● php72-fpm.service - The PHP FastCGI Process Manager
+         Loaded: loaded (/usr/lib/systemd/system/php72-fpm.service; disabled; vendor preset: disabled)
+         Active: active (running) since Thu 2020-02-13 12:05:43 CST; 3h 13min ago
+       Main PID: 13024 (php-fpm72)
+         Status: "Processes active: 0, idle: 2, Requests: 0, slow: 0, Traffic: 0req/sec"
+          Tasks: 3 (limit: 4915)
+         Memory: 13.9M
+         CGroup: /system.slice/php72-fpm.service
+                 ├─13024 php-fpm: master process (/etc/php72/php-fpm.conf)
+                 ├─13027 php-fpm: pool www
+                 └─13028 php-fpm: pool www
 
-    2月 13 12:05:43 Macy systemd[1]: Starting The PHP FastCGI Process Manager...
-    2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] fpm is running, pid 13024
-    2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] ready to handle connections
-    2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] systemd monitor interval set to 10000ms
-    2月 13 12:05:43 Macy systemd[1]: Started The PHP FastCGI Process Manager.
+      2月 13 12:05:43 Macy systemd[1]: Starting The PHP FastCGI Process Manager...
+      2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] fpm is running, pid 13024
+      2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] ready to handle connections
+      2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] systemd monitor interval set to 10000ms
+      2月 13 12:05:43 Macy systemd[1]: Started The PHP FastCGI Process Manager.
     #+END_EXAMPLE
 
     进程状态都是正常的，但是我好像又发现了两个可以对比的配置文件，。
