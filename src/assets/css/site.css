@@ -199,3 +199,15 @@ div.info > p {
     margin-top: 0;
     margin-bottom: 0;
 }
+blockquote {
+    /* margin-left: 1em; */
+    padding: 3px 0 3px 8px;
+    border-left: 6px solid #46bba9ad;
+    background-color: #f6f6f6;
+    color: #000;
+    line-height: 1.5em;
+}
+blockquote > p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
