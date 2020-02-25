@@ -2,24 +2,24 @@
 #+KEYWORDS: Emacs, Org-mode, org-refile, Invalid function, org-preserve-local-variables
 #+DATE: <2020-02-24 Mon 18:30>
 
-*** 问题
-    前段时间升级了本机的 =Org-mode= 版本。由原来安装 Emacs 时默认的 =org-9.1.9= 升级到了最新稳定版 =org-9.3.6= 。
+** 问题
+   前段时间升级了本机的 =Org-mode= 版本。由原来安装 Emacs 时默认的 =org-9.1.9= 升级到了最新稳定版 =org-9.3.6= 。
 
-    今天在执行 =M-x org-refile= 时，出错了，错误信息为 =Invalid function: org-preserve-local-variables= 。
+   今天在执行 =M-x org-refile= 时，出错了，错误信息为 =Invalid function: org-preserve-local-variables= 。
 
-*** 解决办法
-    #+begin_quote
-    In almost all cases an =invalid function= error is caused by an unclean Org-mode source directory. Cleaning it up and recompiling should fix the problem.
-    #+end_quote
+** 解决办法
+   #+begin_quote
+   In almost all cases an =invalid function= error is caused by an unclean Org-mode source directory. Cleaning it up and recompiling should fix the problem.
+   #+end_quote
 
-    删除 =elpa/org= 目录下所有编译后的文件 =*.elc=, 退出并重新打开 Emacs, 使其重新编译即可。
+   删除 =elpa/org= 目录下所有编译后的文件 =*.elc=, 退出并重新打开 Emacs, 使其重新编译即可。
 
-    #+begin_src sh
+   #+begin_src sh
       rm -rf ~/.emacs.d/elpa-26.3/org-9.3.6/*.elc
-    #+end_src
+   #+end_src
 
-*** 参考
-    - [[https://orgmode.org/worg/org-faq.html#invalid-function-error][After updating Org I get an error about an invalid function]]
-    - [[https://orgmode.org/worg/org-faq.html#mixed-install][Is my Orgmode installation mixed?]]
-    - [[https://www.emacswiki.org/emacs/ConflictingLibraries][Emacs Conflicting Libraries]]
-    - [[https://github.com/syl20bnr/spacemacs/issues/11801][org-refile does not work. org-copy-subtree: Invalid function: org-preserve-local-variables]]
+** 参考
+   - [[https://orgmode.org/worg/org-faq.html#invalid-function-error][After updating Org I get an error about an invalid function]]
+   - [[https://orgmode.org/worg/org-faq.html#mixed-install][Is my Orgmode installation mixed?]]
+   - [[https://www.emacswiki.org/emacs/ConflictingLibraries][Emacs Conflicting Libraries]]
+   - [[https://github.com/syl20bnr/spacemacs/issues/11801][org-refile does not work. org-copy-subtree: Invalid function: org-preserve-local-variables]]

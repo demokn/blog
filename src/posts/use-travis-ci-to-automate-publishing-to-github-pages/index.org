@@ -14,39 +14,39 @@
 所谓借助 =Travis-CI= 自动构建，无非就是把原本需要自己手动执行的命令或脚本，
 通过 =.travis.yml= 配置文件告诉 =Travis-CI= 该如何一步步执行。
 
-*** 博客仓库
+** 博客仓库
 
-    我是用 =Emacs Org-mode= 来写博客的，源码在 [[https://github.com/demokn/blog][demokn/blog]] 的 =master= 分支。
-    自己手动执行构建也非常简单，因为借助了 =Makefile=, 只需要执行一下 =make= 命令即可完成构建。
-    当然还有个前提就是我已经安装了新版的 Emacs.
-    这里借助 =Makefile= 并不是使用 =Travis-CI= 必须的, 我只是提一下本项目手动构建的步骤, 为下面配置 =.travis.yml= 做准备。
-    我们也可以把构建所需执行的命令写成一个或多个 =shell 脚本=, 如本例中的 =build.sh=.
-    甚至也可以把这些命令直接逐条写在 =.travis.yml= 配置文件中（当然不推荐就是了）。
+   我是用 =Emacs Org-mode= 来写博客的，源码在 [[https://github.com/demokn/blog][demokn/blog]] 的 =master= 分支。
+   自己手动执行构建也非常简单，因为借助了 =Makefile=, 只需要执行一下 =make= 命令即可完成构建。
+   当然还有个前提就是我已经安装了新版的 Emacs.
+   这里借助 =Makefile= 并不是使用 =Travis-CI= 必须的, 我只是提一下本项目手动构建的步骤, 为下面配置 =.travis.yml= 做准备。
+   我们也可以把构建所需执行的命令写成一个或多个 =shell 脚本=, 如本例中的 =build.sh=.
+   甚至也可以把这些命令直接逐条写在 =.travis.yml= 配置文件中（当然不推荐就是了）。
 
-    再说明一下， =GitHub Pages= 是有 [[https://help.github.com/en/articles/about-github-pages#types-of-github-pages-sites][三种类型]] 的，分别是 project, user, 和 organization.
-    最常见到的 =<username>/<username>.github.io= 仓库, 属于 user 或 organization 类型。
-    而我用的是 =project pages=, 所以仓库名可以随便起, 主要有两个分支:
+   再说明一下， =GitHub Pages= 是有 [[https://help.github.com/en/articles/about-github-pages#types-of-github-pages-sites][三种类型]] 的，分别是 project, user, 和 organization.
+   最常见到的 =<username>/<username>.github.io= 仓库, 属于 user 或 organization 类型。
+   而我用的是 =project pages=, 所以仓库名可以随便起, 主要有两个分支:
 
-    - master: 项目源码, 包含构建脚本, Makefile, .travis.yml, org 格式文章等
-    - gh-pages: 构建完成后的 HTML 等文件, 也即是 project pages 通过 =https://<user>.github.io/<project>= 访问时的默认分支
+   - master: 项目源码, 包含构建脚本, Makefile, .travis.yml, org 格式文章等
+   - gh-pages: 构建完成后的 HTML 等文件, 也即是 project pages 通过 =https://<user>.github.io/<project>= 访问时的默认分支
 
-*** Travis-CI 配置
+** Travis-CI 配置
 
-    因为我也是第一次接触 =Travis-CI=, 只是经常有在开源库中看到过 =.travis.yml= 文件。
-    无疑，这个就是 =Travis-CI= 的配置文件了，告诉 =Travis-CI= 当仓库有新的提交时需要做什么事情。
+   因为我也是第一次接触 =Travis-CI=, 只是经常有在开源库中看到过 =.travis.yml= 文件。
+   无疑，这个就是 =Travis-CI= 的配置文件了，告诉 =Travis-CI= 当仓库有新的提交时需要做什么事情。
 
-    至于配置文件该怎么用，格式怎么写，内容怎么配，呵呵，谁还没有过第一次嘛，干就完了。
-    这里也记录下面对一个对自己来说全新的工具/知识点, 我是怎么学习的, 仅供参考：
+   至于配置文件该怎么用，格式怎么写，内容怎么配，呵呵，谁还没有过第一次嘛，干就完了。
+   这里也记录下面对一个对自己来说全新的工具/知识点, 我是怎么学习的, 仅供参考：
 
-    1. 先找2-3篇 =中文教程= 简单过一下，对 =Travis-CI= 有个入门级的了解, 是什么, 能做什么, 怎么做；（谁让咱英语不行呢）
-    2. 打开官网, 随便看看, 随便点点, 然后, =看官方文档=, =看官方文档=, =看官方文档=, 当然不用一次看完, 拣本次需要用到的知识点看；
-    3. 开始实践, 同步 GitHub 仓库, 配置 Token, 写 =.travis.yml= 配置文件, 然后尝试构建。
+   1. 先找2-3篇 =中文教程= 简单过一下，对 =Travis-CI= 有个入门级的了解, 是什么, 能做什么, 怎么做；（谁让咱英语不行呢）
+   2. 打开官网, 随便看看, 随便点点, 然后, =看官方文档=, =看官方文档=, =看官方文档=, 当然不用一次看完, 拣本次需要用到的知识点看；
+   3. 开始实践, 同步 GitHub 仓库, 配置 Token, 写 =.travis.yml= 配置文件, 然后尝试构建。
 
-    我就直接呈上 =.travis.yml= 配置文件内容了, 在注释里进行必要的解释。
+      我就直接呈上 =.travis.yml= 配置文件内容了, 在注释里进行必要的解释。
 
-    PS: 注释加的有点多, 配置文件显得有点冗长, 别害怕, 其实真的很简单的, 不带注释的参考源文件 [[https://github.com/demokn/blog/blob/master/.travis.yml][.travis.yml]].
+      PS: 注释加的有点多, 配置文件显得有点冗长, 别害怕, 其实真的很简单的, 不带注释的参考源文件 [[https://github.com/demokn/blog/blob/master/.travis.yml][.travis.yml]].
 
-    #+BEGIN_SRC yaml
+      #+BEGIN_SRC yaml
       # Travis-CI 支持很多编程语言, 但永远不可能支持全部.
       # 就像本项目并不是依赖某种特定的语言, 而是基于 Emacs 的 Org-mode, 这也就要求我们要自己安装依赖.
       # language: minimal 和 language: generic 只是基于 Ubuntu 的基础镜像, 未对任何编程语言做特殊的定制和优化.
@@ -105,14 +105,14 @@
         # 推送 local_dir 下的文件到 target_branch 指定的分支
         # 因为本项目使用的是 project pages, 所以推送到 gh-pages 分支
         target_branch: gh-pages
-    #+END_SRC
+      #+END_SRC
 
-*** 参考
+** 参考
 
-    1. [[https://github.com/nukc/how-to-use-travis-ci][如何简单入门使用Travis-CI持续集成]]
+   1. [[https://github.com/nukc/how-to-use-travis-ci][如何简单入门使用Travis-CI持续集成]]
 
-    2. [[https://juejin.im/post/5c52c47ae51d453f45615c41][Travis CI持续集成GitHub个人博客]]
+   2. [[https://juejin.im/post/5c52c47ae51d453f45615c41][Travis CI持续集成GitHub个人博客]]
 
-    3. [[https://docs.travis-ci.com/user/tutorial/][Travis-CI 官方入门教程]]
+   3. [[https://docs.travis-ci.com/user/tutorial/][Travis-CI 官方入门教程]]
 
-    4. [[https://help.github.com/en/articles/about-github-pages][GitHub Pages 官方介绍]]
+   4. [[https://help.github.com/en/articles/about-github-pages][GitHub Pages 官方介绍]]

@@ -107,12 +107,12 @@
   $("#submit").click()
 #+END_SRC
 
-**** 参考
+*** 参考
 
-     1. [[https://www.runoob.com/jsref/dom-obj-event.html][HTML DOM 事件]]
+    1. [[https://www.runoob.com/jsref/dom-obj-event.html][HTML DOM 事件]]
 
-     2. [[https://stackoverflow.com/questions/41166005/modify-react-components-state-using-jquery-plain-javascript-from-chrome-extensi][Modify React Component's State using jQuery/Plain Javascript from Chrome Extension]]
+    2. [[https://stackoverflow.com/questions/41166005/modify-react-components-state-using-jquery-plain-javascript-from-chrome-extensi][Modify React Component's State using jQuery/Plain Javascript from Chrome Extension]]
 
-     3. [[https://stackoverflow.com/questions/50035325/filling-a-react-form-from-the-google-chrome-console][Filling a react form from the Google Chrome console]]
+    3. [[https://stackoverflow.com/questions/50035325/filling-a-react-form-from-the-google-chrome-console][Filling a react form from the Google Chrome console]]
 
-     4. [[https://javascript.info/bubbling-and-capturing][Event bubbling and capturing]]
+    4. [[https://javascript.info/bubbling-and-capturing][Event bubbling and capturing]]

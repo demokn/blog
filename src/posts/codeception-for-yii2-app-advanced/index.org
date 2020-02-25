@@ -2,208 +2,208 @@
 #+KEYWORDS: 珊瑚礁上的程序员, codeception, yii2 framework, api testing, 单元测试, API测试
 #+DATE: <2020-02-02 Sun>
 
-*** 前言
+** 前言
 
-    Yii2 官方兼容 [[https://github.com/Codeception/Codeception][Codeception]] 测试框架，你可以创建以下类型的测试：
+   Yii2 官方兼容 [[https://github.com/Codeception/Codeception][Codeception]] 测试框架，你可以创建以下类型的测试：
 
-    - [[https://codeception.com/docs/05-UnitTests][单元测试]]: 验证一个独立的代码单元是否按照期望的方式运行
-    - [[https://codeception.com/docs/04-FunctionalTests][功能测试]]: 在浏览器模拟器中以用户视角来验证期望的场景是否发生
-    - [[https://codeception.com/docs/03-AcceptanceTests][验收测试]]: 在真实的浏览器中以用户视角验证期望的场景是否发生
+   - [[https://codeception.com/docs/05-UnitTests][单元测试]]: 验证一个独立的代码单元是否按照期望的方式运行
+   - [[https://codeception.com/docs/04-FunctionalTests][功能测试]]: 在浏览器模拟器中以用户视角来验证期望的场景是否发生
+   - [[https://codeception.com/docs/03-AcceptanceTests][验收测试]]: 在真实的浏览器中以用户视角验证期望的场景是否发生
 
-    Yii 为 [[https://github.com/yiisoft/yii2-app-basic][yii2-app-basic]] 和 [[https://github.com/yiisoft/yii2-app-advanced][yii2-app-advanced]] 应用模板均提供了对上述三种类型都支持的开箱即用的测试套件。
+     Yii 为 [[https://github.com/yiisoft/yii2-app-basic][yii2-app-basic]] 和 [[https://github.com/yiisoft/yii2-app-advanced][yii2-app-advanced]] 应用模板均提供了对上述三种类型都支持的开箱即用的测试套件。
 
-    这次我们要做的是基于 =yii2-app-advanced= 模板, 为其增加API测试套件，用于测试API接口。
+     这次我们要做的是基于 =yii2-app-advanced= 模板, 为其增加API测试套件，用于测试API接口。
 
-*** 搭建项目
+** 搭建项目
 
-    1. 从模板创建项目
+   1. 从模板创建项目
 
-       #+BEGIN_SRC shell
-         composer create-project --prefer-dist yiisoft/yii2-app-advanced acme
-       #+END_SRC
+      #+BEGIN_SRC shell
+        composer create-project --prefer-dist yiisoft/yii2-app-advanced acme
+      #+END_SRC
 
-    2. 准备测试环境
-       #+BEGIN_SRC shell
-         cd acme
-         # 初始化项目
-         php init --env=Development --overwrite=y
-         # 创建测试用数据库, 与 common/config/test-local.php 中的配置保持一致
-         # 执行数据库迁移, 注意, 使用的是 yii_test, 而不是 yii
-         php yii_test migrate/up
-       #+END_SRC
+   2. 准备测试环境
+      #+BEGIN_SRC shell
+        cd acme
+        # 初始化项目
+        php init --env=Development --overwrite=y
+        # 创建测试用数据库, 与 common/config/test-local.php 中的配置保持一致
+        # 执行数据库迁移, 注意, 使用的是 yii_test, 而不是 yii
+        php yii_test migrate/up
+      #+END_SRC
 
-    3. 执行 =./vendor/bin/codecept run= 以启动测试
+   3. 执行 =./vendor/bin/codecept run= 以启动测试
 
-       #+ATTR_HTML: :class alert alert-primary
-       #+BEGIN_info
-       假设你已经全局安装了 =codeception=, 后面均直接使用 =codecept= 命令, 不再加上路径了。
-       #+END_info
+      #+ATTR_HTML: :class alert alert-primary
+      #+BEGIN_info
+      假设你已经全局安装了 =codeception=, 后面均直接使用 =codecept= 命令, 不再加上路径了。
+      #+END_info
 
-       这里执行的测试内容为 advanced 模板项目中自带的测试，同时覆盖了单元测试， 功能测试和验收测试。输出内容如下：
+      这里执行的测试内容为 advanced 模板项目中自带的测试，同时覆盖了单元测试， 功能测试和验收测试。输出内容如下：
 
-       #+BEGIN_EXAMPLE
-         ➜ ./vendor/bin/codecept run
-         Codeception PHP Testing Framework v4.0.3
-         Powered by PHPUnit 8.5.2 by Sebastian Bergmann and contributors.
-         Running with seed:
+      #+BEGIN_EXAMPLE
+        ➜ ./vendor/bin/codecept run
+        Codeception PHP Testing Framework v4.0.3
+        Powered by PHPUnit 8.5.2 by Sebastian Bergmann and contributors.
+        Running with seed:
 
-         [common\tests]: tests from /home/demo/Code/learning/yii2-app-advanced/common
+        [common\tests]: tests from /home/demo/Code/learning/yii2-app-advanced/common
 
-         Common\tests.unit Tests (3) -----------------------------------------------------------------------------------------------------------------------------
-         ✔ LoginFormTest: Login no user (0.01s)
-         ✔ LoginFormTest: Login wrong password (0.42s)
-         ✔ LoginFormTest: Login correct (0.46s)
-         ---------------------------------------------------------------------------------------------------------------------------------------------------------
+        Common\tests.unit Tests (3) -----------------------------------------------------------------------------------------------------------------------------
+        ✔ LoginFormTest: Login no user (0.01s)
+        ✔ LoginFormTest: Login wrong password (0.42s)
+        ✔ LoginFormTest: Login correct (0.46s)
+        ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-         ...此处有省略...
+        ...此处有省略...
 
-         [backend\tests]: tests from /home/demo/Code/learning/yii2-app-advanced/backend
+        [backend\tests]: tests from /home/demo/Code/learning/yii2-app-advanced/backend
 
-         Backend\tests.functional Tests (1) ----------------------------------------------------------------------------------------------------------------------
-         ✔ LoginCest: Login user (0.43s)
-         ---------------------------------------------------------------------------------------------------------------------------------------------------------
+        Backend\tests.functional Tests (1) ----------------------------------------------------------------------------------------------------------------------
+        ✔ LoginCest: Login user (0.43s)
+        ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-         Backend\tests.unit Tests (0) ----------------------------------------------------------------------------------------------------------------------------
-         ---------------------------------------------------------------------------------------------------------------------------------------------------------
+        Backend\tests.unit Tests (0) ----------------------------------------------------------------------------------------------------------------------------
+        ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-         Time: 4.53 seconds, Memory: 30.00 MB
+        Time: 4.53 seconds, Memory: 30.00 MB
 
-         OK (43 tests, 121 assertions)
-       #+END_EXAMPLE
+        OK (43 tests, 121 assertions)
+      #+END_EXAMPLE
 
-*** 创建API测试套件
+** 创建API测试套件
 
-    首先需要明确的是 yii2 advanced 模板属于多应用项目，分为 frontend 和 backend ， 当然还可以按需继续添加其他应用。
-    我们需要在多个应用中分别创建API测试套件。此处以 frontend 应用为例。
+   首先需要明确的是 yii2 advanced 模板属于多应用项目，分为 frontend 和 backend ， 当然还可以按需继续添加其他应用。
+   我们需要在多个应用中分别创建API测试套件。此处以 frontend 应用为例。
 
-    1. 进入应用根目录 =cd frontend=
+   1. 进入应用根目录 =cd frontend=
 
-    2. 创建API测试套件 =codecept generate:suite api= , 输出如下
+   2. 创建API测试套件 =codecept generate:suite api= , 输出如下
 
-       #+BEGIN_EXAMPLE
-         ➜ codecept generate:suite api
-         Helper \frontend\tests\Helper\Api was created in /path/acme/frontend/tests/_support/Helper/Api.php
-         Actor ApiTester was created in /path/acme/frontend/tests/_support/ApiTester.php
-         Suite config api.suite.yml was created.
+      #+BEGIN_EXAMPLE
+        ➜ codecept generate:suite api
+        Helper \frontend\tests\Helper\Api was created in /path/acme/frontend/tests/_support/Helper/Api.php
+        Actor ApiTester was created in /path/acme/frontend/tests/_support/ApiTester.php
+        Suite config api.suite.yml was created.
 
-         Next steps:
-         1. Edit api.suite.yml to enable modules for this suite
-         2. Create first test with generate:cest testName ( or test|cept) command
-         3. Run tests of this suite with codecept run api command
-         Suite api generated
-       #+END_EXAMPLE
+        Next steps:
+        1. Edit api.suite.yml to enable modules for this suite
+        2. Create first test with generate:cest testName ( or test|cept) command
+        3. Run tests of this suite with codecept run api command
+        Suite api generated
+      #+END_EXAMPLE
 
-       由输出可知，该命令共生成了三个文件。
-       查看其中 =tests/api.suite.yml= 文件内容如下:
+      由输出可知，该命令共生成了三个文件。
+      查看其中 =tests/api.suite.yml= 文件内容如下:
 
-       #+BEGIN_SRC yaml
-         actor: ApiTester
-         modules:
-             enabled:
-                 - \frontend\tests\Helper\Api
-       #+END_SRC
+      #+BEGIN_SRC yaml
+        actor: ApiTester
+        modules:
+            enabled:
+                - \frontend\tests\Helper\Api
+      #+END_SRC
 
-    3. 修改 =api.suite.yml= 文件, 修改后内容如下:
+   3. 修改 =api.suite.yml= 文件, 修改后内容如下:
 
-       #+BEGIN_SRC yaml
-         suite_namespace: frontend\tests\api
-         actor: ApiTester
-         modules:
-             enabled:
-                 - \frontend\tests\Helper\Api
-                 - REST:
-                       depends: Yii2
-         config:
-             - Yii2
-       #+END_SRC
+      #+BEGIN_SRC yaml
+        suite_namespace: frontend\tests\api
+        actor: ApiTester
+        modules:
+            enabled:
+                - \frontend\tests\Helper\Api
+                - REST:
+                      depends: Yii2
+        config:
+            - Yii2
+      #+END_SRC
 
-    4. composer 安装API测试所需依赖（ =api.suite.yml= 中启用的 =REST= 模块）
+   4. composer 安装API测试所需依赖（ =api.suite.yml= 中启用的 =REST= 模块）
 
-       #+BEGIN_SRC shell
-       composer require codeception/module-rest --dev
-       #+END_SRC
+      #+BEGIN_SRC shell
+      composer require codeception/module-rest --dev
+      #+END_SRC
 
-    5. 执行 =codecept run api=
+   5. 执行 =codecept run api=
 
-       目的是为了验证配置是否正确, 依赖是否安装, 同时生成 =tests/_support/_generated/ApiTesterActions.php= 文件
+      目的是为了验证配置是否正确, 依赖是否安装, 同时生成 =tests/_support/_generated/ApiTesterActions.php= 文件
 
-*** 创建测试
+** 创建测试
 
-    1. 先随便写个常见的登录接口
+   1. 先随便写个常见的登录接口
 
-       新建 =frontend/controllers/ApiController.php= 控制器文件, 内容如下：
+      新建 =frontend/controllers/ApiController.php= 控制器文件, 内容如下：
 
-       #+BEGIN_SRC php
-         <?php
+      #+BEGIN_SRC php
+        <?php
 
-         namespace frontend\controllers;
+        namespace frontend\controllers;
 
-         use yii\web\Controller;
+        use yii\web\Controller;
 
-         class ApiController extends Controller
-         {
-             public $enableCsrfValidation = false;
+        class ApiController extends Controller
+        {
+            public $enableCsrfValidation = false;
 
-             public function actionLogin()
-             {
-                 return json_encode([
-                     'code' => 200,
-                     'data' => [
-                         'token' => 'some random string',
-                     ],
-                     'message' => 'OK',
-                 ]);
-             }
-         }
-       #+END_SRC
+            public function actionLogin()
+            {
+                return json_encode([
+                    'code' => 200,
+                    'data' => [
+                        'token' => 'some random string',
+                    ],
+                    'message' => 'OK',
+                ]);
+            }
+        }
+      #+END_SRC
 
-    1. 生成测试类
+   1. 生成测试类
 
-       执行 =codecept generate:cest api LoginCest= 以生成 =tests/api/LoginCest.php= 测试类，然后在测试类中添加测试方法，修改后文件内容如下：
+      执行 =codecept generate:cest api LoginCest= 以生成 =tests/api/LoginCest.php= 测试类，然后在测试类中添加测试方法，修改后文件内容如下：
 
-       #+BEGIN_SRC php
-         <?php
+      #+BEGIN_SRC php
+        <?php
 
-         namespace frontend\tests\api;
+        namespace frontend\tests\api;
 
-         use Codeception\Util\HttpCode;
-         use frontend\tests\ApiTester;
-         use yii\helpers\Url;
+        use Codeception\Util\HttpCode;
+        use frontend\tests\ApiTester;
+        use yii\helpers\Url;
 
-         class LoginCest
-         {
-             public function _before(ApiTester $I)
-             {
-             }
+        class LoginCest
+        {
+            public function _before(ApiTester $I)
+            {
+            }
 
-             // tests
-             public function tryToTest(ApiTester $I)
-             {
-                 $I->wantTo('登录');
-                 $I->haveHttpHeader('Accept', 'application/json');
-                 $I->haveHttpHeader('Content-Type', 'application/json');
-                 $I->sendPOST(Url::toRoute('/api/login'), ['username' => 'username', 'password' => 'password']);
-                 $I->seeResponseCodeIs(HttpCode::OK);
-                 $I->canSeeResponseIsJson();
-                 $I->canSeeResponseContainsJson(['code' => 200]);
-             }
-         }
-       #+END_SRC
+            // tests
+            public function tryToTest(ApiTester $I)
+            {
+                $I->wantTo('登录');
+                $I->haveHttpHeader('Accept', 'application/json');
+                $I->haveHttpHeader('Content-Type', 'application/json');
+                $I->sendPOST(Url::toRoute('/api/login'), ['username' => 'username', 'password' => 'password']);
+                $I->seeResponseCodeIs(HttpCode::OK);
+                $I->canSeeResponseIsJson();
+                $I->canSeeResponseContainsJson(['code' => 200]);
+            }
+        }
+      #+END_SRC
 
-    1. 执行测试 =codecept run api LoginCest=, 输出如下
+   1. 执行测试 =codecept run api LoginCest=, 输出如下
 
-       #+BEGIN_EXAMPLE
-         ➜ codecept run api LoginCest
-         Codeception PHP Testing Framework v4.0.3
-         Powered by PHPUnit 8.5.2 by Sebastian Bergmann and contributors.
-         Running with seed:
+      #+BEGIN_EXAMPLE
+        ➜ codecept run api LoginCest
+        Codeception PHP Testing Framework v4.0.3
+        Powered by PHPUnit 8.5.2 by Sebastian Bergmann and contributors.
+        Running with seed:
 
-         Frontend\tests.api Tests (1) ----------------------------------------------------------------------------------------------------------------------------
-         ✔ LoginCest: 登录 (0.01s)
-         ---------------------------------------------------------------------------------------------------------------------------------------------------------
+        Frontend\tests.api Tests (1) ----------------------------------------------------------------------------------------------------------------------------
+        ✔ LoginCest: 登录 (0.01s)
+        ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-         Time: 127 ms, Memory: 12.00 MB
+        Time: 127 ms, Memory: 12.00 MB
 
-         OK (1 test, 4 assertions)
+        OK (1 test, 4 assertions)
 
-       #+END_EXAMPLE
+      #+END_EXAMPLE
