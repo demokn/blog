@@ -10,7 +10,7 @@
   ;; (add-to-list 'package-archives '("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/") t)
   ;; (add-to-list 'package-archives '("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/") t)
   (package-refresh-contents))
-(dolist (pkg '(dash org-plus-contrib htmlize))
+(dolist (pkg '(dash org-plus-contrib htmlize json-mode yaml-mode))
   (unless (package-installed-p pkg)
     (package-install pkg)))
 
