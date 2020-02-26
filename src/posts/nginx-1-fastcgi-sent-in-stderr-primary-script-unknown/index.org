@@ -44,13 +44,13 @@
      可以通过 nginx 访问日志查看文件路径是否正确。
 
      打开 nginx 主配置文件（我的是 =/etc/nginx/nginx.conf= ）,在http代码块中增加：
-     #+BEGIN_SRC sh
+     #+BEGIN_SRC conf
         # $document_root$fastcgi_script_name 其实就是 server 代码块中的 fastcgi_param SCRIPT_NAME 的值
         log_format scripts '$document_root$fastcgi_script_name > $request';
      #+END_SRC
 
      继续打开 nginx server 配置文件（我的是 =/etc/nginx/sites-enabled/dl.dev.com.conf= ）,在server代码块增加：
-     #+BEGIN_SRC sh
+     #+BEGIN_SRC conf
         access_log /var/log/nginx/scripts.log scripts;
      #+END_SRC
 
@@ -66,7 +66,7 @@
      同样是通过 php-fpm 的访问日志排查。
 
      编辑 php-fpm 配置文件（我的是 =/etc/php/php-fpm.d/www.conf= ）：
-     #+BEGIN_SRC sh
+     #+BEGIN_SRC conf
         access.log = /var/log/php-fpm/$pool.access.log
      #+END_SRC
 
@@ -114,12 +114,12 @@
      如果两个进程所属用户不同，需要修改如下配置文件：
 
      =nginx.conf= :
-     #+BEGIN_SRC sh
+     #+BEGIN_SRC conf
         user demo;
      #+END_SRC
 
      =php-fpm.d/www.conf= :
-     #+BEGIN_SRC sh
+     #+BEGIN_SRC conf
         ; Unix user/group of processes
         ; Note: The user is mandatory. If the group is not set, the default user's group
         ;       will be used.
@@ -250,7 +250,7 @@
    虽然没抱多大希望，但也没其他思路，就当随便看看吧。
    然而，猜猜我发现了什么，此处必须加“握操”。
    php 7.4.2 的 systemd service 配置文件中多出了这么几个配置项，注释也是清晰明了：
-   #+BEGIN_SRC sh
+   #+BEGIN_SRC conf
       # Set up a new file system namespace and mounts private /tmp and /var/tmp directories
       # so this service cannot access the global directories and other processes cannot
       # access this service's directories.

@@ -10,7 +10,7 @@
 
 ** 查看相关文件
 
-   #+BEGIN_SRC sh
+   #+BEGIN_EXAMPLE
       $ pacman -v
       Root      : /
       Conf File : /etc/pacman.conf
@@ -29,7 +29,7 @@
    相同的小写字母跟在不同的大写字母后面表示的含义可能不同。
    那么多选项和组合只需要记住几个最常用的就可以， 其余的善用 =Tab 补全= 可以查看操作选项后可跟的额外参数和其简要作用描述。
 
-   #+BEGIN_SRC sh
+   #+BEGIN_EXAMPLE
       $ pacman -h
       usage:  pacman <operation> [...]
       operations:

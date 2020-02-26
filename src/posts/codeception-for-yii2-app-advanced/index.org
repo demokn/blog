@@ -18,12 +18,12 @@
 
    1. 从模板创建项目
 
-      #+BEGIN_SRC shell
+      #+BEGIN_SRC sh
         composer create-project --prefer-dist yiisoft/yii2-app-advanced acme
       #+END_SRC
 
    2. 准备测试环境
-      #+BEGIN_SRC shell
+      #+BEGIN_SRC sh
         cd acme
         # 初始化项目
         php init --env=Development --overwrite=y
@@ -119,8 +119,8 @@
 
    4. composer 安装API测试所需依赖（ =api.suite.yml= 中启用的 =REST= 模块）
 
-      #+BEGIN_SRC shell
-      composer require codeception/module-rest --dev
+      #+BEGIN_SRC sh
+        composer require codeception/module-rest --dev
       #+END_SRC
 
    5. 执行 =codecept run api=
