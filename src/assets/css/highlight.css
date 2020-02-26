@@ -1,0 +1,59 @@
+pre.src {
+    color: #24292e;
+}
+
+.org-builtin {
+    color: #005cc5;
+}
+.org-comment,
+.org-comment-delimiter {
+    color: #6a737d;
+    font-style: italic;
+}
+.org-constant {
+    color: blue;
+}
+.org-doc {
+    color: purple;
+}
+.org-doc-string {
+    color: #28a745;
+}
+.org-function-name {
+    color: #6f42c1;
+}
+.org-keyword {
+    color: #d73a49;
+}
+.org-negation-char {
+    color: blue;
+}
+.org-preprocessor {
+    color: purple;
+}
+.org-regexp-grouping-backslash {
+    color: #28a745;
+}
+.org-regexp-grouping-construct {
+    color: purple;
+}
+.org-string {
+    color: #032f62;
+}
+.org-type {
+    color: blue;
+}
+.org-variable-name {
+    color: #28a745;
+    font-weight: bold;
+}
+.org-warning {
+    color: red;
+    font-weight: bold;
+}
+
+/* shell builtin */
+.org-sh-quoted-exec {
+    color: #032f62;
+}
+

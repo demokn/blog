@@ -49,6 +49,7 @@
 <link rel=\"stylesheet\" href=\"https://cdn.staticfile.org/font-awesome/5.11.2/css/all.min.css\">
 <link rel=\"stylesheet\" type=\"text/css\" href=\"https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek\"/>
 <link rel=\"stylesheet\" href=\"/assets/css/site.css\">
+<link rel=\"stylesheet\" href=\"/assets/css/highlight.css\">
 ")
 
 (defun demo/project-src-path (sub-path)
