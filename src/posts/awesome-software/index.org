@@ -1,9 +1,10 @@
 #+TITLE: 常用软件和工具集
-#+KEYWORDS: 珊瑚礁上的程序员, 最佳应用
+#+KEYWORDS: 珊瑚礁上的程序员, 最佳应用, windows software
 #+DATE: <2020-01-16 Thu>
 
 ** Windows
 
+   #+ATTR_HTML: :class table table-sm table-hover
    | 软件            | 描述                      |
    |-----------------+---------------------------|
    | [[https://www.7-zip.org/][7-Zip]]           | 压缩与解压缩              |
