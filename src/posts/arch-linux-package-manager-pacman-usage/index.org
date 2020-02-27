@@ -21,7 +21,7 @@
       Log File  : /var/log/pacman.log
       GPG Dir   : /etc/pacman.d/gnupg/
       Targets   : None
-   #+END_SRC
+   #+END_EXAMPLE
 
 ** 操作选项(operation)
 
@@ -42,7 +42,7 @@
           pacman {-S --sync}     [options] [package(s)]  同步（安装）包
           pacman {-T --deptest}  [options] [package(s)]  检查包依赖
           pacman {-U --upgrade}  [options] <file(s)>     更新或安装包
-   #+END_SRC
+   #+END_EXAMPLE
 
 ** 一些常用命令
 
