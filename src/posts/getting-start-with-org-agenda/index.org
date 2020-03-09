@@ -1,0 +1,41 @@
+#+TITLE: Org Agenda 模式下常用快捷键
+#+KEYWORDS: 珊瑚礁上的程序员, emacs. org-mode, org-agenda
+#+DATE: <2020-03-10 Tue 00:02>
+
+打开 =org-agenda= 的全局快捷键 =C-c a=, 或者使用 =M-x org-agenda= 。
+
+在 =Org Agenda= 模式下, 默认绑定的快捷键就有 *150* 多个。
+要全部记住是不可能的，这辈子都不可能。
+这里就记录一些常用的命令和快捷键。
+
+#+ATTR_HTML: :class alert alert-warning
+#+begin_info
+如果有需要的化，全局快捷键 =C-h m= 或 =M-x describe-mode= 可以查看当前模式下支持的全部命令和对应的快捷键绑定。
+#+end_info
+
+#+ATTR_HTML: :class alert alert-info
+#+begin_info
+在 =org= 模式下的快捷键也都是可以使用的, 如 =C-c C-w= 依旧绑定的是 =org-agenda-refile=, 这里就不再重复列出了。
+#+end_info
+
+#+ATTR_HTML: :class table table-sm table-hover
+| 命令                         | 解释                   | 快捷键  |
+|------------------------------+------------------------+---------|
+| org-agenda-day-view          | 按天展示               | d       |
+| org-agenda-week-view         | 按周展示               | w       |
+| org-agenda-year-view         | 按年展示               | y       |
+| org-agenda-earlier           | 更早的日期（向前翻页） | b       |
+| org-agenda-later             | 更晚的日期（向后翻页） | f       |
+| org-agenda-goto-today        | 跳转到当天             | .       |
+| org-agenda-goto-date         | 跳转到指定日期         | j       |
+| org-agenda-filter            | 筛选条目               | /       |
+| org-agenda-filter-by-tag     | 按标签筛选条目         | \       |
+| org-agenda-filter-by-regexp  | 按正则筛选条目         | =       |
+| org-agenda-filter-remove-all | 移除所有筛选条件       | \vert{} |
+| org-agenda-todo              | 设置状态               | t       |
+| org-agenda-add-note          | 为当前条目添加备注     | z       |
+| org-agenda-archive           | 归档当前条目           | $       |
+| org-agenda-priority          | 设置权重               | ，      |
+| org-agenda-priority-up       | 提高权重               | +       |
+| org-agenda-priority-down     | 降低权重               | -       |
+| org-agenda-set-tags          | 设置标签               | ：      |
