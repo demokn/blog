@@ -43,10 +43,12 @@
 (defvar demo/project-pub-root (expand-file-name "public/" (file-name-directory (or load-file-name buffer-file-name)))
   "项目发布根目录.")
 
+;; 对于引用的外部CSS库，最好是下载到本地.
+;; 使用CDN引用的话，google search 可能无法爬取，导致“移动设备易用性”检查出现错误.
 (defvar demo/project-html-head
   "<link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\">
-<link rel=\"stylesheet\" href=\"https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css\">
-<link rel=\"stylesheet\" href=\"https://cdn.staticfile.org/font-awesome/5.11.2/css/all.min.css\">
+<link rel=\"stylesheet\" href=\"/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css\">
+<link rel=\"stylesheet\" href=\"/assets/lib/font-awesome/5.12.1/all.min.css\">
 <link rel=\"stylesheet\" type=\"text/css\" href=\"https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek\"/>
 <link rel=\"stylesheet\" href=\"/assets/css/site.css\">
 <link rel=\"stylesheet\" href=\"/assets/css/highlight.css\">
