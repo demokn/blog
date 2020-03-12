@@ -1,6 +1,9 @@
 #+TITLE: 珊瑚礁上的程序员
 #+KEYWORDS: 珊瑚礁上的程序员, 博客, 首页, Homepage
+#+COMMENT: google site verification
 #+HTML_HEAD_EXTRA: <meta name="google-site-verification" content="KeCMK1ZsjmPvHYLVcu5CSFEOxguXNd9bPi_ZCSiQ-xw" />
+#+COMMENT: bing site verification
+#+HTML_HEAD_EXTRA: <meta name="msvalidate.01" content="250222ED2307A2C2DD118348301C7C19" />
 
 ** TODO 基础功能 [4/6]
    CLOSED: [2020-02-14 Fri 15:49]
