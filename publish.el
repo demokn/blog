@@ -287,7 +287,7 @@ Return output file name."
          :html-html5-fancy t
          :html-head-include-scripts nil
          :html-head-include-default-style nil
-         :html-head-extra demo/project-html-head
+         :html-head demo/project-html-head
          :html-preamble t
          :html-preamble-format (demo--pre/postamble-format 'preamble)
          :html-postamble t
@@ -346,7 +346,7 @@ Return output file name."
          :html-html5-fancy t
          :html-head-include-scripts nil
          :html-head-include-default-style nil
-         :html-head-extra demo/project-html-head
+         :html-head demo/project-html-head
          :html-preamble t
          :html-preamble-format (demo--pre/postamble-format 'preamble)
          :html-postamble t

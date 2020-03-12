@@ -1,7 +1,8 @@
 #+TITLE: 珊瑚礁上的程序员
 #+KEYWORDS: 珊瑚礁上的程序员, 博客, 首页, Homepage
+#+HTML_HEAD_EXTRA: <meta name="google-site-verification" content="KeCMK1ZsjmPvHYLVcu5CSFEOxguXNd9bPi_ZCSiQ-xw" />
 
-** DONE 基础功能 [4/4]
+** TODO 基础功能 [4/6]
    CLOSED: [2020-02-14 Fri 15:49]
    :LOGBOOK:
    - State "DONE"       from              [2020-02-14 Fri 15:49]
@@ -10,6 +11,8 @@
    - [X] 文章列表(archive)
    - [X] 网站地图(sitemap)
    - [X] 博客订阅(rss)
+   - [ ] 文章类别(category)
+   - [ ] 文章标签(tag)
 ** DONE 三方插件 [3/3]
    CLOSED: [2020-02-14 Fri 15:49]
    :LOGBOOK:
