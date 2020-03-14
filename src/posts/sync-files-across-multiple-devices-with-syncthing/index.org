@@ -1,0 +1,76 @@
+#+TITLE: 使用 Syncthing 实现跨设备同步文件
+#+KEYWORDS: 珊瑚礁上的程序员, Syncthing, file synchronization, 跨设备同步文件
+#+DATE: <2020-03-14 Sat 20:30>
+
+** 前言
+   笔记本上装的 [[https://manjaro.org/][Manjaro]] 系统，微信客户端用的是 [[https://github.com/kooritea/electronic-wechat][electronic-wechat]] 。
+   一直存在的一个问题是每当发送屏幕截屏时，图片分辨率都好低。
+   因为工作的原因，又经常需要通过微信发送屏幕截屏，所以今天特地想找找原因。
+   原本以为是截屏工具的问题，今天才发现竟然是 [[https://web.wechat.com/][网页版微信]] 自身的问题，图片会被自动压缩。
+   要想发送“原图”，可以把图片打包后作为非图片文件发送，但这对接收者来说太不友好了。
+   无奈，只好找一个“曲线救国”的方案：先把屏幕截屏保存在电脑上，再同步到手机上，然后用手机端微信发送图片。
+   乍一看这也太曲线，太麻烦了吧。
+   但是再转念一想，我不是一直都想找一个电脑和手机互传文件的方案吗。
+   现在需要互传时，基本上都是通过微信发送给自己的小号或者文件传输助手，然后再到另一台设备上下载下来。
+   但其实早就想摆脱这种方案了，毕竟有些文件实在不想经过第三方服务器中转（当然也不想上传到云盘了）。
+   一番简单的Google之后，最终选择了使用 [[https://syncthing.net/][Syncthing]] 。
+
+** 简介
+   =Syncthing= 是一个开源的跨平台的文件夹/文件持续同步程序，支持 =Android=, =Linux=, =Windows,= =Mac OS X= 等平台。
+   数据安全方面， =Syncthing= 不需要将数据上传到云，而是当自己的多台设备同时联机时仅在这些受信任的设备之间交换数据。
+   官方对它的介绍是：
+   #+begin_quote
+   Syncthing is a *continuous file synchronization* program.
+   It synchronizes files between two or more computers in real time, safely protected from prying eyes.
+   Your data is your data alone and you deserve to choose where it is stored, whether it is shared with some third party,
+   and how it's transmitted over the internet.
+   #+end_quote
+
+   #+ATTR_HTML: :class alert alert-info
+   #+begin_info
+   =Syncthing= 并没有官方支持的 iOS 客户端，官方给出的解释参见 [[https://docs.syncthing.net/users/faq.html#why-is-there-no-ios-client][这里]] 。
+   不过好像说是有一个第三方的实现，叫 =fsync= 。有需要的自己搜一下试试。
+   #+end_info
+
+** 安装
+
+   安装其实没什么好说的，到 [[https://syncthing.net/downloads/][官网]] 去选择合适的版本下载就是了。
+   我目前在两台设备上装了 =Syncthing= ，安卓手机直接到 [[https://play.google.com/store/apps/details?id=com.nutomic.syncthingandroid][Google Play]] 商店安装；
+   笔记本电脑是通过软件包管理工具装的：
+   #+begin_src sh
+     sudo pacman -S syncthing
+   #+end_src
+
+** 基本使用
+
+   在我的笔记本上启动 =Syncthing=:
+
+   #+begin_src sh
+     syncthing
+   #+end_src
+
+   #+ATTR_HTML: :class alert alert-info
+   #+begin_info
+   如果需要，可以自行配置后台常驻运行和开机自启动等。
+   #+end_info
+
+   =Syncthing= 启动后会自动在浏览器中打开 [[http://127.0.0.1:8384][管理页面]] 。
+
+   #+ATTR_HTML: :class d-block mw-100 mx-auto
+   [[./syncthing-admin-gui-index.png]]
+
+   左侧是“文件夹”列表或要同步的目录，右侧是设备列表。
+   你可以根据需要来添加任意数量的目录和任意数量的设备。
+   /该图中右下方的远程设备列表里显示我已经成功连接了我的手机。/
+
+   Web GUI 已经自带了中文翻译，自己都点一点，看一下都有些什么功能。
+   这里只做一下简单说明，就不一步步放图讲解了。
+
+   为了使 =Syncthing= 能够与另一台设备同步文件，必须告知该设备。这可以通过交换 *设备ID* 来实现。
+   设备ID是唯一的加密安全标识符，该标识符在首次启动 =Syncthing= 时作为密钥的一部分生成的。
+   可以通过 =操作= \Rightarrow =显示 ID= 查看设备ID。
+   只有两个设备都配置有彼此的设备ID，它们才会相互连接。
+   也就是说配置必须是相互的，需要双方都同意，因此不需要刻意将设备ID保密。它们本质上是公钥的一部分。
+
+   接下来自己操作试试吧，有问题记得看 [[https://docs.syncthing.net/users/index.html][文档]]，同时借用文档中的一句话：
+   *Good luck and have fun!*
