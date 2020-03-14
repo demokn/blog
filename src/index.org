@@ -24,6 +24,7 @@
    - [X] 评论插件(disqus)
    - [X] Google Analytics
    - [X] StatCounter
-** TODO 补充页面 [1/2]
+** TODO 补充页面 [2/3]
    - [X] 首页
    - [ ] 关于
+   - [X] 404
