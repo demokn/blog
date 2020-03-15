@@ -75,3 +75,33 @@
       # pacman进度条吃糖果动画
       grep "ILoveCandy" /etc/pacman.conf >/dev/null || sudo sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
    #+END_SRC
+
+** 常见问题
+
+   1. *unable to lock database*
+
+      执行 =sudo pacman -Syyu= 时报错，输出如下：
+      #+begin_example
+      ➜ sudo pacman -Syu
+      :: Synchronizing package databases...
+      error: failed to update core (unable to lock database)
+      error: failed to update extra (unable to lock database)
+      error: failed to update community (unable to lock database)
+      error: failed to update multilib (unable to lock database)
+      error: failed to synchronize all databases
+      #+end_example
+
+      #+ATTR_HTML: :class alert alert-info
+      #+begin_info
+      我碰到这个问题是因为在执行一次更新过程中电脑死机了, 强制关机重启后, 再次执行更新报了这个错。
+
+      谢天谢地, 系统没挂。也是第一次碰到更新过程中死机的情况，我当时还以为就要重装系统了呢。
+      #+end_info
+
+      解决办法:
+      #+begin_src sh
+        sudo rm -rf /var/lib/pacman/db.lck
+      #+end_src
+
+      参考:
+      - [[https://www.ostechnix.com/how-to-fix-unable-to-lock-database-error-in-arch-linux/][How To Fix “unable to lock database” Error In Arch Linux]]
