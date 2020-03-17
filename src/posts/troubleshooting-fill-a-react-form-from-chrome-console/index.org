@@ -90,20 +90,20 @@
 
 继续尝试，google，尝试，此处省略半小时。。。
 
-最终发现，确实是 =oninput= 事件的问题，至于上面的事件测试中明明有 =oninput= 事件，
-确没生效的原因是初始化事件时，没有明确指定事件的冒泡属性为 true，即 =input.initEvent("input", {bubbles: true})= 。
+最终发现，确实是 =input= 事件的问题，至于上面的事件测试中明明有 =input= 事件却没生效的原因是：
+*初始化事件时，没有明确指定事件的冒泡属性为 =true= ， 即 =input.initEvent("input", {bubbles: true})= 。*
 至于，这之中涉及到的 DOM事件, 事件监听, 事件触发, 事件冒泡 和 React组件State 等，我也不是专业前端，很难讲明白，有兴趣的就自行 google 吧。
 
 完整的代码如下：
 
 #+BEGIN_SRC javascript
-  var input = document.createEvent("HTMLEvents")
-  input.initEvent("input")
+  var inputEvent = document.createEvent("HTMLEvents")
+  inputEvent.initEvent("input", {bubbles: true})
 
   $("#username").value = "USERNAME"
-  $("#username").dispatchEvent(input)
+  $("#username").dispatchEvent(inputEvent)
   $("#password").value = "PASSWORD"
-  $("#password").dispatchEvent(input)
+  $("#password").dispatchEvent(inputEvent)
   $("#submit").click()
 #+END_SRC
 
