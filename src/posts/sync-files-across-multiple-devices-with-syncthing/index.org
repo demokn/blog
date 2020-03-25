@@ -74,3 +74,16 @@
 
    接下来自己操作试试吧，有问题记得看 [[https://docs.syncthing.net/users/index.html][文档]]，同时借用文档中的一句话：
    *Good luck and have fun!*
+
+** 常见问题
+   1. 手机端使用 *垃圾清理* 时会把 =Syncthing= 自动创建的[[https://docs.syncthing.net/users/faq.html#how-do-i-serve-a-folder-from-a-read-only-filesystem][文件夹标记(默认为 =.stfolder= )]]删除，导致无法同步
+      -----
+      首先明确， =.stfolder= 之所以会被 *垃圾清理* “误删”是因为它是一个空文件夹。
+      故，只需要在 =.stfoler= 文件夹中随便放入一个文件即可。
+      还有一个思路就是根据文档描述，在 *高级配置* 中把 =Marker Name= 由默认的 =.stfolder= 改名为你明确知道在同步文件夹中会一直存在的文件或目录名。(TODO: 未验证)
+
+      #+ATTR_HTML: :class alert alert-info
+      #+begin_info
+      特别提一下，一般这种情况都是放一个空文件，如命名为 =.keep=, 然而我的手机(XiaoMi Mix 2s)默认文件管理器不支持直接新建文件。
+      无奈，我只能在电脑端新建一个 =.keep= 空文件，同步到手机端后，再移动该文件到 =.stfolder= 目录。
+      #+end_info
