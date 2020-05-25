@@ -1,0 +1,156 @@
+#+TITLE: 使用 PHP 获取网站 SSL 证书信息
+#+KEYWORDS: 珊瑚礁上的程序员, php, ssl certificate
+#+DATE: <2020-05-25 Mon 15:48>
+
+前两天，有用户反馈网站突然打不开了，看了一下用户给的截图，应该是网站的证书过期了。
+赶紧爬起来更新了一下证书。为了避免再次发生这种尴尬的事情，想着写一个简单的脚本，
+监控网站的证书到期时间，以便提醒自己及时更新证书。
+
+因为自己平时还是和 =php= 打交道比较多，也有现成的短信、邮件、企业微信等通知方式可用，
+所以还是决定用 =php= 来实现。
+关于如何使用PHP获取网站的SSL证书，经过简单的搜索和尝试，还是比较简单的，直接附上代码：
+
+#+begin_src php
+  $url = 'https://www.httpbin.org/';
+  $host = parse_url($url, PHP_URL_HOST);
+  $streamContext = stream_context_create(['ssl' => ['capture_peer_cert' => true]]);
+  $socket = stream_socket_client(
+      'ssl://'.$host.':443',
+      $errorNo,
+      $errorMessage,
+      30,
+      STREAM_CLIENT_CONNECT,
+      $streamContext
+  );
+  if ($socket === false) {
+      echo "[ERROR] Failed to open socket connection: {$errorNo} - {$errorMessage}".PHP_EOL;
+      exit(1);
+  }
+  $parameters = stream_context_get_params($socket);
+  $certificate = openssl_x509_parse($parameters['options']['ssl']['peer_certificate']);
+  print_r($certificate);
+  /*[
+      'name' => '/CN=httpbin.org',
+      'subject' => [
+          'CN' => 'httpbin.org',
+      ],
+      'hash' => '5a356b71',
+      'issuer' => [
+          'C' => 'US',
+          'O' => 'Amazon',
+          'OU' => 'Server CA 1B',
+          'CN' => 'Amazon',
+      ],
+      'version' => 2,
+      'serialNumber' => '15511154429359216763915851913648262204',
+      'serialNumberHex' => '0BAB56F52FC9F721C8C35BFC58E9CC3C',
+      'validFrom' => '200118000000Z',
+      'validTo' => '210218120000Z',
+      'validFrom_time_t' => 1579305600,
+      'validTo_time_t' => 1613649600,
+      'signatureTypeSN' => 'RSA-SHA256',
+      'signatureTypeLN' => 'sha256WithRSAEncryption',
+      'signatureTypeNID' => 668,
+      'purposes' => [
+          1 => [
+              true,
+              false,
+              'sslclient',
+          ],
+          2 => [
+              true,
+              false,
+              'sslserver',
+          ],
+          3 => [
+              true,
+              false,
+              'nssslserver',
+          ],
+          4 => [
+              false,
+              false,
+              'smimesign',
+          ],
+          5 => [
+              false,
+              false,
+              'smimeencrypt',
+          ],
+          6 => [
+              false,
+              false,
+              'crlsign',
+          ],
+          7 => [
+              true,
+              true,
+              'any',
+          ],
+          8 => [
+              true,
+              false,
+              'ocsphelper',
+          ],
+          9 => [
+              false,
+              false,
+              'timestampsign',
+          ],
+      ],
+      'extensions' => [
+          'authorityKeyIdentifier' => "keyid:59:A4:66:06:52:A0:7B:95:92:3C:A3:94:07:27:96:74:5B:F9:3D:D0\n",
+          'subjectKeyIdentifier' => '4D:47:D7:1B:DA:3A:E5:FB:D0:31:40:CA:CE:35:D6:54:B9:C8:EF:A5',
+          'subjectAltName' => 'DNS:httpbin.org, DNS:*.httpbin.org',
+          'keyUsage' => 'Digital Signature, Key Encipherment',
+          'extendedKeyUsage' => 'TLS Web Server Authentication, TLS Web Client Authentication',
+          'crlDistributionPoints' => "
+           \n
+           Full Name:\n
+             URI:http://crl.sca1b.amazontrust.com/sca1b.crl\n
+           ",
+          'certificatePolicies' => "
+           Policy: 2.16.840.1.114412.1.2\n
+           Policy: 2.23.140.1.2.1\n
+           ",
+          'authorityInfoAccess' => "
+           OCSP - URI:http://ocsp.sca1b.amazontrust.com\n
+           CA Issuers - URI:http://crt.sca1b.amazontrust.com/sca1b.crt\n
+           ",
+          'basicConstraints' => 'CA:FALSE',
+          'ct_precert_scts' => "
+           Signed Certificate Timestamp:\n
+               Version   : v1 (0x0)\n
+               Log ID    : EE:4B:BD:B7:75:CE:60:BA:E1:42:69:1F:AB:E1:9E:66:\n
+                           A3:0F:7E:5F:B0:72:D8:83:00:C4:7B:89:7A:A8:FD:CB\n
+               Timestamp : Jan 18 01:26:21.019 2020 GMT\n
+               Extensions: none\n
+               Signature : ecdsa-with-SHA256\n
+                           30:45:02:21:00:81:00:82:78:B4:00:81:AD:D1:F0:07:\n
+                           86:67:18:81:93:CB:7F:FD:17:1B:99:F4:62:28:1E:07:\n
+                           D7:E5:18:DE:7D:02:20:79:76:3E:C7:BA:16:42:62:12:\n
+                           85:70:AB:05:27:6A:79:36:17:AE:CC:50:71:61:3A:66:\n
+                           90:32:43:17:2C:75:45\n
+           Signed Certificate Timestamp:\n
+               Version   : v1 (0x0)\n
+               Log ID    : 87:75:BF:E7:59:7C:F8:8C:43:99:5F:BD:F3:6E:FF:56:\n
+                           8D:47:56:36:FF:4A:B5:60:C1:B4:EA:FF:5E:A0:83:0F\n
+               Timestamp : Jan 18 01:26:21.098 2020 GMT\n
+               Extensions: none\n
+               Signature : ecdsa-with-SHA256\n
+                           30:45:02:20:10:CC:62:29:B6:B0:5F:1E:1E:95:B5:67:\n
+                           BF:F2:43:59:62:4F:06:BC:21:14:A3:89:D0:5D:F5:95:\n
+                           48:C1:EE:A6:02:21:00:EC:33:CE:4D:A4:60:73:F7:07:\n
+                           DC:EC:C8:19:2B:BA:74:B6:9E:7B:91:7F:61:19:26:0B:\n
+                           D4:E2:91:68:96:4C:2F
+           ",
+      ],
+  ]*/
+#+end_src
+
+可以看到证书信息中的 =validTo_time_t= 就是证书到期时间。简单的配合 =CRONTAB= 每天检查一遍，就可以提前通知自己“证书即将到期，请及时更新”。
+
+** 参考
+
+- [[https://stackoverflow.com/questions/3081042/how-to-get-ssl-certificate-info-with-curl-in-php][How to get SSL certificate info with CURL in PHP?]]
+- [[https://www.php.net/manual/zh/context.ssl.php#context.ssl.capture-peer-cert][PHP SSL 上下文选项]]
