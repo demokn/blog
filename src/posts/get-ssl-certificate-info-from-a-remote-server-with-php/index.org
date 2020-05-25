@@ -29,7 +29,13 @@
   $parameters = stream_context_get_params($socket);
   $certificate = openssl_x509_parse($parameters['options']['ssl']['peer_certificate']);
   print_r($certificate);
-  /*[
+#+end_src
+
+解析后的证书信息如下：
+
+#+ATTR_HTML: :style max-height:360px;
+#+begin_example
+  [
       'name' => '/CN=httpbin.org',
       'subject' => [
           'CN' => 'httpbin.org',
@@ -145,8 +151,8 @@
                            D4:E2:91:68:96:4C:2F
            ",
       ],
-  ]*/
-#+end_src
+  ]
+#+end_example
 
 可以看到证书信息中的 =validTo_time_t= 就是证书到期时间。简单的配合 =CRONTAB= 每天检查一遍，就可以提前通知自己“证书即将到期，请及时更新”。
 
