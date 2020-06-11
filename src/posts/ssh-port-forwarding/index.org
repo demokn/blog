@@ -27,7 +27,7 @@
 #+ATTR_HTML: :class d-block mw-100 mx-auto
 [[./data-transfer.png]]
 
-#+begin_src plantuml :file ./data-transfer.png :results none :exports none
+#+begin_src plantuml :eval no-export :file ./data-transfer.png :results none :cmdline -charset utf-8
 @startuml
 skinparam handwritten true
 
