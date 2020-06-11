@@ -19,6 +19,28 @@
 (require 'ox-rss)
 (require 'ox-publish)
 
+(if (fboundp 'with-eval-after-load)
+    (defalias 'after-load 'with-eval-after-load)
+  (defmacro after-load (feature &rest body)
+    "After FEATURE is loaded, evaluate BODY."
+    (declare (indent defun))
+    `(eval-after-load ,feature
+       '(progn ,@body))))
+
+(after-load 'ob-plantuml
+  (let ((jar-name "plantuml.jar")
+        (url "http://jaist.dl.sourceforge.net/project/plantuml/plantuml.jar"))
+    (setq org-plantuml-jar-path (expand-file-name jar-name user-emacs-directory))
+    (unless (file-exists-p org-plantuml-jar-path)
+      (url-copy-file url org-plantuml-jar-path))))
+
+(defun demo/org-confirm-babel-evaluate (lang body)
+  "执行代码前是否需要确认.  LANG: 语言, BODY: 代码块."
+  (not (or
+        (string= lang "ditaa")
+        (string= lang "plantuml"))))
+(setq org-confirm-babel-evaluate #'demo/org-confirm-babel-evaluate)
+
 ;; (defun demo/hash-for-filename (filename)
 ;;   "计算指定文件的散列值.  FILENAME: 文件路径."
 ;;   (with-temp-buffer
