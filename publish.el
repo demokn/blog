@@ -307,6 +307,9 @@ Return output file name."
          :html-preamble-format (demo--pre/postamble-format 'preamble)
          :html-postamble t
          :html-postamble-format (demo--pre/postamble-format 'postamble)
+         :html-divs '((preamble "div" "preamble")
+                      (content "div" "article")
+                      (postamble "div" "postamble"))
 
          :auto-sitemap t
          :sitemap-style 'list

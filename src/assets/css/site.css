@@ -87,6 +87,28 @@ ul.share-buttons li {
     /* fancy and maybe more readable. */
     font-family: Libre Baskerville;
 }
+#article {
+    border-left: 1px solid #eeeeee;
+    border-right: 1px solid #eeeeee;
+}
+#article header {
+    text-align: center;
+}
+#article .org-src-container {
+    font-family:'Bree Serif', serif;
+    background-color: floralwhite;
+}
+#article p {
+    /* Remove Handlee and keep Libre Baskerville if you want something less*/
+    /* fancy and maybe more readable. */
+    font-family: Libre Baskerville;
+}
+#article h2:before, #article h3:before, #article h4:before {
+    content: "#";
+    color: #737c84;
+    margin-right: .5rem;
+}
+
 #postamble > footer {
     width: 40%;
     margin: auto;
