@@ -1,0 +1,36 @@
+#+TITLE: win10 使用 laravel homestead 碰到的一些问题
+#+KEYWORDS: 珊瑚礁上的程序员, laravel homestead, windows 10
+#+DATE: <2020-10-28 Wed 12:00>
+
+Windows 上一直都是使用 [[https://laravel.com/docs/homestead][laravel homestead]] 进行本地开发。
+把使用中碰到的一些问题记录一下。
+
+* =Homestead.yaml= 中指定 =authorize= 和 =keys= 未生效
+  示例中的配置如下:
+  #+begin_src yaml
+    authorize: ~/.ssh/id_rsa.pub
+
+    keys:
+      - ~/.ssh/id_rsa
+  #+end_src
+
+  首先明确指定的这两个公钥和秘钥文件确实是存在的，但在执行 =vagrant up= 时，却始终无法生效，SSH 认证无法通过。
+  虽然可以通过用户名和密码的方式登入，再手动操作，但毕竟是不方便，况且还有我这无处安放的求知欲“我明明指定了，你为什么不生效”。
+  经过一番 google，终于找到了解决办法。这个问题倒也确实是挺 tricky。
+  在 Windows 上需要这样指定路径：
+  #+begin_src yaml
+    authorize: c:/Users/demo/.ssh/id_rsa.pub
+
+    keys:
+        - c:/Users/demo/.ssh/id_rsa
+  #+end_src
+
+  下面开始划重点了：
+  1. *不能使用 =~= 表示 HOME 目录，需要使用完整的路径，如 =c:/Users/demo/=;*
+  2. *磁盘分区标识符必须小写： 使用 =c= 而不是 =C=;*
+  3. *目录分割符必须使用斜杠 =/= 而不是反斜杠 =\=;*
+
+  至于为什么一定要这么做，我也还是不清楚。
+  查了 =Virtual Box= 和 =Vagrant= 的文档也没找到相关问题的说明。
+  反正先这么用就对了。
+  有谁了解的，还请告知一下。
