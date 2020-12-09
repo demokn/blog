@@ -331,7 +331,7 @@ Return output file name."
          :publishing-directory (demo/project-pub-path "posts")
          :publishing-function #'demo/org-rss-publish-to-rss
 
-         :html-link-home "https://demokn.com/posts/"
+         :html-link-home "https://blog.demokn.com/posts/"
          :html-home/up-format ""
          :html-link-use-abs-url t
          :html-link-org-files-as-html t
@@ -379,7 +379,7 @@ Return output file name."
          :publishing-directory demo/project-pub-root
          :publishing-function #'demo/org-sitemap-publish-to-sitemap
 
-         :html-link-home "https://demokn.com/"
+         :html-link-home "https://blog.demokn.com/"
          :html-home/up-format ""
          :html-link-use-abs-url t
          :html-link-org-files-as-html t
