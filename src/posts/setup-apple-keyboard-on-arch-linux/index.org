@@ -1,0 +1,82 @@
+#+TITLE: Linux 配置 Apple Magic Keyboard
+#+KEYWORDS: 珊瑚礁上的程序员, Arch Linux, Apple Magic Keyboard, 蓝牙键盘
+#+DATE: <2021-02-06 Sat 15:35>
+
+因为疫情原因，最近都是在家办公。在家用的一直都是自己的笔记本（荣耀 MagicBook），
+笔记本用的时间也蛮久了，感觉 Ctrl 键按着有点不太对劲，为防本子上的键盘真的坏掉，
+吓的我赶紧拿出闲置很久的苹果蓝牙键盘给它接上。
+
+我用的 =Manjaro= 系统，桌面环境 =Xfce= ，蓝牙 GUI 管理器 =Blueman= 。
+
+* 配对和连接
+
+  因为都是图形界面操作，蓝牙设备的配对和连接倒没什么好说的。
+  提一点就是，一定要先配对(=pair=)，再连接(=connect=)。
+  我一开始就是没有配对，直接连接了，而且还连接成功了。
+  出现的问题就是，键盘时而工作，时而不工作，甚至会把系统卡住完全无响应。反正就是一团浆糊。
+
+  当然如果你想，也可以在终端使用 =bluetoothctl= 进行配对和连接的操作。
+  具体命令参考 [[https://wiki.archlinux.org/index.php/Bluetooth][Arch Wiki]] 即可。
+
+* 设置开机自启
+
+  只需要修改蓝牙的配置文件 =/etc/bluetooth/main.conf= ，在 =[Policy]= 部分找到或添加 =AutoEnable=true= 即可.
+
+* 修改键位
+
+  重要的来了，苹果键盘的键位和我本子上键盘的键位布局是有一点差异的。
+  主要是 =Ctrl, Fn, Win(Command), Alt= 四个键位。
+  苹果键盘的键位顺序是 =Fn, Ctrl, Alt, Command= 。
+  键位不改的话，在两个键盘上切换的时候，因为肌肉记忆，特别容易按错。
+
+  要调整苹果键盘跟本子上的键盘键位一致，要做的就是将 =Fn= 和 =Ctrl= 键位互换, =Alt= 和 =Command= 键位互换。
+
+  根据 [[https://wiki.archlinux.org/index.php/Apple_Keyboard][Arch Wiki]] 描述，要实现这种键位互换，可以使用 =hid_apple= 模块配置选项。
+  但是官方的 hid_apple 模块仅支持 Alt 和 Command 互换，为了实现 Fn 和 Ctrl 的互换，还需要重新安装 [[https://github.com/free5lot/hid-apple-patched][hid-apple-patched]] 补丁包。
+  根据该补丁包文档描述，我直接使用的 Arch 三方包 [[https://aur.archlinux.org/packages/hid-apple-patched-git-dkms/][hid-apple-patched-git-dkms]] 。
+  不过该包目前已经没人维护了，该包原作者 *2021-01-10* 说自己已经不在 Macbook Pro 上使用 archlinux 了。
+  有同学介意的话，也可以自己编译安装。
+  要注意的就是，hid_apple 属于内核模块，自己编译安装之后，需要重新创建内核镜像。
+
+  #+begin_src shell
+    sudo mkinitcpio -P
+  #+end_src
+
+  安装好 hid-apple 补丁包之后，修改配置文件 =/usr/lib/modprobe.d/hid_apple.conf=
+
+  #+begin_src conf
+    # Enable PC-like layout by default.
+    # To override, copy this file to /etc/modprobe.d/hid_apple.conf and make
+    # desired changes. Note that /etc/modprobe.d/hid_apple.conf will completely
+    # replace this file, and the content is NOT merged.
+    #
+    # Option reference: https://github.com/free5lot/hid-apple-patched#configuration
+    options hid_apple fnmode=1
+    options hid_apple swap_fn_leftctrl=1
+    options hid_apple swap_opt_cmd=1
+    options hid_apple rightalt_as_rightctrl=1
+    options hid_apple ejectcd_as_delete=1
+  #+end_src
+
+  配置文件修改之后也要重新创建内核镜像。
+  然后重新加载 =hid_apple= 模块。
+
+  #+begin_src shell
+    sudo modprobe -r hid_apple
+    sudo modprobe hid_apple
+  #+end_src
+
+  至此，苹果键盘改键完成。
+  再也不用担心切换键盘时犯错了。
+
+* 参考
+
+  - [[https://wiki.archlinux.org/index.php/Bluetooth][Arch 蓝牙管理]]
+  - [[https://wiki.archlinux.org/index.php/Bluetooth_keyboard][Arch 蓝牙键盘]]
+  - [[https://wiki.archlinux.org/index.php/Apple_Keyboard][Arch 苹果键盘]]
+  - [[https://github.com/free5lot/hid-apple-patched][hid-apple 补丁包]]
+
+  更多:
+
+  - [[https://wiki.archlinux.org/index.php/Kernel_module][Arch Kernel Module]]
+  - [[https://wiki.archlinux.org/index.php/Mkinitcpio][Arch Mkinitcpio]]
