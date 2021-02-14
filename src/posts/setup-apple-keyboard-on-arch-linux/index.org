@@ -42,7 +42,8 @@
     sudo mkinitcpio -P
   #+end_src
 
-  安装好 hid-apple 补丁包之后，修改配置文件 =/usr/lib/modprobe.d/hid_apple.conf=
+  安装好 hid-apple 补丁包之后，将配置文件 =/usr/lib/modprobe.d/hid_apple.conf= 复制到 =/etc/modprobe.d/hid_apple.conf= 。
+  然后按需修改配置项：
 
   #+begin_src conf
     # Enable PC-like layout by default.
