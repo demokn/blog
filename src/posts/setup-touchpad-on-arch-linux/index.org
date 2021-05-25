@@ -1,0 +1,66 @@
+#+TITLE: Arch Linux 下调教笔记本的触控板
+#+KEYWORDS: 珊瑚礁上的程序员, Arch Linux, Touchpad, 触摸板, 触控板
+#+DATE: <2021-05-25 Tue 22:00>
+
+#+begin_quote
+生命不息，折腾不止。
+#+end_quote
+
+最近主力窗口管理器从 =xfwm= 切换到了 =dwm= 。
+
+当然也就意味着放弃了 =xfce= 这一整套桌面环境。
+
+随之带来的问题就是在系统使用过程中每碰到一个问题，或者产生某种想自定义的想法，那都是一顿折腾。
+
+比如这次的想法就是，实现触摸板的触碰即点击（单指触碰即等同于点击鼠标左键）。
+
+在 =xfce= 桌面环境实现这个相当简单，只需要在 =xfce4-settings= 的 =Mouse and Touchpad= 子菜单中找到相关选项勾选即可。
+
+现在，我们要通过 =Xorg= 的配置文件来实现。
+
+首先要知道 =X Server= 默认是使用 =libinput= 驱动来处理输入设备的。
+
+我们可以通过查看 =xorg= 的日志文件来确认触摸板是不是通过 =libinput= 来管理的：
+
+#+begin_example
+$ grep "Using input driver" ~/.local/share/xorg/Xorg.0.log
+[  5949.867] (II) Using input driver 'libinput' for 'Power Button'
+[  5949.874] (II) Using input driver 'libinput' for 'Video Bus'
+[  5949.880] (II) Using input driver 'libinput' for 'Video Bus'
+[  5949.887] (II) Using input driver 'libinput' for 'Power Button'
+[  5949.896] (II) Using input driver 'libinput' for 'hm1091_techfront: hm1091_techfr'
+[  5949.907] (II) Using input driver 'libinput' for 'ELAN2203:00 04F3:309A Mouse'
+[  5949.915] (II) Using input driver 'libinput' for 'ELAN2203:00 04F3:309A Touchpad'
+[  5949.925] (II) Using input driver 'libinput' for 'Huawei WMI hotkeys'
+[  5949.930] (II) Using input driver 'libinput' for 'AT Translated Set 2 keyboard'
+[  5949.936] (II) Using input driver 'libinput' for 'ETPS/2 Elantech Touchpad'
+#+end_example
+
+可以看到触摸板(touchpad)确实是使用 =libinput= 管理的。
+
+接下里就是修改配置文件了。
+
+Arch 在 =/usr/share/X11/xorg.conf.d= 目录下提供了 xorg 的默认配置文件。
+
+可以在该目录下找到 =libinput= 的默认配置文件，复制到 =/etc/X11/xorg.conf.d= 目录下。
+或者直接在 =/etc/X11/xorg.conf.d= 目录下新建一个配置文件 =40-libinput-touchpad.conf= ，内容如下：
+
+#+begin_src conf
+  Section "InputClass"
+      Identifier "libinput touchpad catchall"
+      MatchIsTouchpad "on"
+      MatchDevicePath "/dev/input/event*"
+      Driver "libinput"
+      Option "Tapping" "on"
+      Option "TappingButtonMap" "lrm"
+      Option "NaturalScrolling" "true"
+  EndSection
+#+end_src
+
+我这里配置了：
+
+- =Option "Tapping" "on"=: 触摸即点击
+- =Option "TappingButtonMap" "lrm"=: 单指、两指、三指触摸分别对应左键、右键、中键点击
+- =Option "NaturalScrolling" "true"=: 自然滚动（反方向滚动）
+
+当然还有更多配置项可以通过 =man 4 libinput= 来查看 man-page。
