@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- May 25, 2021 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Org-mode 执行 org-refile 报错 &ldquo;Invalid function: &#x2026;&rdquo;</title>
+<meta name="generator" content="Org mode">
+<meta name="keywords" content="珊瑚礁上的程序员, Emacs, Org-mode, org-refile, Invalid function org-preserve-local-variables">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="stylesheet" href="/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="/posts/archive.html"> Archive </a> </li>
+  <li><a href="/posts/rss.xml"> RSS </a> </li>
+  <li><a href="/about.html"> About </a> </li>
+</ul>
+<hr>
+</div>
+<div id="article">
+<header>
+<h1 class="title">Org-mode 执行 org-refile 报错 &ldquo;Invalid function: &#x2026;&rdquo;</h1>
+<p class="subtitle">Published on Feb 24, 2020</p>
+</header>
+<div id="outline-container-org1c92e00" class="outline-2">
+<h2 id="org1c92e00">问题</h2>
+<div class="outline-text-2" id="text-org1c92e00">
+<p>
+前段时间升级了本机的 <code>Org-mode</code> 版本。由原来安装 Emacs 时默认的 <code>org-9.1.9</code> 升级到了最新稳定版 <code>org-9.3.6</code> 。
+</p>
+
+<p>
+今天在执行 <code>M-x org-refile</code> 时，出错了，错误信息为 <code>Invalid function: org-preserve-local-variables</code> 。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org75e4c6d" class="outline-2">
+<h2 id="org75e4c6d">解决办法</h2>
+<div class="outline-text-2" id="text-org75e4c6d">
+<blockquote>
+<p>
+In almost all cases an <code>invalid function</code> error is caused by an unclean Org-mode source directory. Cleaning it up and recompiling should fix the problem.
+</p>
+</blockquote>
+
+<p>
+删除 <code>elpa/org</code> 目录下所有编译后的文件 <code>*.elc</code>, 退出并重新打开 Emacs, 使其重新编译即可。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">rm -rf ~/.emacs.d/elpa-26.3/org-9.3.6/*.elc
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org233dbfa" class="outline-2">
+<h2 id="org233dbfa">参考</h2>
+<div class="outline-text-2" id="text-org233dbfa">
+<ul class="org-ul">
+<li><a href="https://orgmode.org/worg/org-faq.html#invalid-function-error">After updating Org I get an error about an invalid function</a></li>
+<li><a href="https://orgmode.org/worg/org-faq.html#mixed-install">Is my Orgmode installation mixed?</a></li>
+<li><a href="https://www.emacswiki.org/emacs/ConflictingLibraries">Emacs Conflicting Libraries</a></li>
+<li><a href="https://github.com/syl20bnr/spacemacs/issues/11801">org-refile does not work. org-copy-subtree: Invalid function: org-preserve-local-variables</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="/assets/images/orgmode.svg"/> in <img id="i-emacs" src="/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>
