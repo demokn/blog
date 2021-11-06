@@ -25,6 +25,6 @@ jobs:
         with:
           personal_token: ${{ secrets.ACCESS_TOKEN }}
           publish_branch: gp-pages
-          publish_dir: public
-          destination_dir: /
+          publish_dir: ./public
+          destination_dir: ./
           force_orphan: true
