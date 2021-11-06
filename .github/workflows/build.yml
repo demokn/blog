@@ -24,7 +24,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3.7.3
         with:
           personal_token: ${{ secrets.ACCESS_TOKEN }}
-          publish_branch: gp-pages
+          publish_branch: gh-pages
           publish_dir: ./public
           destination_dir: ./
           force_orphan: true
