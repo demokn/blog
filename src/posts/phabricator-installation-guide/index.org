@@ -1,6 +1,12 @@
-#+TITLE: phabricator 安装过程
+#+TITLE: Phabricator 安装过程
 #+KEYWORDS: 珊瑚礁上的程序员, phabricator
 #+DATE: <2021-01-22 五 23:17>
+
+#+ATTR_HTML: :class alert alert-warning
+#+begin_info
+更新于 2021-11-06
+=Phabricator= 发布公告称[[https://admin.phacility.com/phame/post/view/11/phacility_is_winding_down_operations/][不再维护]], 已经切换到 [[https://gitea.io/][gitea]].
+#+end_info
 
 * 基础的 LNMP 环境搭建
   #+begin_src sh

@@ -1,4 +1,4 @@
-#+TITLE: win10 使用 laravel homestead 碰到的一些问题
+#+TITLE: Win10 使用 Laravel Homestead 碰到的一些问题
 #+KEYWORDS: 珊瑚礁上的程序员, laravel homestead, windows 10
 #+DATE: <2020-10-28 Wed 12:00>
 
@@ -22,7 +22,7 @@ Windows 上一直都是使用 [[https://laravel.com/docs/homestead][laravel home
     authorize: c:/Users/demo/.ssh/id_rsa.pub
 
     keys:
-        - c:/Users/demo/.ssh/id_rsa
+      - c:/Users/demo/.ssh/id_rsa
   #+end_src
 
   下面开始划重点了：
