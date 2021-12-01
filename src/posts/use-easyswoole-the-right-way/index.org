@@ -1,0 +1,80 @@
+#+TITLE: EasySwoole 踩坑指南
+#+KEYWORDS: 珊瑚礁上的程序员, PHP, EasySwoole, Swoole
+#+DATE: <2021-11-25 Thu 13:00>
+
+#+begin_example
+php version: 8.0.12
+swoole version: 4.8.1
+easyswoole version: 3.4.6
+#+end_example
+
+1. =TEMP_DIR= 配置必须使用绝对路径
+   临时文件存放的目录, 默认为框架根目录的 =Temp= 目录, 如需自定义, 务必要使用绝对路径, 否则会造成守护模式运行无法退出.
+   #+begin_src shell
+     php easyswoole server stop
+     pid :4177803 not exist
+   #+end_src
+
+   错误用法：
+   #+begin_src php
+     'TEMP_DIR' => './storage/temp',
+   #+end_src
+
+   正确用法：
+   #+begin_src php
+     'TEMP_DIR' => EASYSWOOLE_ROOT . '/storage/temp',
+   #+end_src
+
+2. =ORM= 联表查询时, 要指定 =field()=
+   在 orm 中使用联表查询时, 务必要指定查询的字段, 一般就是 =YourTable.*=.
+   否则会造成不同表的同名字段值被覆盖的情况。
+
+   一些成熟框架的 =ORM= 其实都会对这种联表查询的情况自动处理, 例如 =Yii2=
+   #+begin_src php
+     // \yii\db\ActiveQuery::prepare()
+     if (empty($this->select) && !empty($this->join)) {
+         list(, $alias) = $this->getTableNameAndAlias();
+         $this->select = ["$alias.*"];
+     }
+   #+end_src
+   但 =EasySwoole= 目前的版本确实还是需要自己手动指定查询字段.
+
+   错误用法：
+   #+begin_src php
+     $articles = Article::create()
+         ->join('author', 'author.id=article.author', 'INNER')
+         ->all();
+     // author 表中的 id 会覆盖 article 表中的 id
+   #+end_src
+
+   正确用法：
+   #+begin_src php
+     $articles = Article::create()
+         ->with(['author'])
+         ->field('article.*')
+         ->join('author', 'author.id=article.author', 'INNER')
+         ->all();
+   #+end_src
+
+ 3. 不要使用 =ORM= 和 =QueryBuilder= 的 =withTotalCount()= 方法
+
+    =withTotalCount= 查询总条数的方式是通过 =SQL_CALC_FOUND_ROWS= 查询选项 + =select FOUND_ROWS()= 实现的,
+    并非我们平常使用的 =select count(*)= 方式.
+    =SQL_CALC_FOUND_ROWS= 查询选项在 mysql 8.0 版本已经被 [[https://dev.mysql.com/doc/refman/8.0/en/information-functions.html#function_found-rows][标记为废弃]] 了，所以不建议使用.
+    而且, 在实际使用过程中, 确实出现了无法预知的结果。(阿里云 RDS + 读写分离)
+
+    错误用法：
+    #+begin_src php
+      $query = SmsRecord::create()
+          ->withTotalCount()
+          ->limit(10, 5);
+      $articles = $query->all();
+      $totalCount = $query->lastQueryResult()->getTotalCount();
+    #+end_src
+
+    正确用法：
+    #+begin_src php
+      $query = SmsRecord::create();
+      $totalCount = (clone $query)->count();
+      $articles = $query->limit(10, 5)->all();
+    #+end_src
