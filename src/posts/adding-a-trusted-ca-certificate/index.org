@@ -1,0 +1,25 @@
+#+TITLE: Manjaro 安装 CA 证书
+#+KEYWORDS: 珊瑚礁上的程序员, Manjaro, CA Certificate
+#+DATE: <2021-12-31 Fri 14:00>
+
+装好了 =http= 抓包工具, =charles= 和 =mitmproxy=, 该装证书了.
+下好了证书 [[http://chrl.pro/ssl][Charles]] [[http://mitm.it/][mitmproxy]], 突然发现在 =Linux= 上不会装.
+
+借助万能的 [[https://wiki.archlinux.org/title/User:Grawity/Adding_a_trusted_CA_certificate][Arch Wiki]], 一行命令, 轻松解决, 这里记录一下.
+
+#+begin_src sh
+  sudo trust anchor --store charles-proxy-ssl-proxying-certificate.pem
+#+end_src
+
+使用 =ls -alh /etc/ca-certificates/trust-source= 检查一下是不是安装好了.
+
+如果这个解决不了, 还可以尝试(我直接成功了, 没有试这个):
+
+#+begin_src sh
+  sudo mv charles-proxy-ssl-proxying-certificate.pem /etc/ca-certificates/trust-source/anchors
+  sudo update-ca-trust
+#+end_src
+
+** 参考
+
+- [[https://wiki.archlinux.org/title/User:Grawity/Adding_a_trusted_CA_certificate][Grawity/Adding a trusted CA certificate]]
