@@ -4,12 +4,12 @@
 ;;; Code:
 (require 'package)
 (package-initialize)
-(unless package-archive-contents
-  (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  ;; (add-to-list 'package-archives '("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/") t)
-  ;; (add-to-list 'package-archives '("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/") t)
-  (package-refresh-contents))
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("gnu" . "https://elpa.gnu.org/packages/")
+                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+(package-refresh-contents)
+
+(package-reinstall 'org)
 (dolist (pkg '(org-contrib dash htmlize json-mode yaml-mode php-mode))
   (unless (package-installed-p pkg)
     (package-install pkg)))
