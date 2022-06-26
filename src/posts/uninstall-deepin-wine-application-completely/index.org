@@ -1,0 +1,23 @@
+#+TITLE: Linux 下完全卸载 deepin wine 应用
+#+KEYWORDS: 珊瑚礁上的程序员, uninstall deepin wine
+#+DATE: <2022-06-26 日 22:00>
+
+前段时间在本子上装了下腾讯会议，之后又删掉了。
+安装和卸载都是使用的 =yay= 。
+
+#+begin_src sh
+  # 安装
+  yay -S com.tencent.meeting.deepin
+  # 卸载
+  yay -Rsc com.tencent.meeting.deepin
+#+end_src
+
+今天突然发现在 =rofi -show drun= 中还是有腾讯会议的图标，选择后报错提示相关文件不存在。
+这说明应该是有相关的 =desktop= 文件没删掉。
+
+要想完全删除的话，还需手动删除以下文件：
+#+begin_src sh
+  rm -rf ~/.config/menus/applications-merged/wine*
+  rm -rf ~/.local/share/applications/wine
+  rm -rf ~/.local/share/desktop-directories/wine*
+#+end_src
