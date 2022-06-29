@@ -1,0 +1,35 @@
+#+TITLE: OpenSSH 格式的密钥转换为 PEM 格式
+#+KEYWORDS: 珊瑚礁上的程序员, openssh private key, id_rsa
+#+DATE: <2022-06-29 Wed 23:00>
+
+MySQL 客户端软件一直使用的 =DBeaver=, 使用 =SSH= 隧道连接数据库的时候报错 =Specified private key cannot be converted=.
+
+出现这个错误是由于 =SSH= 私钥的格式造成的。
+默认情况下 =ssh-keygen= 创建的密钥使用的是 =OpenSSH= 格式。
+密钥的文件头是:
+#+begin_example
+-----BEGIN OPENSSH PRIVATE KEY-----
+#+end_example
+但 =DBeaver= 使用的是旧的 =PEM= 格式的密钥，密钥的文件头应该是：
+#+begin_example
+-----BEGIN RSA PRIVATE KEY-----
+#+end_example
+
+解决方案的话也比较简单，可以重新生成一个 =PEM= 格式的密钥，也可以将原有的 =OpenSSH= 格式密钥装换为 =PEM= 格式。
+
+重新生成 =PEM= 格式的密钥:
+#+begin_src shell
+  ssh-keygen -t rsa -b 2048 -m PEM
+#+end_src
+
+将现有密钥转换为 =PEM= 格式:
+#+begin_src shell
+  # 注意备份原有的密钥, 执行 ssh-keygen -p 时会直接覆盖原密钥文件
+  cp id_rsa id_rsa.bak
+  ssh-keygen -p -m PEM -f id_rsa
+#+end_src
+
+* 参考
+
+- [[https://stackoverflow.com/questions/56979849/dbeaver-ssh-tunnel-invalid-private-key][DBeaver ssh tunnel invalid private key]]
+- [[https://github.com/dbeaver/dbeaver/issues/5845]["invalid privatekey" connecting through SSH tunnel #5845]]
