@@ -37,7 +37,7 @@
    安装其实没什么好说的，到 [[https://syncthing.net/downloads/][官网]] 去选择合适的版本下载就是了。
    我目前在两台设备上装了 =Syncthing= ，安卓手机直接到 [[https://play.google.com/store/apps/details?id=com.nutomic.syncthingandroid][Google Play]] 商店安装；
    笔记本电脑是通过软件包管理工具装的：
-   #+begin_src sh
+   #+begin_src shell
      sudo pacman -S syncthing
    #+end_src
 
@@ -45,7 +45,7 @@
 
    在我的笔记本上启动 =Syncthing=:
 
-   #+begin_src sh
+   #+begin_src shell
      syncthing
    #+end_src
 

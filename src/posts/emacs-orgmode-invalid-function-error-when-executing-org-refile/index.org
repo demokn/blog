@@ -14,7 +14,7 @@
 
    删除 =elpa/org= 目录下所有编译后的文件 =*.elc=, 退出并重新打开 Emacs, 使其重新编译即可。
 
-   #+begin_src sh
+   #+begin_src shell
       rm -rf ~/.emacs.d/elpa-26.3/org-9.3.6/*.elc
    #+end_src
 

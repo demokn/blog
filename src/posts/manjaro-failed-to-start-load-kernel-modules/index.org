@@ -28,7 +28,7 @@
    2. 确认升级之前的内核版本号
 
       可以从pacman的日志文件 =/var/log/pacman.log= 中找到需要的信息：
-      #+begin_src sh
+      #+begin_src shell
         cat /var/log/pacman.log | grep "upgraded linux" | tail -n10
       #+end_src
 
@@ -49,13 +49,13 @@
 
    3. 执行降级安装
 
-      #+begin_src sh
+      #+begin_src shell
       pacman -U /var/cache/pacman/pkg/linux419-4.19.125-1-x86_64.pkg.tar.xz
       #+end_src
 
    4. 重启
 
-      #+begin_src sh
+      #+begin_src shell
       reboot
       #+end_src
 
@@ -85,27 +85,27 @@
 
    1. 通过方案一回滚内核版本后，正常进入系统
    2. 确认EFI系统分区确实是挂载到了 =/boot/efi= 目录
-      #+begin_src sh
+      #+begin_src shell
         mount | grep "boot"
         # OR
         findmnt /boot/efi
       #+end_src
    3. 重新执行 =grub-install=
-      #+begin_src sh
+      #+begin_src shell
         grub-install --recheck /dev/sda --efi-directory=/boot/efi
         update-grub
       #+end_src
    4. 再次升级内核
-      #+begin_src sh
+      #+begin_src shell
         pacman -Syyuu
       #+end_src
    5. 重启
-      #+begin_src sh
+      #+begin_src shell
         reboot
       #+end_src
 
 * 命令汇总
-  #+begin_src sh
+  #+begin_src shell
     # 查看系统信息
     uname -a
     # 查看已安装的linux包

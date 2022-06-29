@@ -5,7 +5,7 @@
 前段时间在本子上装了下腾讯会议，之后又删掉了。
 安装和卸载都是使用的 =yay= 。
 
-#+begin_src sh
+#+begin_src shell
   # 安装
   yay -S com.tencent.meeting.deepin
   # 卸载
@@ -16,7 +16,7 @@
 这说明应该是有相关的 =desktop= 文件没删掉。
 
 要想完全删除的话，还需手动删除以下文件：
-#+begin_src sh
+#+begin_src shell
   rm -rf ~/.config/menus/applications-merged/wine*
   rm -rf ~/.local/share/applications/wine
   rm -rf ~/.local/share/desktop-directories/wine*

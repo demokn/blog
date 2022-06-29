@@ -8,7 +8,7 @@
 没办法，只能换回 http 协议。但每次都要输入用户名密码的问题，确实不能忍。
 经过简单搜索，可以使用如下配置，来避免这个问题：
 
-#+begin_src sh
+#+begin_src shell
    git config --global credential.helper store
 #+end_src
 

@@ -11,12 +11,12 @@
   这时候，使用 SSH 本地端口转发就可以很好的解决这个问题。
 
   本地端口转发的命令格式如下：
-  #+begin_src sh
+  #+begin_src shell
     ssh -L [<本地主机>:]<本地主机端口>:<远程主机>:<远程主机端口> <SSH登录主机>
   #+end_src
 
   在本地电脑上执行如下命令：
-  #+begin_src sh
+  #+begin_src shell
     ssh -L 33060:RDS数据库服务器:3306 ECS云服务器
   #+end_src
 
@@ -63,7 +63,7 @@ MysqlClient <-- SshClient
   中的服务端口映射到宿主机的端口。这样才能让公司内其他同事访问到。
 
   在宿主机执行如下命令：
-  #+begin_src sh
+  #+begin_src shell
     ssh -L 0.0.0.0:80:192.168.10.10:9501 USER@192.168.10.10
   #+end_src
 

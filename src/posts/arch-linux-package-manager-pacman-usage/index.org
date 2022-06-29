@@ -99,7 +99,7 @@
       #+end_info
 
       解决办法:
-      #+begin_src sh
+      #+begin_src shell
         sudo rm -rf /var/lib/pacman/db.lck
       #+end_src
 

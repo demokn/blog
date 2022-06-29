@@ -9,7 +9,7 @@
 #+end_info
 
 * 基础的 LNMP 环境搭建
-  #+begin_src sh
+  #+begin_src shell
     # 安装基础软件
     apt update
     apt install -y curl wget htop git vim
@@ -28,7 +28,7 @@
   #+end_src
 
 * CLONE 项目源码
-  #+begin_src sh
+  #+begin_src shell
     # cd __wwwroot__
     git clone https://github.com/phacility/libphutil.git
     git clone https://github.com/phacility/arcanist.git
@@ -66,7 +66,7 @@
    #+end_src
 
 ** phabricator 数据库配置
-   #+begin_src sh
+   #+begin_src shell
      # cd phabricator
      ./bin/config set mysql.host __host__
      ./bin/config set mysql.user __user__
@@ -75,7 +75,7 @@
    #+end_src
 
 ** 执行数据库迁移(创建库和表)
-   #+begin_src sh
+   #+begin_src shell
      ./bin/storage upgrade
    #+end_src
 
@@ -92,7 +92,7 @@
 
      点击头像 > =Settings= > =Password=: 发送重置密码邮件.
      因为还没有配置邮件相关, 可以在命令行查看邮件内容, 拿到邮件中的重置密码链接直接访问即可.
-     #+begin_src sh
+     #+begin_src shell
        # 查看发送的邮件列表
        ./bin/phabricator mail list-outbound
        # 找到重置密码的邮件ID, 查看内容
@@ -114,7 +114,7 @@
 
 ** 配置
 
-   #+begin_src sh
+   #+begin_src shell
      # cd phabricator
      ./bin/config set phabricator.base-uri http://phabricator.example.com/
      ./bin/config set storage.local-dist.path /data/pha/storage
@@ -173,7 +173,7 @@
    继续回到浏览器, 登入后上传一下自己本机的 SSH 公钥.
    点击头像 > =Settings= > =SSH Public Keys=.
    在本机终端测试:
-   #+begin_src sh
+   #+begin_src shell
      echo {} | ssh git@phabricator.example.com conduit conduit.ping
      # 一切正常的话, 应该可以看到
      # {"result":"__hostname__","error_code":null,"error_info":null}
