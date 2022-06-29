@@ -1,0 +1,18 @@
+#+TITLE: 使用 gitcredentials 避免每次都要输入用户名密码
+#+KEYWORDS: 珊瑚礁上的程序员, git credentials
+#+DATE: <2022-06-29 三 11:00>
+
+公司开发机上拉取代码使用的是 =https= 协议, 每次执行 =git pull= 都需要输入用户名和密码。
+尝试把 remote 改成走 git 协议，生成了 ssh key，并配置在 gitlab 上，发现项目直接无权访问了。
+询问运维，得到的答复是 "开发机上访问代码仓库只能走http, 具体原因我不能说"。
+没办法，只能换回 http 协议。但每次都要输入用户名密码的问题，确实不能忍。
+经过简单搜索，可以使用如下配置，来避免这个问题：
+
+#+begin_src sh
+   git config --global credential.helper store
+#+end_src
+
+配置后只需再输入一次用户名和密码，git 会帮我们自动存储，以后就不用再输入了。
+
+* 参考
+- [[https://git-scm.com/docs/gitcredentials/en][gitcredentials]]
