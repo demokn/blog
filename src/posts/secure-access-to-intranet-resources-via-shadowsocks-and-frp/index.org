@@ -1,0 +1,126 @@
+#+TITLE: 使用 shadowsocks + frp 完全的访问内网资源
+#+KEYWORDS: 珊瑚礁上的程序员, shadowsocks, frp
+#+DATE: <2022-10-27 Thu 12:00>
+
+** 需求
+
+公司的很多资源都是限制内网访问的, 如 git 仓库, 内部网站等.
+当然公司一般也会提供 VPN 给员工, 但最近公司提供的 VPN 不太好用.
+就想着用放在公司的电脑做代理, 是不是就可以远程访问内部资源了.
+
+更多的是出于学习的目的, 有了这次实践.
+
+** 要求
+
+- 一台有固定公网 IP 的云服务器 (我的是阿里云 ECS Ubuntu)
+- 一台放在公司的个人电脑 (我的是 Macbook Pro)
+- 一台放在外网(家里)的个人电脑 (我的是 Manjaro KDE)
+
+** 原理
+
+在 Mac 上开启 shadowsocks 服务, 借助 frp 将 Mac 上的 shadowsocks 服务端口映射到 ECS 的某个端口.
+在 Manjaro 上开启 shandowsocks 客户端, 指定的 shandowsocks 服务器 IP 为 ECS 的公网 IP, 端口为 ECS 上的端口.
+在 Manjaro 上浏览器借助 =SwitchyOmega= 走代理, ssh git 借助 =netcat= 走代理.
+
+** 步骤和配置
+
+*** ECS 安装 frp 服务端
+
+1. 安装 frp
+#+begin_src shell
+  # 下载 frp
+  wget https://github.com/fatedier/frp/releases/download/v0.45.0/frp_0.45.0_linux_amd64.tar.gz
+  # 解压 frp
+  tar -xvf frp_0.45.0_linux_amd64.tar.gz
+  # 移动命令和配置
+  cd frp_0.45.0_linux_amd64
+  sudo mv frps /usr/bin/
+  sudo mkdir /etc/frp
+  sudo mv frps.ini /etc/frp
+#+end_src
+
+2. frps.ini 配置
+#+begin_src conf
+  [common]
+  bind_port = 7000
+  dashboard_port = 7500
+  token = YOUR_TOKEN
+  dashboard_user = YOUR_USER
+  dashboard_pwd = YOUR_PWD
+#+end_src
+
+3. 启动 frp 服务
+   #+begin_src sh
+  nohup frps -c /etc/frp/frps.ini >/var/log/frps.log 2>&1 &
+   #+end_src
+
+4. 记得在 ECS 管理后台开启相应的端口访问
+
+*** Mac 安装 shadowsocks 服务端和 frp 客户端
+
+1. 使用 =brew= 安装
+   #+begin_src sh
+  brew install frpc shadowsocks-libev
+   #+end_src
+
+2. frpc.ini 配置
+#+begin_src conf
+  [common]
+  server_addr = YOUR_ECS_IP
+  server_port = 7000
+  token = YOUR_TOKEN
+
+  [mac-sss]
+  type = tcp
+  local_ip = 127.0.0.1
+  local_port = 8388
+  remote_port = 2388
+#+end_src
+
+3. shadowsocks 配置
+   #+begin_src javascript
+  {
+    "server":["::0","0.0.0.0"],
+    "server_port":8388,
+    "method":"chacha20-ietf-poly1305",
+    "password":"YOUR_PASSWORD",
+    "timeout":600,
+    "mode":"tcp_only",
+    "fast_open":false
+  }
+   #+end_src
+
+4. 启动 shadowsocks 和 frp
+   #+begin_src shell
+  # 开启 shadowsocks 服务端
+  ss-server -c /usr/local/etc/shadowsocks-libev-server.json
+  # 开启 frp 客户端
+  frpc -c /usr/local/etc/frp/frpc.ini
+   #+end_src
+
+*** Manjaro 安装 shadowsocks 客户端
+
+1. 安装 shadowsocks 和 netcat
+   #+begin_src shell
+  sudo pacman -S shadowsocks-libev openbsd-netcat
+   #+end_src
+
+2. 启动 shadowsocks
+   #+begin_src shell
+  ss-local -s ECS_IP -p 2288 -l 1088 -m chacha20-ietf-poly1305 -k YOUR_PASSWORD
+   #+end_src
+
+3. ssh git 代理配置
+   #+begin_src conf
+  Host github.com
+  Hostname github.com
+  ProxyCommand nc -x 127.0.0.1:1080 %h %p
+   #+end_src
+
+4. SwitchyOmega 配置
+   不再赘述
+
+*** 参考
+- [[https://oneforalone.github.io/misc/frp.html][内网穿透 frp 配置]]
+- [[https://blog.ikuamike.io/posts/2021/netcat/][Netcat - All you need to know]]
+- [[https://superuser.com/questions/1233614/what-is-the-difference-between-shadowsocks-and-openvpn][What is the difference between shadowsocks and openvpn?]]
