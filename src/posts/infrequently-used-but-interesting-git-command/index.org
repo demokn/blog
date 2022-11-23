@@ -1,0 +1,33 @@
+#+TITLE: 一些不常使用但有趣的 Git 命令
+#+KEYWORDS: 珊瑚礁上的程序员, git, git command
+#+DATE: <2022-11-23 Wed 14:00>
+
+** 判断分支是否已经合并到主干
+
+#+begin_src shell
+  # 判断第一个分支是其他分支的祖先吗
+  git merge-base --is-ancestor your/feature-brance origin/master
+#+end_src
+
+该命令不会有任何输出, 如果 "是"，返回值为 "0"; 如果不是，返回值为 "1".
+
+=gitlab= 上查看分支列表时，对于已合并的分支会有一个 =merged= 的标签，应该就是用这种方式实现的。
+
+** 忽略项目中某些文件, 但不放在 .gitignore 文件中
+
+在团队合作的项目中, 你使用了某些大家不常用的工具等，可能会在项目根目录下生成一些配置文件等。
+
+因为不常用，所以极大概率没有加入到 =.gitignore= 文件中。
+为了避免提交代码时受到这些文件的困扰（误提交）,我们可以在本地忽略掉这些文件。
+
+#+begin_src shell
+  echo "/your-some-file" >> .git/info/exclude
+#+end_src
+
+参考：[[https://git-scm.com/docs/gitignore][gitignore]]
+
+** 比较本地文件和某[远程]分支上的文件差异
+
+#+begin_src shell
+  git diff origin/dev -- path/to/filename
+#+end_src
