@@ -31,3 +31,50 @@
 #+begin_src shell
   git diff origin/dev -- path/to/filename
 #+end_src
+
+** 使用 =git-hooks= 设置受保护的分支(禁止推送)
+
+在团队开发中, 一般都有权限管理的, 比如 =master= 分支只允许 Team Leader 点合并。
+开发者是没有权限直接推送到 =master= 分支的。
+
+但作为 Team Leader, 即便有权限直接推送到 =master= 分支, 最佳实践还是不要这么干的好。
+更可怕的是，今天由于误操作，将还在开发中的代码直接 push 到了 =master= 分支, 惊出一身冷汗。
+
+为了避免再次发生这种情况，可通过 =.git/hooks/pre-push= 来实现禁止推送到某些受保护的分支。
+
+#+begin_src shell
+  #!/bin/sh
+
+  # An example hook script to verify what is about to be pushed.  Called by "git
+  # push" after it has checked the remote status, but before anything has been
+  # pushed.  If this script exits with a non-zero status nothing will be pushed.
+  #
+  # This hook is called with the following parameters:
+  #
+  # $1 -- Name of the remote to which the push is being done
+  # $2 -- URL to which the push is being done
+  #
+  # If pushing without using a named remote those arguments will be equal.
+  #
+  # Information about the commits which are being pushed is supplied as lines to
+  # the standard input in the form:
+  #
+  #   <local ref> <local oid> <remote ref> <remote oid>
+
+  remote="$1"
+  url="$2"
+
+  protected_branch="main"
+  protected_remote_ref="refs/heads/${protected_branch}"
+  while read local_ref local_oid remote_ref remote_oid
+  do
+      # echo "$local_ref" "$local_oid" "$remote_ref" "$remote_oid"
+      if test "$remote_ref" = "$protected_remote_ref"
+      then
+          echo >&2 "分支 ${protected_branch} 为受保护的分支, 不允许推送"
+          exit 1
+      fi
+  done
+
+  exit 0
+#+end_src
