@@ -11,7 +11,16 @@
 
 该命令不会有任何输出, 如果 "是"，返回值为 "0"; 如果不是，返回值为 "1".
 
-=gitlab= 上查看分支列表时，对于已合并的分支会有一个 =merged= 的标签，应该就是用这种方式实现的。
+=gitlab= 上查看分支列表时，对于已合并的分支会有一个 =merged= 的标签，maybe 就是用这种方式实现的。
+
+** 删除所有已合并到主干的分支
+
+#+begin_src shell
+  # 删除本地分支
+  git branch --merged | xargs git branch -d
+  # 删除远程分支
+  git branch -r --merged | sed 's/origin\///' | xargs -I {} git push origin :{}
+#+end_src
 
 ** 忽略项目中某些文件, 但不放在 .gitignore 文件中
 
