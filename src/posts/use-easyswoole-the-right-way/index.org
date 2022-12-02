@@ -11,71 +11,326 @@
 
 ** 踩坑实践
 *** 1. =TEMP_DIR= 配置必须使用绝对路径
-    临时文件存放的目录, 默认为框架根目录的 =Temp= 目录, 如需自定义, 务必要使用绝对路径, 否则会造成守护模式运行无法退出.
+临时文件存放的目录, 默认为框架根目录的 =Temp= 目录, 如需自定义, 务必要使用绝对路径, 否则会造成守护模式运行无法退出.
     #+begin_src shell
-      php easyswoole server stop
-      pid :4177803 not exist
+  php easyswoole server stop
+  pid :4177803 not exist
     #+end_src
 
-    错误用法：
+错误用法：
     #+begin_src php
-      'TEMP_DIR' => './storage/temp',
+  'TEMP_DIR' => './storage/temp',
     #+end_src
 
-    正确用法：
+正确用法：
     #+begin_src php
-      'TEMP_DIR' => EASYSWOOLE_ROOT . '/storage/temp',
+  'TEMP_DIR' => EASYSWOOLE_ROOT . '/storage/temp',
     #+end_src
 
 *** 2. =ORM= 联表查询时, 要指定 =field()=
-    在 orm 中使用联表查询时, 务必要指定查询的字段, 一般就是 =YourTable.*=.
-    否则会造成不同表的同名字段值被覆盖的情况。
+在 orm 中使用联表查询时, 务必要指定查询的字段, 一般就是 =YourTable.*=.
+否则会造成不同表的同名字段值被覆盖的情况。
 
-    一些成熟框架的 =ORM= 其实都会对这种联表查询的情况自动处理, 例如 =Yii2=
+一些成熟框架的 =ORM= 其实都会对这种联表查询的情况自动处理, 例如 =Yii2=
     #+begin_src php
-      // \yii\db\ActiveQuery::prepare()
-      if (empty($this->select) && !empty($this->join)) {
-          list(, $alias) = $this->getTableNameAndAlias();
-          $this->select = ["$alias.*"];
-      }
+  // \yii\db\ActiveQuery::prepare()
+  if (empty($this->select) && !empty($this->join)) {
+      list(, $alias) = $this->getTableNameAndAlias();
+      $this->select = ["$alias.*"];
+  }
     #+end_src
-    但 =EasySwoole= 目前的版本确实还是需要自己手动指定查询字段.
+但 =EasySwoole= 目前的版本确实还是需要自己手动指定查询字段.
 
-    错误用法：
+错误用法：
     #+begin_src php
-      $articles = Article::create()
-          ->join('author', 'author.id=article.author', 'INNER')
-          ->all();
-      // author 表中的 id 会覆盖 article 表中的 id
+  $articles = Article::create()
+      ->join('author', 'author.id=article.author', 'INNER')
+      ->all();
+  // author 表中的 id 会覆盖 article 表中的 id
     #+end_src
 
-    正确用法：
+正确用法：
     #+begin_src php
-      $articles = Article::create()
-          ->with(['author'])
-          ->field('article.*')
-          ->join('author', 'author.id=article.author', 'INNER')
-          ->all();
+  $articles = Article::create()
+      ->with(['author'])
+      ->field('article.*')
+      ->join('author', 'author.id=article.author', 'INNER')
+      ->all();
     #+end_src
 
 *** 3. 不要使用 =ORM= 和 =QueryBuilder= 的 =withTotalCount()= 方法
-    =withTotalCount= 查询总条数的方式是通过 =SQL_CALC_FOUND_ROWS= 查询选项 + =select FOUND_ROWS()= 实现的,
-    并非我们平常使用的 =select count(*)= 方式.
-    =SQL_CALC_FOUND_ROWS= 查询选项在 mysql 8.0 版本已经被 [[https://dev.mysql.com/doc/refman/8.0/en/information-functions.html#function_found-rows][标记为废弃]] 了，所以不建议使用.
-    而且, 在实际使用过程中, 确实出现了无法预知的结果。(阿里云 RDS + 读写分离)
+=withTotalCount= 查询总条数的方式是通过 =SQL_CALC_FOUND_ROWS= 查询选项 + =select FOUND_ROWS()= 实现的,
+并非我们平常使用的 =select count(*)= 方式.
+=SQL_CALC_FOUND_ROWS= 查询选项在 mysql 8.0 版本已经被 [[https://dev.mysql.com/doc/refman/8.0/en/information-functions.html#function_found-rows][标记为废弃]] 了，所以不建议使用.
+而且, 在实际使用过程中, 确实出现了无法预知的结果。(阿里云 RDS + 读写分离)
 
-    错误用法：
+错误用法：
     #+begin_src php
-      $query = Article::create()
-          ->withTotalCount()
-          ->limit(10, 5);
-      $articles = $query->all();
-      $totalCount = $query->lastQueryResult()->getTotalCount();
+  $query = Article::create()
+      ->withTotalCount()
+      ->limit(10, 5);
+  $articles = $query->all();
+  $totalCount = $query->lastQueryResult()->getTotalCount();
     #+end_src
 
-    正确用法：
+正确用法：
     #+begin_src php
-      $query = Article::create();
-      $totalCount = (clone $query)->count();
-      $articles = $query->limit(10, 5)->all();
+  $query = Article::create();
+  $totalCount = (clone $query)->count();
+  $articles = $query->limit(10, 5)->all();
     #+end_src
+
+*** 4. 慎用 =max_request= 选项
+
+参考 [[https://wiki.swoole.com/#/server/setting?id=max_request][Swoole 官方文档]] ：
+#+begin_quote
+这个参数的主要作用是解决由于程序编码不规范导致的 PHP 进程内存泄露问题。
+PHP 应用程序有缓慢的内存泄漏，但无法定位到具体原因、无法解决，可以通过设置 max_request 临时解决，
+需要找到内存泄漏的代码并修复，而不是通过此方案，可以使用 Swoole Tracker 发现泄漏的代码。
+#+end_quote
+
+但是，在 =EasySwoole= 的实现中，当收到 [[https://wiki.swoole.com/#/server/events?id=onworkerexit][onWorkerExit]] 和 [[https://wiki.swoole.com/#/server/events?id=onworkerstop][onWrokerStop]] 事件时，
+直接调用了 [[https://wiki.swoole.com/#/event?id=exit][\Swoole\Event::exit()]] 方法退出了整个事件循环。
+这会造成当前 worker 可能尚未执行结束就被强行终止了。
+从而导致本次请求假死（得不到响应）。
+
+再直白一点描述，当第 max_request 个请求被投递到 =worker= 后，因为到达了 =max_request= 的阈值限制，
+=manager= 进程会向 =worker= 发出 =onWorkerExit= 的事件信号。
+因为 =worker= 中还有协程还在处理， =manager= 不会直接强杀 =worker= ，需要等到 =max_wait_time= 后才会强杀。
+但由于在 =onWorkerExit= 回调中，执行了  =\Swoole\Event::exit()= ，会直接退出当前协程。
+也就是 =manager= 进程只是尝试通知 =worker= 干完手上的事你就可以下班了，
+但 =worker= 收到通知后，就啥也没管，放下手上未完成的工作（有协程还在执行）就跑路了。
+
+这个问题在社区反馈过，得到的答复是 “不要使用 =max_request= ”。
+截至到当前最新版本 [[https://github.com/easy-swoole/easyswoole/blob/24910e08c380c43a3f3e469b4c3349d5a68ae274/src/Core.php#L330][3.6.1]] 该问题依据存在。
+
+好在 EasySwoole 提供了机制可以完全接管 =Swoole= 的全部事件。
+只需要把框架中原有事件注册方法复制出来，简单改一下即可。
+
+#+begin_src php
+  <?php
+
+  use EasySwoole\Component\Di;
+  use EasySwoole\Component\Process\Manager;
+  use EasySwoole\EasySwoole\AbstractInterface\Event;
+  use EasySwoole\EasySwoole\Config;
+  use EasySwoole\EasySwoole\Http\Dispatcher;
+  use EasySwoole\EasySwoole\ServerManager;
+  use EasySwoole\EasySwoole\Swoole\EventHelper;
+  use EasySwoole\EasySwoole\Swoole\EventRegister;
+  use EasySwoole\EasySwoole\SysConst;
+  use EasySwoole\EasySwoole\Trigger;
+  use EasySwoole\Http\Message\Status;
+  use EasySwoole\Http\Request;
+  use EasySwoole\Http\Response;
+  use Swoole\Http\Request as SwooleRequest;
+  use Swoole\Http\Response as SwooleResponse;
+  use Swoole\Server;
+  use Swoole\Timer;
+
+  class EasySwooleEvent implements Event {
+      public static function initialize()
+      {
+          // TODO: Implement initialize() method.
+      }
+
+      public static function mainServerCreate(\EasySwoole\EasySwoole\Swoole\EventRegister $register)
+      {
+          $server = ServerManager::getInstance()->getSwooleServer();
+          $serverType = Config::getInstance()->getConf('MAIN_SERVER.SERVER_TYPE');
+          self::overrideEasySwooleDefaultCallBack($server, $serverType);
+
+          return false; //返回false, 表示希望接管全部事件
+      }
+
+      private static function overrideEasySwooleDefaultCallBack(Server $server, int $serverType)
+      {
+          /*
+           ,* 注册默认回调
+           ,*/
+          if (in_array($serverType, [EASYSWOOLE_WEB_SERVER, EASYSWOOLE_WEB_SOCKET_SERVER], true)) {
+              $namespace = Di::getInstance()->get(SysConst::HTTP_CONTROLLER_NAMESPACE);
+              if (empty($namespace)) {
+                  $namespace = 'App\\HttpController\\';
+              }
+              $depth = intval(Di::getInstance()->get(SysConst::HTTP_CONTROLLER_MAX_DEPTH));
+              $depth = $depth > 5 ? $depth : 5;
+              $max = intval(Di::getInstance()->get(SysConst::HTTP_CONTROLLER_POOL_MAX_NUM));
+              if ($max == 0) {
+                  $max = 500;
+              }
+              $waitTime = intval(Di::getInstance()->get(SysConst::HTTP_CONTROLLER_POOL_WAIT_TIME));
+              if ($waitTime == 0) {
+                  $waitTime = 5;
+              }
+              $dispatcher = Dispatcher::getInstance()->setNamespacePrefix($namespace)->setMaxDepth($depth)->setControllerMaxPoolNum($max)->setControllerPoolWaitTime($waitTime);
+              ;
+              //补充HTTP_EXCEPTION_HANDLER默认回调
+              $httpExceptionHandler = Di::getInstance()->get(SysConst::HTTP_EXCEPTION_HANDLER);
+              if (!is_callable($httpExceptionHandler)) {
+                  $httpExceptionHandler = function ($throwable, $request, $response) {
+                      $response->withStatus(Status::CODE_INTERNAL_SERVER_ERROR);
+                      $response->write(nl2br($throwable->getMessage() . "\n" . $throwable->getTraceAsString()));
+                      Trigger::getInstance()->throwable($throwable);
+                  };
+                  Di::getInstance()->set(SysConst::HTTP_EXCEPTION_HANDLER, $httpExceptionHandler);
+              }
+              $dispatcher->setHttpExceptionHandler($httpExceptionHandler);
+              $requestHook = Di::getInstance()->get(SysConst::HTTP_GLOBAL_ON_REQUEST);
+              $afterRequestHook = Di::getInstance()->get(SysConst::HTTP_GLOBAL_AFTER_REQUEST);
+              EventHelper::on($server, EventRegister::onRequest, function (SwooleRequest $request, SwooleResponse $response) use ($dispatcher, $requestHook, $afterRequestHook) {
+                  $request_psr = new Request($request);
+                  $response_psr = new Response($response);
+                  try {
+                      $ret = null;
+                      if (is_callable($requestHook)) {
+                          $ret = call_user_func($requestHook, $request_psr, $response_psr);
+                      }
+                      if ($ret !== false) {
+                          $dispatcher->dispatch($request_psr, $response_psr);
+                      }
+                  } catch (\Throwable $throwable) {
+                      call_user_func(Di::getInstance()->get(SysConst::HTTP_EXCEPTION_HANDLER), $throwable, $request_psr, $response_psr);
+                  } finally {
+                      try {
+                          if (is_callable($afterRequestHook)) {
+                              call_user_func($afterRequestHook, $request_psr, $response_psr);
+                          }
+                      } catch (\Throwable $throwable) {
+                          call_user_func(Di::getInstance()->get(SysConst::HTTP_EXCEPTION_HANDLER), $throwable, $request_psr, $response_psr);
+                      }
+                  }
+                  $response_psr->__response();
+              });
+          }
+
+          $register = ServerManager::getInstance()->getEventRegister();
+          //注册默认的worker start
+          EventHelper::registerWithAdd($register, EventRegister::onWorkerStart, function (Server $server, $workerId) {
+              $serverName = Config::getInstance()->getConf('SERVER_NAME');
+              $type = 'Unknown';
+              if (($workerId < Config::getInstance()->getConf('MAIN_SERVER.SETTING.worker_num')) && $workerId >= 0) {
+                  $type = 'Worker';
+              }
+              $processName = "{$serverName}.{$type}.{$workerId}";
+              set_process_name($processName);
+              $table = Manager::getInstance()->getProcessTable();
+              $pid = getmypid();
+              $table->set($pid, [
+                  'pid' => $pid,
+                  'name' => $processName,
+                  'group' => "{$serverName}.{$type}",
+                  'startUpTime' => time(),
+              ]);
+              Timer::tick(1 * 1000, function () use ($table, $pid) {
+                  $table->set($pid, [
+                      'memoryUsage' => memory_get_usage(),
+                      'memoryPeakUsage' => memory_get_peak_usage(true),
+                  ]);
+              });
+              register_shutdown_function(function () use ($pid) {
+                  $table = Manager::getInstance()->getProcessTable();
+                  $table->del($pid);
+              });
+          });
+          //onWorkerStop,onWorkerExit,register_shutdown_function冗余清理
+          EventHelper::registerWithAdd($register, $register::onWorkerStop, function (Server $server, int $workerId) {
+              $table = Manager::getInstance()->getProcessTable();
+              $pid = getmypid();
+              $table->del($pid);
+              Timer::clearAll();
+              //SwooleEvent::exit(); //就是这里, 注释掉即可
+          });
+
+          /*
+           ,* 开启reload async的时候，清理事件
+           ,*/
+          EventHelper::registerWithAdd($register, $register::onWorkerExit, function (Server $server, int $workerId) {
+              $table = Manager::getInstance()->getProcessTable();
+              $pid = getmypid();
+              $table->del($pid);
+              Timer::clearAll();
+              //SwooleEvent::exit(); //还有这里, 注释掉即可
+          });
+
+          EventHelper::registerWithAdd($register, EventRegister::onManagerStart, function (Server $server) {
+              $serverName = Config::getInstance()->getConf('SERVER_NAME');
+              set_process_name($serverName . '.Manager');
+          });
+      }
+  }
+#+end_src
+
+基于 =Swoole= 的最小复现代码如下：
+#+begin_src php
+  <?php
+
+  function setProcessName(string $processName = ''): void
+  {
+      if (empty($processName) || in_array(PHP_OS, ['Darwin', 'CYGWIN', 'WINNT'])) {
+          return;
+      }
+
+      if (function_exists('cli_set_process_title')) {
+          cli_set_process_title($processName);
+      } elseif (function_exists('swoole_set_process_name')) {
+          swoole_set_process_name($processName);
+      }
+  }
+
+  $serv = new Swoole\Http\Server('0.0.0.0', 9502, SWOOLE_PROCESS, SWOOLE_TCP);
+
+  $serv->set(
+      [
+          "worker_num" => 1,
+          "reload_async" => true,
+          "max_wait_time" => 30,
+          "max_request" => 3,
+          "package_max_length" => 104857600,
+          "pid_file" => "/easyswoole/storage/temp/pid.pid",
+          "log_file" => "/easyswoole/storage/logs/swoole.log",
+      ]
+  );
+
+  $serv->on('Request', function (\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
+      $response->header('Content-Type', 'text/html; charset=utf-8');
+      Co::sleep(5); //这里是为了模拟业务代码的执行时间
+      $response->write('<h1>Hello Swoole. #' . rand(1000, 9999) . '</h1>' . PHP_EOL);
+  });
+
+  $serv->on('ManagerStart', function (\Swoole\Server $serv) {
+      setProcessName('my.Manager');
+  });
+
+  $serv->on('WorkerStart', function (\Swoole\Server $serv, $workerId) {
+      setProcessName('my.Worker.' . $workerId);
+  });
+
+  $serv->on('WorkerExit', function (\Swoole\Server $serv, $workerId) {
+      $ms = microtime(true);
+      $pid = getmypid();
+      var_dump("WorkerExit, worker_id#{$workerId}, pid#{$pid}, ms#{$ms}");
+      \Swoole\Timer::clearAll();
+      \Swoole\Event::exit();
+  });
+
+  $serv->on('WorkerStop', function (\Swoole\Server $serv, $workerId) {
+      $ms = microtime(true);
+      $pid = getmypid();
+      var_dump("WorkerStop, worker_id#{$workerId}, pid#{$pid}, ms#{$ms}");
+      \Swoole\Timer::clearAll();
+      \Swoole\Event::exit();
+  });
+
+  $serv->start();
+#+end_src
+
+*** 5. 使用 =Redis= 连接池时不要执行 =select db= 的操作
+
+这只是一个建议。
+
+当执行了 =select db= 操作后，如果忘记 select 回去默认的 db，那么当这个连接被重新放回到连接池，又被其他协程取走使用的话，
+就会出现一些意外情况。
+
+如果确实有用多个 db 的需要，最好是将不同的 db 分别注册到不同的连接池。
+这样可以方便的从不同的连接池直接取出对应 db 的连接，而不需要通过 =select db= 来切换db。
