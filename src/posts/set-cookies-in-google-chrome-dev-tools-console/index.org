@@ -3,7 +3,7 @@
 #+DATE: <2022-12-06 Tue 21:00>
 
 公司项目一般都有区分开发环境，测试环境，预发环境和生产环境。
-通常预发环境连接的也是生产的域名。
+通常预发环境连接的也是生产的数据库。
 也就是说预发环境和生产环境的用户 =token= 是相同的。
 如果你正在登录着生产环境，突然想登录预发环境，这个时候其实完全可以将生产环境的 =token= 复制到预发环境，
 这样可以免去重新登录的麻烦（需要短信验证码）。
@@ -25,7 +25,7 @@
     document.cookie
   #+end_src
 
-  ATTR_HTML: :class d-block mw-100 mx-auto
+  #+ATTR_HTML: :class d-block mw-100 mx-auto
   [[./console-get-cookie.png]]
 
 
@@ -44,8 +44,8 @@
   document.cookie='token=123456789'
 #+end_src
 
-  ATTR_HTML: :class d-block mw-100 mx-auto
-  [[./console-set-cookie.png]]
+#+ATTR_HTML: :class d-block mw-100 mx-auto
+[[./console-set-cookie.png]]
 
 如果不想一个一个的设置，也有小伙伴提供了一个简单的方法封装。
 #+begin_src javascript
@@ -70,8 +70,8 @@
 
 之后就可以调用 =parseCookies('_ga=balabalabala; token=1234567890')= 来实现一次设置多个 =cookie= 。
 
-  ATTR_HTML: :class d-block mw-100 mx-auto
-  [[./console-set-cookie-2.png]]
+#+ATTR_HTML: :class d-block mw-100 mx-auto
+[[./console-set-cookie-2.png]]
 
 **** 参考
 
