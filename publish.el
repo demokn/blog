@@ -55,12 +55,12 @@
   "项目/站点名称.")
 (defvar kn/site-url "https://blog.demokn.com/"
   "网站地址.")
-(defvar kn/posts-url "https://blog.demokn.com/posts/"
+(defvar kn/posts-url (concat kn/site-url "posts/")
   "文章地址.")
 
-(defvar kn/src-root (expand-file-name "src/" (file-name-directory (or load-file-name buffer-file-name)))
+(defvar kn/src-dir (expand-file-name "src/" (file-name-directory (or load-file-name buffer-file-name)))
   "项目源码根目录.")
-(defvar kn/pub-root (expand-file-name "public/" (file-name-directory (or load-file-name buffer-file-name)))
+(defvar kn/pub-dir (expand-file-name "public/" (file-name-directory (or load-file-name buffer-file-name)))
   "项目发布根目录.")
 
 ;; 对于引用的外部CSS库，最好是下载到本地.
@@ -76,19 +76,19 @@
 
 (defun kn/src-path (sub-path)
   "获取项目源码子路径.  SUB-PATH."
-  (expand-file-name sub-path kn/src-root))
+  (expand-file-name sub-path kn/src-dir))
 
 (defun kn/pub-path (sub-path)
   "获取项目发布子路径.  SUB-PATH."
-  (expand-file-name sub-path kn/pub-root))
+  (expand-file-name sub-path kn/pub-dir))
 
-(defun demo--pre/postamble-format (name)
+(defun kn--pre/postamble-format (name)
   "读取snippets目录下的代码片段文件, 返回格式化的pre/postamble内容.  NAME."
   `(("en" ,(with-temp-buffer
              (insert-file-contents (expand-file-name (format "%s.html" name) (kn/src-path "snippets")))
              (buffer-string)))))
 
-(defun demo--insert-snippet (filename)
+(defun kn--insert-snippet (filename)
   "读取snippets目录下的代码片段文件, 返回文件内容.  FILENAME."
   (with-temp-buffer
     (insert-file-contents (expand-file-name filename (kn/src-path "snippets")))
@@ -113,8 +113,8 @@ Return output file name."
         (goto-char (point-max))
         (search-backward "</body>")
         (insert "\n</div>\n</div>\n</div>\n")
-        (insert (demo--insert-snippet "analytics.js.html"))
-        (insert (demo--insert-snippet "statcounter.js.html"))
+        (insert (kn--insert-snippet "analytics.js.html"))
+        (insert (kn--insert-snippet "statcounter.js.html"))
         (save-buffer)
         (kill-buffer)))
     file-path))
@@ -150,10 +150,10 @@ Return output file name."
         (goto-char (point-max))
         (search-backward "</body>")
         (unless (equal "archive.org" (file-name-nondirectory filename))
-          (insert (demo--insert-snippet "disqus.js.html")))
+          (insert (kn--insert-snippet "disqus.js.html")))
         (insert "\n</div>\n</div>\n</div>\n")
-        (insert (demo--insert-snippet "analytics.js.html"))
-        (insert (demo--insert-snippet "statcounter.js.html"))
+        (insert (kn--insert-snippet "analytics.js.html"))
+        (insert (kn--insert-snippet "statcounter.js.html"))
         (save-buffer)
         (kill-buffer)))
     file-path))
@@ -309,9 +309,9 @@ Return output file name."
          :html-head-include-default-style nil
          :html-head kn/html-head
          :html-preamble t
-         :html-preamble-format (demo--pre/postamble-format 'preamble)
+         :html-preamble-format (kn--pre/postamble-format 'preamble)
          :html-postamble t
-         :html-postamble-format (demo--pre/postamble-format 'postamble)
+         :html-postamble-format (kn--pre/postamble-format 'postamble)
          :html-divs '((preamble "div" "preamble")
                       (content "div" "article")
                       (postamble "div" "postamble"))
@@ -352,12 +352,12 @@ Return output file name."
          :sitemap-format-entry #'kn/org-publish-sitemap-format-rss-entry)
 
    (list "site"
-         :base-directory kn/src-root
+         :base-directory kn/src-dir
          :base-extension "org"
          :recursive nil
          :exclude (regexp-opt '("sitemap.org"))
 
-         :publishing-directory kn/pub-root
+         :publishing-directory kn/pub-dir
          :publishing-function #'kn/org-html-publish-site-to-html
 
          :section-numbers nil
@@ -371,17 +371,17 @@ Return output file name."
          :html-head-include-default-style nil
          :html-head kn/html-head
          :html-preamble t
-         :html-preamble-format (demo--pre/postamble-format 'preamble)
+         :html-preamble-format (kn--pre/postamble-format 'preamble)
          :html-postamble t
-         :html-postamble-format (demo--pre/postamble-format 'postamble))
+         :html-postamble-format (kn--pre/postamble-format 'postamble))
 
    (list "sitemap"
-         :base-directory kn/src-root
+         :base-directory kn/src-dir
          :base-extension "org"
          :recursive t
          :exclude (regexp-opt '("drafts/" "posts/rss.org" "sitemap.org"))
 
-         :publishing-directory kn/pub-root
+         :publishing-directory kn/pub-dir
          :publishing-function #'kn/org-sitemap-publish-to-sitemap
 
          :html-link-home kn/site-url
@@ -399,12 +399,12 @@ Return output file name."
          :sitemap-format-entry #'kn/org-publish-sitemap-format-rss-entry)
 
    (list "assets"
-         :base-directory kn/src-root
+         :base-directory kn/src-dir
          :base-extension (regexp-opt '("ico" "jpg" "jpeg" "png" "gif" "svg" "css" "js" "pdf"))
          :recursive t
          :include '("CNAME" "robots.txt" "404.html")
 
-         :publishing-directory kn/pub-root
+         :publishing-directory kn/pub-dir
          :publishing-function #'org-publish-attachment)
 
    (list "all"
