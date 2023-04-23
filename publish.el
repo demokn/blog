@@ -11,13 +11,14 @@
   ;; (add-to-list 'package-archives '("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/") t)
   (package-refresh-contents))
 
-(dolist (pkg '(org dash htmlize json-mode yaml-mode php-mode))
+(dolist (pkg '(org ox-rss dash htmlize json-mode yaml-mode php-mode))
   (unless (package-installed-p pkg)
     (package-install pkg)))
 
 (require 'dash)
 (require 'org)
 (require 'ox-publish)
+(require 'ox-rss)
 
 ;; 在本地导出图片即可, 无需每次编译都重新导出
 ;; (with-eval-after-load 'ob-plantuml
@@ -232,6 +233,11 @@ PROJECT is the current project."
          (file-name-nondirectory (directory-file-name entry)))
         (t entry)))
 
+(org-export-define-derived-backend 'kn/sitemap 'rss
+  :translate-alist
+  '((headline . demo/org-sitemap-headline)
+    (template . demo/org-sitemap-template)))
+
 (defun kn/org-sitemap-headline (headline contents info)
   "Transcode HEADLINE element into sitemap format.
 
@@ -321,6 +327,30 @@ Return output file name."
          :sitemap-function #'kn/org-publish-sitemap-publish-archive
          :sitemap-format-entry #'kn/org-publish-sitemap-format-archive-entry)
 
+   (list "blog-posts-rss"
+         :base-directory (kn/src-path "posts")
+         :base-extension "org"
+         :recursive t
+         :exclude (regexp-opt '("archive.org" "rss.org"))
+
+         :publishing-directory (kn/pub-path "posts")
+         :publishing-function #'kn/org-rss-publish-to-rss
+
+         :html-link-home kn/posts-url
+         :html-home/up-format ""
+         :html-link-use-abs-url t
+         :html-link-org-files-as-html t
+
+         :auto-sitemap t
+         :sitemap-style 'list
+         :sitemap-filename "rss.org"
+         :sitemap-title nil
+         :sitemap-sort-folders 'ignore
+         :sitemap-sort-files 'anti-chronologically
+         :sitemap-ignore-case nil
+         :sitemap-function #'kn/org-publish-sitemap-publish-rss
+         :sitemap-format-entry #'kn/org-publish-sitemap-format-rss-entry)
+
    (list "site"
          :base-directory kn/src-root
          :base-extension "org"
@@ -345,6 +375,29 @@ Return output file name."
          :html-postamble t
          :html-postamble-format (demo--pre/postamble-format 'postamble))
 
+   (list "sitemap"
+         :base-directory kn/src-root
+         :base-extension "org"
+         :recursive t
+         :exclude (regexp-opt '("drafts/" "posts/rss.org" "sitemap.org"))
+
+         :publishing-directory kn/pub-root
+         :publishing-function #'kn/org-sitemap-publish-to-sitemap
+
+         :html-link-home kn/site-url
+         :html-home/up-format ""
+         :html-link-use-abs-url t
+         :html-link-org-files-as-html t
+
+         :auto-sitemap t
+         :sitemap-style 'list
+         :sitemap-title nil
+         :sitemap-sort-folders 'ignore
+         :sitemap-sort-files 'anti-chronologically
+         :sitemap-ignore-case nil
+         :sitemap-function #'kn/org-publish-sitemap-publish-rss
+         :sitemap-format-entry #'kn/org-publish-sitemap-format-rss-entry)
+
    (list "assets"
          :base-directory kn/src-root
          :base-extension (regexp-opt '("ico" "jpg" "jpeg" "png" "gif" "svg" "css" "js" "pdf"))
@@ -355,7 +408,7 @@ Return output file name."
          :publishing-function #'org-publish-attachment)
 
    (list "all"
-         :components '("blog-posts" "site" "assets"))))
+         :components '("blog-posts" "blog-posts-rss" "site" "sitemap" "assets"))))
 
 (defun kn/org-publish-all ()
   "发布博客."

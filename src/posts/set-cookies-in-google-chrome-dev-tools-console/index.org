@@ -28,7 +28,6 @@
   #+ATTR_HTML: :class d-block mw-100 mx-auto
   [[./console-get-cookie.png]]
 
-
 - 设置 =cookie=
   #+begin_src javascript
     document.cookie='_ga=balabalabala; token=1234567890'
