@@ -135,8 +135,8 @@ Return output file name."
                :subtitle nil)
     (unless (equal "archive.org" (file-name-nondirectory filename))
       (plist-put plist
-                 :subtitle (format "Published on %s"
-                                   (format-time-string "%h %d, %Y" (org-publish-find-date filename project))))))
+                 :subtitle (format "发布于 %s"
+                                   (format-time-string "%Y-%m-%d" (org-publish-find-date filename project))))))
 
   (let* ((file-path (org-html-publish-to-html plist filename pub-dir)))
     (save-window-excursion
@@ -181,7 +181,7 @@ representation for the files to include, as returned by
 ENTRY is a file name.  STYLE is the style of the sitemap.
 PROJECT is the current project."
   (format "@@html:<span class=\"archive-item\"><span class=\"archive-date\">@@ %s @@html:</span>@@ [[file:%s][%s]] @@html:</span>@@"
-          (format-time-string "%h %d, %Y" (org-publish-find-date entry project))
+          (format-time-string "%Y-%m-%d" (org-publish-find-date entry project))
           entry
           (org-publish-find-title entry project)))
 
@@ -317,7 +317,7 @@ Return output file name."
          :sitemap-sort-folders 'ignore
          :sitemap-sort-files 'anti-chronologically
          :sitemap-ignore-case nil
-         :sitemap-date-format "%h %d, %Y"
+         :sitemap-date-format "%Y-%m-%d"
          :sitemap-function #'kn/org-publish-sitemap-publish-archive
          :sitemap-format-entry #'kn/org-publish-sitemap-format-archive-entry)
 
