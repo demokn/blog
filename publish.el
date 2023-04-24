@@ -3,18 +3,20 @@
 
 ;;; Code:
 (require 'package)
+(setq package-user-dir (expand-file-name "./.elpa"))
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")
+                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 (package-initialize)
 (unless package-archive-contents
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
-  ;; (add-to-list 'package-archives '("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/") t)
-  ;; (add-to-list 'package-archives '("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/") t)
   (package-refresh-contents))
 
+;; 安装依赖包
 (dolist (pkg '(org ox-rss dash htmlize json-mode yaml-mode php-mode))
   (unless (package-installed-p pkg)
     (package-install pkg)))
 
+;; 加载依赖包
 (require 'dash)
 (require 'org)
 (require 'ox-publish)
@@ -289,7 +291,7 @@ Return output file name."
 
 (defvar kn/org-publish-project-alist
   (list
-   (list "blog-posts"
+   (list "blog-posts" ;; 文章发布
          :base-directory (kn/src-path "posts")
          :base-extension "org"
          :recursive t
@@ -298,11 +300,12 @@ Return output file name."
          :publishing-directory (kn/pub-path "posts")
          :publishing-function #'kn/org-html-publish-post-to-html
 
-         :section-numbers nil
-         :with-toc nil
-         :with-title t
-         :with-author nil
-         :with-creator nil
+         :with-toc nil ;; 是否包含目录
+         :with-title t ;; 是否包含标题
+         :with-author nil ;; 是否包含作者名称
+         :with-creator nil ;; 是否包含 Emacs 和 Org 版本信息
+         :section-numbers nil ;; 是否包含块编号
+         :time-stamp-file nil ;; 是否包含时间戳
          :html-doctype "html5"
          :html-html5-fancy t
          :html-head-include-scripts nil
@@ -327,7 +330,7 @@ Return output file name."
          :sitemap-function #'kn/org-publish-sitemap-publish-archive
          :sitemap-format-entry #'kn/org-publish-sitemap-format-archive-entry)
 
-   (list "blog-posts-rss"
+   (list "blog-posts-rss" ;; 文章 RSS 订阅
          :base-directory (kn/src-path "posts")
          :base-extension "org"
          :recursive t
@@ -351,7 +354,7 @@ Return output file name."
          :sitemap-function #'kn/org-publish-sitemap-publish-rss
          :sitemap-format-entry #'kn/org-publish-sitemap-format-rss-entry)
 
-   (list "site"
+   (list "site-root" ;; 网站根目录下的 org 文件发布, 如 index.org about.org 等
          :base-directory kn/src-dir
          :base-extension "org"
          :recursive nil
@@ -365,6 +368,7 @@ Return output file name."
          :with-title nil
          :with-author nil
          :with-creator nil
+         :time-stamp-file nil
          :html-doctype "html5"
          :html-html5-fancy t
          :html-head-include-scripts nil
@@ -375,7 +379,7 @@ Return output file name."
          :html-postamble t
          :html-postamble-format (kn--pre/postamble-format 'postamble))
 
-   (list "sitemap"
+   (list "sitemap" ;; 网站地图 xml 格式, SEO 需要
          :base-directory kn/src-dir
          :base-extension "org"
          :recursive t
@@ -398,7 +402,7 @@ Return output file name."
          :sitemap-function #'kn/org-publish-sitemap-publish-rss
          :sitemap-format-entry #'kn/org-publish-sitemap-format-rss-entry)
 
-   (list "assets"
+   (list "static-assets" ;; 网站静态资源文件
          :base-directory kn/src-dir
          :base-extension (regexp-opt '("ico" "jpg" "jpeg" "png" "gif" "svg" "css" "js" "pdf"))
          :recursive t
@@ -408,10 +412,10 @@ Return output file name."
          :publishing-function #'org-publish-attachment)
 
    (list "all"
-         :components '("blog-posts" "blog-posts-rss" "site" "sitemap" "assets"))))
+         :components '("blog-posts" "blog-posts-rss" "site-root" "sitemap" "static-assets"))))
 
 (defun kn/org-publish-all ()
-  "发布博客."
+  "发布网站."
   (interactive)
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -426,11 +430,11 @@ Return output file name."
         (org-export-with-toc nil)
         (org-export-with-sub-superscripts '{})
         (org-html-container-element "section")
-        (org-html-metadata-timestamp-format "%h %d, %Y")
-        (org-html-checkbox-type 'html)
+        (org-html-metadata-timestamp-format "%Y-%m-%d")
+        (org-html-checkbox-type 'unicode)
+        (org-html-doctype "html5")
         (org-html-html5-fancy t)
         (org-html-validation-link nil)
-        (org-html-doctype "html5")
         (org-html-htmlize-output-type 'css))
     (org-publish-all)))
 
