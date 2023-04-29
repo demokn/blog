@@ -209,26 +209,36 @@ representation for the files to include, as returned by
     (concat (format "#+TITLE: %s\n" title)
             (format "#+KEYWORDS: %s\n\n" title)
             (org-list-to-subtree sitemap nil '(:istart "" :icount "")))))
-
 (defun kn/org-publish-sitemap-format-rss-entry (entry style project)
   "Default format for posts rss site map ENTRY, as a string.
 
 ENTRY is a file name.  STYLE is the style of the sitemap.
 PROJECT is the current project."
   (cond ((not (directory-name-p entry))
-         (let* ((file (org-publish--expand-file-name entry project))
-                (title (org-publish-find-title entry project))
-                (date (format-time-string "%Y-%m-%d" (org-publish-find-date entry project)))
-                (link (concat (file-name-sans-extension entry) ".html")))
+         (let* ((file (org-publish--expand-file-name entry project)) ;; org文件绝对路径
+                (title (org-publish-find-title entry project)) ;; 文章标题(#+TITLE)
+                (pubdate (format-time-string "%Y-%m-%d" (org-publish-find-date entry project))) ;; 发布时间(#+DATE)
+                ;; git 不会存储文件的元数据(文件的最后修改时间会是git clone的时间)
+                ;; (moddate (format-time-string "%Y-%m-%d" (file-attribute-modification-time (file-attributes file)))) ;; 文件最后修改时间
+                ;; 这种方式并不能从org文件中取到moddate属性
+                ;; (moddate (or (format-time-string "%Y-%m-%d" (org-publish-find-property file :moddate project))
+                ;; pubdate))
+                (moddate pubdate)
+                (link (concat (file-name-sans-extension entry) ".html"))) ;; 文件后缀改为 .html
+           (message "文件: %s\n发布时间: %s\n更新时间: %s" file pubdate moddate)
+           ;; (message (org-publish-find-property file :title project))
+           ;; (message (org-publish-find-property file :date project))
+
            (with-temp-buffer
              ;; 用链接的方式, title 会取成文件路径
              ;; (insert (format "* [[file:%s][%s]]\n" file title))
              (insert (format "* %s\n" title))
              (org-set-property "RSS_PERMALINK" link)
-             (org-set-property "PUBDATE" date)
+             (org-set-property "PUBDATE" pubdate)
+             (org-set-property "MODDATE" moddate)
              ;; To avoid second update to rss.org by org-icalendar-create-uid
              ;; (org-id-get-create)
-             (insert-file-contents file)
+             ;; (insert-file-contents file)
              (buffer-string))))
         ((eq style 'tree)
          ;; Return only last subdir.
@@ -237,8 +247,8 @@ PROJECT is the current project."
 
 (org-export-define-derived-backend 'kn/sitemap 'rss
   :translate-alist
-  '((headline . demo/org-sitemap-headline)
-    (template . demo/org-sitemap-template)))
+  '((headline . kn/org-sitemap-headline)
+    (template . kn/org-sitemap-template)))
 
 (defun kn/org-sitemap-headline (headline contents info)
   "Transcode HEADLINE element into sitemap format.
@@ -250,20 +260,23 @@ communication channel."
          (hl-home (file-name-as-directory (plist-get info :html-link-home)))
          (hl-pdir (plist-get info :publishing-directory))
          (hl-perm (org-element-property :RSS_PERMALINK headline))
+         (hl-moddate (org-element-property :MODDATE headline))
          (publink
           (or (and hl-perm (concat (or hl-home hl-pdir) hl-perm))
               (concat
                (or hl-home hl-pdir)
                (file-name-nondirectory
                 (file-name-sans-extension
-                 (plist-get info :input-file))) "." htmlext)))
-         (moddate (format-time-string "%Y-%m-%d" (current-time))))
+                 (plist-get info :input-file)))
+               "."
+               htmlext)))
+         )
     (format (concat
              "<url>\n"
              "<loc>%s</loc>\n"
              "<lastmod>%s</lastmod>\n"
              "</url>\n")
-            publink moddate)))
+            publink hl-moddate)))
 
 (defun kn/org-sitemap-template (contents info)
   "Return complete document string after SITEMAP conversion.
@@ -271,9 +284,9 @@ communication channel."
 CONTENTS is the transcoded contents string.  INFO is a plist used
 as a communication channel."
   (concat
-   (format "<?xml version=\"1.0\" encoding=\"%s\"?>"
+   (format "<?xml version=\"1.0\" encoding=\"%s\"?>\n"
            (symbol-name org-html-coding-system))
-   "\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
+   "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
    contents
    "</urlset>"))
 
