@@ -2,6 +2,27 @@
 #+KEYWORDS: 珊瑚礁上的程序员, 最佳应用, windows software
 #+DATE: <2020-01-16 Thu>
 
+** 跨平台
+
+  #+ATTR_HTML: :class table table-sm table-hover
+  | 软件        | 描述                    |
+  |-------------+-------------------------|
+  | [[https://dbeaver.io/][dbeaver]]     | 数据库客户端            |
+  | [[https://www.gnu.org/software/emacs/][Emacs]]       | 神之编辑器              |
+  | [[https://www.gimp.org/][Gimp]]        | 开源图像编辑器          |
+  | [[https://www.vim.org/][gVim]]        | 编辑器之神              |
+  | [[https://www.getpostman.com/][Postman]]     | API 测试工具            |
+  | [[https://qbittorrent.org/][qBittorrent]] | P2P bittorrent 下载软件 |
+  | [[https://github.com/BurntSushi/ripgrep][ripgrep]]     | 命令行下文件搜索        |
+  | [[https://www.vagrantup.com/][Vagrant]]     | 虚拟机管理工具          |
+  | [[https://www.virtualbox.org/][VirtualBox]]  | 开源虚拟机              |
+  | [[https://www.wireshark.org/][Wireshark]]   | 网络协议分析工具        |
+  | [[https://mitmproxy.org/][mitmproxy]]   | 开源 web 抓包调试工具   |
+  | [[https://www.charlesproxy.com/][Charles]]     | web 抓包调试工具        |
+  | [[https://www.thunderbird.net/][Thunderbird]] | 邮箱客户端              |
+  | [[https://espanso.org/][Espanso]]     | 文本扩展工具            |
+  | [[https://kdeconnect.kde.org/][KDE Connect]] | 手机电脑互联            |
+
 ** Windows
 
    #+ATTR_HTML: :class table table-sm table-hover
@@ -9,27 +30,16 @@
    |-----------------+---------------------------|
    | [[https://www.7-zip.org/][7-Zip]]           | 压缩与解压缩              |
    | [[https://autohotkey.com/][AutoHotKey]]      | 自动化脚本语言            |
-   | [[https://dbeaver.io/][dbeaver]]         | 数据库客户端              |
    | [[http://www.voidtools.com/][Everything]]      | 最快的文件/文件夹搜索工具 |
-   | [[https://www.gnu.org/software/emacs/][Emacs]]           | 神之编辑器                |
-   | [[http://www.telerik.com/fiddler][Fiddler]]         | web调试代理工具           |
-   | [[https://www.gimp.org/][Gimp]]            | 开源图像编辑器            |
-   | [[https://www.vim.org/][gVim]]            | 编辑器之神                |
-   | [[https://mitmproxy.org/][mitmproxy]]       | 开源web抓包调试工具       |
+   | [[http://www.telerik.com/fiddler][Fiddler]]         | web 调试代理工具           |
    | [[https://mremoteng.org/][mRemoteNG]]       | 远程连接管理器            |
-   | [[https://www.getpostman.com/][Postman]]         | API测试工具               |
-   | [[https://qbittorrent.org/][qBittorrent]]     | P2P bittorrent 下载软件   |
    | [[https://github.com/QL-Win/QuickLook][QuickLook]]       | 资源管理器中快速预览文件  |
    | [[https://www.rainmeter.net/][Rainmeter]]       | 自定义桌面                |
-   | [[https://github.com/BurntSushi/ripgrep][ripgrep]]         | 命令行下文件搜索          |
    | [[http://www.screentogif.com/][ScreenToGif]]     | 屏幕录制                  |
    | [[https://getsharex.com/][ShareX]]          | 另一个截屏录屏工具        |
    | [[http://www.uderzo.it/main_products/space_sniffer/][spacesniffer]]    | 磁盘空间检索              |
    | [[http://www.cgsecurity.org/wiki/TestDisk][testdisk]]        | 数据恢复                  |
-   | [[https://www.vagrantup.com/][Vagrant]]         | 虚拟机管理工具            |
-   | [[https://www.virtualbox.org/][VirtualBox]]      | 开源虚拟机                |
    | [[https://rime.im/][weasel]]          | 高度自定义中文输入法      |
-   | [[https://sourceforge.net/projects/win32diskimager/][Win32DiskImager]] | 创建USB启动盘             |
-   | [[https://www.wireshark.org/][Wireshark]]       | 网络协议分析工具          |
+   | [[https://sourceforge.net/projects/win32diskimager/][Win32DiskImager]] | 创建 USB 启动盘             |
 
 ** To be continued...
