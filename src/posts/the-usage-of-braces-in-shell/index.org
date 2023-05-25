@@ -115,3 +115,8 @@
   echo ${string: -7:2} # 输出: bc
   echo ${string: -7:-2} # 输出: bcdef
 #+end_src
+
+** 参考
+
+- [[https://www.gnu.org/software/bash/manual/html_node/Brace-Expansion.html][GNU Manual: Brace Expansion]]
+- [[https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html][GNU Manual: Shell Parameter Expansion]]
