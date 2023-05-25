@@ -1,0 +1,117 @@
+#+TITLE: Shell 中大括号的用法
+#+KEYWORDS: 珊瑚礁上的程序员, shell, bash, braces, 大括号
+#+DATE: <2023-05-19 Fri 09:00>
+
+在 shell 中，大括号的作用主要包括:
+
+1. 大括号(表达式)扩展
+2. 变量(字符串)操作
+
+巧用大括号可以极大的提高 shell 编程的便捷性。
+
+** 表达式扩展
+
+#+begin_src shell
+  # 生成序列化的内容
+  echo {1..10}
+  # 输出: 1 2 3 4 5 6 7 8 9 10
+  # 数值类型可以指定步进值
+  echo {1..10..2}
+  # 输出: 1 3 5 7 9
+  echo {a..f}
+  # 输出: a b c d e f
+  echo {A..F}
+  # 输出: A B C D E F
+  echo {X..c}
+  # 输出: X Y Z [ \ ] ^ _ ` a b c
+
+  # 对逗号分割的进行展开
+  # 注: 逗号前后不能有空格
+  # 如果字符中确实有空格, 需要用 \ 转义
+  echo file_{aa,ab,ac}.txt
+  # 输出: file_aa.txt file_ab.txt file_ac.txt
+  echo file_{a,b}{1..2}.txt
+  # 输出: file_a1.txt file_a2.txt file_b1.txt file_b2.txt
+  # 支持嵌套用法
+  echo file_{a,{1..3},b}.txt
+  # 输出: file_a.txt file_1.txt file_2.txt file_3.txt file_b.txt
+
+  echo hello{,,}
+  # 输出: hello hello hello
+#+end_src
+
+** 字符串操作
+
+使用大括号进行字符串操作，例如删除字符、替换字符等。具体的操作符包括：
+
+- =${var#pattern}= ：从变量 var 的开头删除最短匹配 pattern 的子串。
+- =${var##pattern}= ：从变量 var 的开头删除最长匹配 pattern 的子串。
+- =${var%pattern}= ：从变量 var 的结尾删除最短匹配 pattern 的子串。
+- =${var%%pattern}= ：从变量 var 的结尾删除最长匹配 pattern 的子串。
+- =${var/pattern/string}= ：将变量 var 中第一个匹配 pattern 的子串替换为 string。
+- =${var//pattern/string}= ：将变量 var 中所有匹配 pattern 的子串替换为 string。
+
+示例：
+#+begin_src shell
+  filename="example.tar.gz"
+  echo ${filename%.gz}   # 输出：example.tar
+  echo ${filename%%.*}  # 输出：example
+  echo ${filename#*.}   # 输出：tar.gz
+  echo ${filename##*.}  # 输出：gz
+  echo ${filename/gz/zip}  # 输出：example.tar.zip
+  echo ${filename//a/A}  # 输出：exAmple.tAr.gz
+#+end_src
+
+其他用法:
+
+- ${#var} : 获取变量 var 的长度
+- ${var:-default} : 变量 var 为空或未设置, 则取默认值
+- ${var:=default} : 变量 var 为空或未设置, 则取默认值, 并将默认值赋值给变量 var
+- ${var:?message} : 变量 var 为空或未设置, 则输出 message 并退出
+- ${var:+other} : 如果变量 var 不为空, 则输出 other, 否则输出空
+- ${var:offset} : 从 offset 处截取字符串到末尾, 如果 offset 为负数, 必须加前置空格
+- ${var:offset:length} : 从 offset 处截取指定长度的字符串
+
+示例:
+#+begin_src shell
+  foo=hello
+  bar=
+  echo ${#foo} # 输出: 5
+  echo ${#bar} # 输出: 0
+
+  echo ${foo:-default value} # 输出: hello
+  echo ${bar:-default value} # 输出: default value
+  echo $foo # 输出: hello
+  echo $bar # 输出:
+
+  foo=hello
+  bar=
+  echo ${foo:=default value} # 输出: hello
+  echo ${bar:=default value} # 输出: default value
+  echo $foo # 输出: hello
+  echo $bar # 输出: default value
+
+  foo=hello
+  bar=
+  echo ${foo:?未设置} # 输出: hello
+  echo ${bar:?未设置} # 输出:  bar: 未设置 (并退出)
+  echo $foo # 输出: hello
+  echo $bar # 输出:
+
+  foo=hello
+  bar=
+  echo ${foo:+foo已设置} # 输出: foo已设置
+  echo ${bar:+bar已设置} # 输出:
+  echo $foo # 输出: hello
+  echo $bar # 输出:
+
+  string=01234567890abcdefgh
+  echo ${string:7} # 输出: 7890abcdefgh
+  echo ${string:7:0} # 输出:
+  echo ${string:7:2} # 输出: 78
+  echo ${string:7:-2} # 输出: 7890abcdef
+  echo ${string: -7} # 输出: bcdefgh
+  echo ${string: -7:0} # 输出:
+  echo ${string: -7:2} # 输出: bc
+  echo ${string: -7:-2} # 输出: bcdef
+#+end_src
