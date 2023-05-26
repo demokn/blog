@@ -46,26 +46,26 @@
 下面是一些 =expect= 脚本的基本语法和命令解释：
 
 1. =set= 命令：定义变量，变量的值可以是字符串或数值类型。例如：
-#+begin_src shell
-  set username "myusername"
-  set password "mypassword"
-#+end_src
+   #+begin_src shell
+     set username "myusername"
+     set password "mypassword"
+   #+end_src
 
 2. =spawn= 命令：启动一个新的进程，通常是启动一个交互式的命令行工具。例如：
    #+begin_src shell
-  spawn ssh username@hostname
+     spawn ssh username@hostname
    #+end_src
 
 3. =expect= 命令：等待指定的输出，通常是等待命令提示符或其他特定的输出。例如：
    #+begin_src shell
-  expect "Password:"
-  expect "$ "
+     expect "Password:"
+     expect "$ "
    #+end_src
 
 4. =send= 命令：向进程发送一个字符串，通常是输入命令或密码。例如：
    #+begin_src shell
-  send "password\n"
-  send "ls -l\n"
+     send "password\n"
+     send "ls -l\n"
    #+end_src
 
 5. =interact= 命令：将控制权交给用户，允许用户直接与进程进行交互。
@@ -74,7 +74,7 @@
 
 7. =sleep= 命令：将脚本挂起指定的时间（单位为秒）。例如：
    #+begin_src shell
-  sleep 2
+     sleep 2
    #+end_src
 
 ** 其他方案
