@@ -1,0 +1,87 @@
+#+TITLE: Shell 脚本实现ssh 密码登录
+#+KEYWORDS: 珊瑚礁上的程序员, shell, ssh, expect
+#+DATE: <2023-05-26 Fri 13:00>
+
+首先明确一下，ssh 是支持免密登录的。只需要把公钥放到目标机器的 =~/.ssh/authorized_keys= 文件中即可。
+但这不是本文的重点，本次要介绍的是使用 =expect= 脚本实现密码认证的自动登录。
+
+** =expect= 脚本自动输入密码
+
+先上代码：
+#+begin_src shell
+  #!/usr/bin/expect -f
+
+  # 设置SSH连接参数
+  set user "YOUR_USERNAME"
+  set host "YOUR_REMOTE_HOST"
+  set pass "YOUR_PASSWORD"
+
+  # 启动SSH连接
+  spawn ssh $user@$host
+
+  # 等待登录提示符
+  expect "*: "
+
+  # 输入密码
+  send "$pass\r"
+
+  # 等待登录成功提示符
+  #expect "$user@"
+  # 执行 pwd 命令
+  #send "pwd\r"
+
+  # 进入交互式模式
+  interact
+#+end_src
+
+在这个例子中， =expect= 命令将读取脚本文件中的所有命令，直到遇到 =interact= 命令。
+在这之前，脚本会通过 =spawn= 命令启动一个新的进程，打开一个 =SSH= 连接并等待登录提示符。
+一旦登录提示符出现， =expect= 命令会等待用户输入，然后通过 =send= 命令将密码发送到 =SSH= 连接。
+最后，停留在在交互式模式下，用户将能够与远程主机进行交互。
+
+** =expect= 脚本是什么
+
+=expect= 脚本是一种用于自动化交互式命令行的工具，类似于一个脚本化的终端。
+
+下面是一些 =expect= 脚本的基本语法和命令解释：
+
+1. =set= 命令：定义变量，变量的值可以是字符串或数值类型。例如：
+#+begin_src shell
+  set username "myusername"
+  set password "mypassword"
+#+end_src
+
+2. =spawn= 命令：启动一个新的进程，通常是启动一个交互式的命令行工具。例如：
+   #+begin_src shell
+  spawn ssh username@hostname
+   #+end_src
+
+3. =expect= 命令：等待指定的输出，通常是等待命令提示符或其他特定的输出。例如：
+   #+begin_src shell
+  expect "Password:"
+  expect "$ "
+   #+end_src
+
+4. =send= 命令：向进程发送一个字符串，通常是输入命令或密码。例如：
+   #+begin_src shell
+  send "password\n"
+  send "ls -l\n"
+   #+end_src
+
+5. =interact= 命令：将控制权交给用户，允许用户直接与进程进行交互。
+
+6. =break= 命令：停止执行脚本。
+
+7. =sleep= 命令：将脚本挂起指定的时间（单位为秒）。例如：
+   #+begin_src shell
+  sleep 2
+   #+end_src
+
+** 其他方案
+
+*** =sshpass= 工具
+
+#+begin_src shell
+  # 注: sshpass 需要单独安装
+  sshpass -p 'mypassword' ssh user@host
+#+end_src
