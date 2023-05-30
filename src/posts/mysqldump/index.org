@@ -1,0 +1,65 @@
+#+TITLE: 使用 mysqldump 备份数据库
+#+KEYWORDS: 珊瑚礁上的程序, mysql, mysqldump
+#+DATE: <2023-05-30 Tue 14:30>
+
+mysqldump 是 MySQL 提供的备份工具，在备份 MySQL 数据库时，可以使用多个选项来指定备份结果的格式和内容。
+
+** =mysqldump= 常用选项
+
+1. =-u= 或 =--user= : 指定连接 MySQL 服务器使用的用户名。
+1. =-p= 或 =--password= : 指定连接 MySQL 服务器使用的密码。如果不指定该选项，则会在命令中提示输入密码。
+1. =-h= 或 =--host= : 指定连接 MySQL 服务器使用的主机名。
+1. =--port= : 指定连接 MySQL 服务器使用的端口号，默认为 3306。
+1. =--single-transaction= : 在备份过程中使用事务来保证备份结果的一致性。
+1. =--master-data= : 在备份过程中添加 CHANGE MASTER TO 语句，方便在主从复制环境下恢复备份。
+1. =--databases= : 指定要备份的数据库名，多个数据库名之间用空格分隔。
+1. =--tables= : 指定要备份的表名，多个表名之间用逗号分隔。
+1. =--ignore-table= : 忽略指定表, 要忽略多个表可以多次指定该参数。
+1. =-r= 或 =--result-file= : 指定备份结果存储的文件路径。
+1. =--no-data= : 只备份建表语句, 不备份数据。
+1. =--no-create-info= : 只备份表中的数据，不包括建表的 SQL 语句。
+1. =-F= 或 =--force= : 强制备份即使备份结果可能不完整或不一致。
+1. =-c= 或 =--complete-insert= : 在备份结果中使用完整的 INSERT 语句，包括列名和值。
+1. =-e= 或  =--extended-insert= : 在备份结果中使用扩展的 INSERT 语句，可以将多个值一起插入。
+1. =--hex-blob= : 在备份结果中使用十六进制表示 BLOB 类型的列。
+1. =--compact= : 备份结果使用紧凑格式，可以减小备份文件的大小。
+1. =--compress= : 压缩备份结果，可以减小备份文件的大小。
+1. =--events= : 备份事件（即 MySQL 中的定时任务）。
+1. =--routines= : 备份存储函数和存储过程。
+1. =--lock-tables= : 备份表时加锁，确保备份结果的一致性。
+1. =--skip-lock-tables= : 不备份表时加锁。
+1. =--add-drop-table= : 在备份结果中添加 DROP TABLE 语句，方便恢复备份时删除原有表。
+1. =--skip-add-drop-table= : 不在备份结果中添加 DROP TABLE 语句。
+1. =--add-locks= : 备份每个表时添加锁。
+1. =--skip-add-locks= : 备份每个表时不加锁。
+1. =--triggers= : 备份触发器。
+1. =--skip-triggers= : 不备份触发器。
+1. =--dump-date= : 在备份结果中添加日期和时间信息。
+1. =--skip-dump-date= : 不在备份结果中添加日期和时间信息。
+1. =--comments= : 在备份数据的过程中添加注释信息，如备份时间、Mysql 版本等，方便用户在后续操作中进行识别和管理。
+1. =--skip-comments= : 不在备份结果中添加注释。
+
+** 常用示例
+
+#+begin_src shell
+  # 备份整个数据库
+  mysqldump -h'地址' --port=端口号 -u'用户名' -p'密码' [数据库名称] > [备份文件名.sql]
+
+  # 备份指定表
+  mysqldump -h'地址' --port=端口号 -u'用户名' -p'密码' [数据库名称] [表名1] [表名2] > [备份文件名.sql]
+
+  # 恢复备份数据
+  mysql -h'地址' --port=端口号 -u'用户名' -p'密码' [数据库名称] < [备份文件名.sql]
+#+end_src
+
+** 常见问题
+
+1. 报错 =Unknown table 'column_statistics' in information_schema (1109)=
+
+   这个错误通常是使用高版本的 mysqldump 备份低版本的 MySQL 引起的。
+   由于低版本不支持 =column_statistics= 表，但是 =mysqldump= 在备份时默认会包括 =column_statistics= 表，因此在备份时会出现该错误。
+   解决该问题的方法有两种：
+   1. 升级 MySQL 数据库版本到高版本（单纯为了这个备份的话，完全没必要）；
+   2. 在使用 =mysqldump= 命令时，增加 =--column-statistics=0= 参数，该参数可以禁止备份 =column_statistics= 表，从而避免出现错误。
+
+2. 若非确实需要，建议加上 =--skip-add-locks= 选项，以避免备份过程中产生长时间的表锁，影响线上业务
