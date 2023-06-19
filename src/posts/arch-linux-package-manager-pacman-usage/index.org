@@ -85,10 +85,10 @@ pacman 在使用时通常是一个操作选项(大写字母)加上一些额外�
   #+end_src
 
 - 再接上, 如果要动态计算软件包的名称, 而不是使用固定的宽度
-#+begin_src shell
-  max_len=$(pacman -Q | awk '{if (length($1) > max) max=length($1)}; END {print max}'); pacman -Q | cut -d ' ' -f 1 | xargs pacman -Qi | awk -v w="$max_len" '/^Name/ {printf "%-"w"s", $3}; /^Description/ {print $0}' | sed 's/Description[[:space:]]*: / /'
-  # awk '{if (length($1) > max) max=length($1)}; END {print max}'  命令对  pacman -Q  命令的输出进行处理，计算出软件包名称的最大长度
-#+end_src
+  #+begin_src shell
+    max_len=$(pacman -Q | awk '{if (length($1) > max) max=length($1)}; END {print max}'); pacman -Q | cut -d ' ' -f 1 | xargs pacman -Qi | awk -v w="$max_len" '/^Name/ {printf "%-"w"s", $3}; /^Description/ {print $0}' | sed 's/Description[[:space:]]*: / /'
+    # awk '{if (length($1) > max) max=length($1)}; END {print max}'  命令对  pacman -Q  命令的输出进行处理，计算出软件包名称的最大长度
+  #+end_src
 
 ** 好玩的配置
 
