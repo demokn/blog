@@ -4,104 +4,128 @@
 
 ** 善用帮助文档
 
-   - =pacman -h= 简要帮助信息
+- =pacman -h= 简要帮助信息
 
-   - =man pacman= 详细帮助文档
+- =man pacman= 详细帮助文档
 
 ** 查看相关文件
 
-   #+BEGIN_EXAMPLE
-      $ pacman -v
-      Root      : /
-      Conf File : /etc/pacman.conf
-      DB Path   : /var/lib/pacman/
-      Cache Dirs: /var/cache/pacman/pkg/
-      Hook Dirs : /usr/share/libalpm/hooks/  /etc/pacman.d/hooks/
-      Lock File : /var/lib/pacman/db.lck
-      Log File  : /var/log/pacman.log
-      GPG Dir   : /etc/pacman.d/gnupg/
-      Targets   : None
-   #+END_EXAMPLE
+#+BEGIN_EXAMPLE
+   $ pacman -v
+   Root      : /
+   Conf File : /etc/pacman.conf
+   DB Path   : /var/lib/pacman/
+   Cache Dirs: /var/cache/pacman/pkg/
+   Hook Dirs : /usr/share/libalpm/hooks/  /etc/pacman.d/hooks/
+   Lock File : /var/lib/pacman/db.lck
+   Log File  : /var/log/pacman.log
+   GPG Dir   : /etc/pacman.d/gnupg/
+   Targets   : None
+#+END_EXAMPLE
 
 ** 操作选项(operation)
 
-   pacman 在使用时通常是一个操作选项(大写字母)加上一些额外的参数(小写字母)。
-   相同的小写字母跟在不同的大写字母后面表示的含义可能不同。
-   那么多选项和组合只需要记住几个最常用的就可以， 其余的善用 =Tab 补全= 可以查看操作选项后可跟的额外参数和其简要作用描述。
+pacman 在使用时通常是一个操作选项(大写字母)加上一些额外的参数(小写字母)。
+相同的小写字母跟在不同的大写字母后面表示的含义可能不同。
+那么多选项和组合只需要记住几个最常用的就可以， 其余的善用 =Tab 补全= 可以查看操作选项后可跟的额外参数和其简要作用描述。
 
-   #+BEGIN_EXAMPLE
-      $ pacman -h
-      usage:  pacman <operation> [...]
-      operations:
-          pacman {-h --help}                             查看pacman使用帮助
-          pacman {-V --version}                          查看pacman版本
-          pacman {-D --database} <options> <package(s)>  操作软件包数据库
-          pacman {-F --files}    [options] [package(s)]  查询文件数据库
-          pacman {-Q --query}    [options] [package(s)]  查询已安装包信息
-          pacman {-R --remove}   [options] <package(s)>  删除已安装包
-          pacman {-S --sync}     [options] [package(s)]  同步（安装）包
-          pacman {-T --deptest}  [options] [package(s)]  检查包依赖
-          pacman {-U --upgrade}  [options] <file(s)>     更新或安装包
-   #+END_EXAMPLE
+#+BEGIN_EXAMPLE
+   $ pacman -h
+   usage:  pacman <operation> [...]
+   operations:
+       pacman {-h --help}                             查看pacman使用帮助
+       pacman {-V --version}                          查看pacman版本
+       pacman {-D --database} <options> <package(s)>  操作软件包数据库
+       pacman {-F --files}    [options] [package(s)]  查询文件数据库
+       pacman {-Q --query}    [options] [package(s)]  查询已安装包信息
+       pacman {-R --remove}   [options] <package(s)>  删除已安装包
+       pacman {-S --sync}     [options] [package(s)]  同步（安装）包
+       pacman {-T --deptest}  [options] [package(s)]  检查包依赖
+       pacman {-U --upgrade}  [options] <file(s)>     更新或安装包
+#+END_EXAMPLE
 
 ** 一些常用命令
 
-   - 搜索
-     - =pacman -Ss curl= 搜索指定软件
+- 搜索
+  - =pacman -Ss curl= 搜索指定软件
 
-   - 安装
-     - =pacman -S curl= 安装指定软件
+- 安装
+  - =pacman -S curl= 安装指定软件
 
-   - 查看
-     - =pacman -Q= 查看所有已安装的包
-     - =pacman -Qe= 查看所有被明确指定安装的包（而不是作为依赖项被安装）
-     - =pacman -Qd= 查看所有仅作为依赖项而被安装的包
-     - =pacman -Qi= 查看已安装包的详细信息
-     - =pacman -Qdt= 查看孤立包(仅作为依赖被安装, 且当前没有被其他包依赖)
+- 查看
+  - =pacman -Q= 查看所有已安装的包
+  - =pacman -Qe= 查看所有被明确指定安装的包（而不是作为依赖项被安装）
+  - =pacman -Qd= 查看所有仅作为依赖项而被安装的包
+  - =pacman -Qi= 查看已安装包的详细信息
+  - =pacman -Qdt= 查看孤立包(仅作为依赖被安装, 且当前没有被其他包依赖)
 
-   - 删除
-     - =pacman -Rs curl= 删除指定软件，并删除所有不被其他软件依赖的依赖包
-     - =pacman -Rsc curl= 删除指定软件，并删除所有不被其他软件依赖的依赖包, 并删除所有依赖该软件的包
+- 删除
+  - =pacman -Rs curl= 删除指定软件，并删除所有不被其他软件依赖的依赖包
+  - =pacman -Rsc curl= 删除指定软件，并删除所有不被其他软件依赖的依赖包, 并删除所有依赖该软件的包
 
-   - 更新
-     - =pacman -Syu= 更新所有包
+- 更新
+  - =pacman -Syu= 更新所有包
+
+** 一些复杂命令
+
+- 查看所有已安装的软件包及其描述, 每个软件包占一行
+  #+begin_src shell
+    pacman -Q | cut -d ' ' -f 1 | xargs pacman -Qi | awk '/^Name/ {printf $3 " "}; /^Description/ {print $0};' | sed 's/Description[[:space:]]*: / /'
+    # 1.  pacman -Q  命令列出所有已安装的软件包及其版本号；
+    # 2.  cut -d ' ' -f 1  命令将每行的第一个单词即软件包名称提取出来；
+    # 3.  xargs pacman -Qi  命令对每个软件包名称执行  pacman -Qi  命令，获取软件包的详细信息；
+    # 4.  awk '/^Name/ {printf $3 " "}; /^Description/ {print $0};'  命令对  pacman -Qi  命令的输出进行处理，将软件包名称和简要描述提取出来，并以空格分隔；
+    # 5.  sed 's/Description[[:space:]]*: / /'  命令将简要描述中的 "Description: " 字符串替换为空格。
+  #+end_src
+
+- 接上, 如果还想让软件包名称和描述同时实现对齐
+  #+begin_src shell
+    pacman -Q | cut -d ' ' -f 1 | xargs pacman -Qi | awk '/^Name/ {printf "%-25s", $3}; /^Description/ {print $0};' | sed 's/Description[[:space:]]*: / /'
+    # 不同之处在于在 awk 命令中使用了 printf "%-25s" 格式化输出，将软件包名称左对齐并占用 25 个字符的宽度
+  #+end_src
+
+- 再接上, 如果要动态计算软件包的名称, 而不是使用固定的宽度
+#+begin_src shell
+  max_len=$(pacman -Q | awk '{if (length($1) > max) max=length($1)}; END {print max}'); pacman -Q | cut -d ' ' -f 1 | xargs pacman -Qi | awk -v w="$max_len" '/^Name/ {printf "%-"w"s", $3}; /^Description/ {print $0}' | sed 's/Description[[:space:]]*: / /'
+  # awk '{if (length($1) > max) max=length($1)}; END {print max}'  命令对  pacman -Q  命令的输出进行处理，计算出软件包名称的最大长度
+#+end_src
 
 ** 好玩的配置
 
-   #+BEGIN_SRC sh
-      # https://www.linux.com/news/10-truly-amusing-easter-eggs-linux
-      # pacman输出内容变为彩色
-      grep "^Color" /etc/pacman.conf >/dev/null || sudo sed -i "s/^#Color/Color/" /etc/pacman.conf
-      # pacman进度条吃糖果动画
-      grep "ILoveCandy" /etc/pacman.conf >/dev/null || sudo sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
-   #+END_SRC
+#+BEGIN_SRC sh
+  # https://www.linux.com/news/10-truly-amusing-easter-eggs-linux
+  # pacman输出内容变为彩色
+  grep "^Color" /etc/pacman.conf >/dev/null || sudo sed -i "s/^#Color/Color/" /etc/pacman.conf
+  # pacman进度条吃糖果动画
+  grep "ILoveCandy" /etc/pacman.conf >/dev/null || sudo sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
+#+END_SRC
 
 ** 常见问题
 
-   1. *unable to lock database*
+1. *unable to lock database*
 
-      执行 =sudo pacman -Syyu= 时报错，输出如下：
-      #+begin_example
-      ➜ sudo pacman -Syu
-      :: Synchronizing package databases...
-      error: failed to update core (unable to lock database)
-      error: failed to update extra (unable to lock database)
-      error: failed to update community (unable to lock database)
-      error: failed to update multilib (unable to lock database)
-      error: failed to synchronize all databases
-      #+end_example
+   执行 =sudo pacman -Syyu= 时报错，输出如下：
+   #+begin_example
+   ➜ sudo pacman -Syu
+   :: Synchronizing package databases...
+   error: failed to update core (unable to lock database)
+   error: failed to update extra (unable to lock database)
+   error: failed to update community (unable to lock database)
+   error: failed to update multilib (unable to lock database)
+   error: failed to synchronize all databases
+   #+end_example
 
-      #+ATTR_HTML: :class alert alert-info
-      #+begin_info
-      我碰到这个问题是因为在执行一次更新过程中电脑死机了, 强制关机重启后, 再次执行更新报了这个错。
+   #+ATTR_HTML: :class alert alert-info
+   #+begin_info
+   我碰到这个问题是因为在执行一次更新过程中电脑死机了, 强制关机重启后, 再次执行更新报了这个错。
 
-      谢天谢地, 系统没挂。也是第一次碰到更新过程中死机的情况，我当时还以为就要重装系统了呢。
-      #+end_info
+   谢天谢地, 系统没挂。也是第一次碰到更新过程中死机的情况，我当时还以为就要重装系统了呢。
+   #+end_info
 
-      解决办法:
-      #+begin_src shell
-        sudo rm -rf /var/lib/pacman/db.lck
-      #+end_src
+   解决办法:
+   #+begin_src shell
+     sudo rm -rf /var/lib/pacman/db.lck
+   #+end_src
 
-      参考:
-      - [[https://www.ostechnix.com/how-to-fix-unable-to-lock-database-error-in-arch-linux/][How To Fix “unable to lock database” Error In Arch Linux]]
+   参考:
+   - [[https://www.ostechnix.com/how-to-fix-unable-to-lock-database-error-in-arch-linux/][How To Fix “unable to lock database” Error In Arch Linux]]
