@@ -1,0 +1,152 @@
+#+TITLE: AWK - 强大的文本处理工具
+#+KEYWORDS: 珊瑚礁上的程序员, awk, vim
+#+DATE: <2023-06-19 Mon 18:30>
+
+=awk= 是一款强大的文本处理工具， =awk= 把文件逐行的读入，以空格为默认分隔符将每行切片，切开的部分再进行各种分析处理。
+
+** =AWK= 命令基本语法
+
+AWK 命令的基本语法如下：
+#+begin_src shell
+  awk 'pattern {action}' file
+#+end_src
+
+其中， =pattern= 是模式，用于匹配文件中的文本行； =action= 是动作，用于对匹配到的文本行进行处理。
+=file= 是待处理的文件名，可以省略，此时 AWK 命令将从标准输入中读取数据。
+
+AWK 命令的执行流程如下：
+
+1. 读取文件中的每一行文本；
+2. 对每一行文本，依次检查所有的模式，如果有模式匹配成功，则执行对应的动作；
+3. 处理完所有的文本行后，输出所有的结果。
+
+AWK 命令的模式可以是正则表达式，也可以是字符串，还可以是一个布尔表达式。
+动作可以是一条或多条命令，多条命令之间用分号隔开。
+
+** =AWK= 命令内置变量
+
+AWK 命令有许多内置变量，可以用于处理文本数据。下面是一些常用的内置变量及其含义：
+
+- =NR= ：表示当前处理的行号；
+- =NF= ：表示当前行中的字段数；
+- =$0= ：表示当前行的所有内容；
+- =$1= 、 =$2= 、 =$3=  等：表示当前行中的第 1、2、3 个字段；
+- =FS= ：表示字段分隔符，默认为一个或多个空格；
+- =OFS= ：表示输出字段分隔符，默认为一个空格；
+- =RS= ：表示记录分隔符，默认为一个换行符；
+- =ORS= ：表示输出记录分隔符，默认为一个换行符；
+- =FILENAME= ：表示当前处理的文件名。
+
+** =AWK= 命令模式匹配
+
+AWK 命令的模式可以是正则表达式，也可以是字符串，还可以是一个布尔表达式。下面是一些常用的模式匹配方式：
+
+- =\/pattern\/= ：使用正则表达式匹配；
+- =$1 == "value"= ：使用字符串匹配；
+- =NR > 1= ：使用布尔表达式匹配。
+
+** =AWK= 命令动作
+
+AWK 命令的动作可以是一条或多条命令，多条命令之间用分号隔开。下面是一些常用的动作：
+
+- =print= ：打印当前行或指定的字段；
+- =printf= ：格式化输出；
+- =getline= ：读取下一行文本；
+- =next= ：跳过当前行；
+- =if/else= ：条件语句；
+- =for/while= ：循环语句；
+- =split= ：将字符串分割成数组。
+
+** =AWK= 命令常用示例
+
+**** 统计文件中每个单词的出现次数
+#+begin_src shell
+  awk '{for(i=1;i<=NF;i++) count[$i]++} END {for(j in count) print j, count[j]}' file.txt
+#+end_src
+
+**** 计算文件中每一行的字符数
+#+begin_src shell
+  awk '{print length}' file.txt
+#+end_src
+
+**** 格式化输出文件中的数据
+#+begin_src shell
+  awk -F, '{printf "%-10s %-10s %5d\n", $1, $2, $3}' file.txt
+#+end_src
+
+**** 删除文件中的空行
+#+begin_src shell
+  awk 'NF > 0' file.txt
+#+end_src
+
+**** 提取文件中的某一列数据
+#+begin_src shell
+  awk '{print $2}' file.txt
+#+end_src
+
+**** 替换文件中的某个字符串
+#+begin_src shell
+  awk '{gsub(/old/, "new"); print}' file.txt
+#+end_src
+
+**** 计算最长的行
+#+begin_src shell
+  awk '{ if (length > max) { max = length; longest = $0 } } END { print longest }' file.txt
+#+end_src
+
+其中， =length= 是 =AWK= 内置变量，表示当前行的字符数；
+=max= 和 =longest= 是自定义变量，分别用于保存最大长度和最长的行。
+在每一行处理时，如果当前行的长度大于 =max= ，则更新 =max= 和 =longest= 的值。
+在处理完所有行后，输出 =longest= 即可。
+
+注意，如果文件中有多行长度相同且都是最长的行，则只会输出其中任意一行。
+如果需要输出所有最长的行，可以使用以下命令：
+#+begin_src shell
+  awk '{ if (length > max) { max = length; delete longest; longest[NR] = $0 } else if (length == max) { longest[NR] = $0 } } END { for (i in longest) print longest[i] }' file.txt
+#+end_src
+
+该命令使用了一个数组 =longest= ，用于保存所有最长的行。
+在每一行处理时，如果当前行的长度大于 =max= ，则清空 =longest= 并将当前行加入数组；
+如果当前行的长度等于 =max= ，则将当前行加入数组。
+在处理完所有行后，输出数组中的所有元素即可。
+
+**** 互换奇数行和偶数行
+#+begin_src shell
+  awk '{a[NR]=$0} END{for(i=1;i<=NR;i+=2){if(i==NR){print a[i]}else{print a[i+1];print a[i]}}}' file.txt
+#+end_src
+
+该命令的含义是，将文件中的每一行存储到数组 =a= 中，然后对数组进行处理，将奇数行和偶数行互换，并输出到标准输出流中。
+
+具体实现原理如下：
+
+- =a[NR]=$0= ：将当前行存储到数组 =a= 的第 =NR= 个元素中。
+- =END{}= ：在处理完文件后执行的操作。
+- =for(i=1;i<=NR;i+=2)= ：遍历数组 =a= 中的所有元素，步长为 2。
+- =if(i==NR){print a[i]}= ：如果当前行是最后一行，则直接输出该行。
+- =else{print a[i+1];print a[i]}= ：否则，输出下一行和当前行，实现奇偶行的互换。
+
+** 心有多大, 舞台就有多大
+
+**** 将三方 API 文档中的字段描述转换为 =DTO= 类的属性
+
+三方 API 文档长这样:
+
+#+ATTR_HTML: :class d-block mw-100 mx-auto :alt 三方 API 文档 :title 三方 API 文档
+[[./三方API文档.png]]
+
+转换成 DTO 后长这样:
+
+#+ATTR_HTML: :class d-block mw-100 mx-auto :alt 转换成 DTO 类的属性 :title 转换成 DTO 类的属性
+[[./转换成DTO类的属性.png]]
+
+处理的思路是这样色的：
+1. 将三方 API 文档复制到 =vim= 编辑器
+2. 将制表符 =\t= 替换为换行符 =\n=, 处理之后将会得到 字段名 和 描述 各占一行(字段名在上, 描述在下)
+   #+begin_src shell
+     :%s/\t/\n/
+   #+end_src
+3. 使用 =awk= 将奇数行和偶数行交换(为了让描述在上, 字段名在下)
+4. 在完成第 3 步的同时, 可以拼接额外的字符串, 以满足不同编程语言的语法规则
+   #+begin_src shell
+     :%!awk '{a[NR]=$0} END{for(i=1;i<=NR;i+=2){if(i==NR){print a[i]}else{print "/**" RS " * " a[i+1] RS " */" ; print "private String " a[i] ";" RS}}}'
+   #+end_src
