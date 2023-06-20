@@ -51,20 +51,26 @@ pacman 在使用时通常是一个操作选项(大写字母)加上一些额外�
 
 - 安装
   - =pacman -S curl= 安装指定软件
+  - =pacman -U \/var/cache/pacman/pkg/curl-x.x.x-x86_64.pkg.tar.zst= 安装(回滚)指定版本的软件
+
+- 更新
+  - =pacman -Syu= 更新所有包
 
 - 查看
   - =pacman -Q= 查看所有已安装的包
   - =pacman -Qe= 查看所有被明确指定安装的包（而不是作为依赖项被安装）
   - =pacman -Qd= 查看所有仅作为依赖项而被安装的包
   - =pacman -Qi= 查看已安装包的详细信息
+  - =pacman -Ql= 查看软件包中包含的文件列表
   - =pacman -Qdt= 查看孤立包(仅作为依赖被安装, 且当前没有被其他包依赖)
 
 - 删除
   - =pacman -Rs curl= 删除指定软件，并删除所有不被其他软件依赖的依赖包
   - =pacman -Rsc curl= 删除指定软件，并删除所有不被其他软件依赖的依赖包, 并删除所有依赖该软件的包
 
-- 更新
-  - =pacman -Syu= 更新所有包
+- 清理
+  - =pacman -Sc= 清理未安装软件包的缓存
+  - =pacman -Scc= 清理所有软件包的缓存
 
 ** 一些复杂命令
 
@@ -90,6 +96,21 @@ pacman 在使用时通常是一个操作选项(大写字母)加上一些额外�
     # awk '{if (length($1) > max) max=length($1)}; END {print max}'  命令对  pacman -Q  命令的输出进行处理，计算出软件包名称的最大长度
   #+end_src
 
+  输出示例:
+  #+begin_example
+    archlinux-keyring       Arch Linux PGP keyring
+    base                    Minimal package set to define a basic Arch Linux installation
+    bash                    The GNU Bourne Again shell
+    bzip2                   A high-quality data compression program
+    ca-certificates         Common CA certificates (default providers)
+    ca-certificates-mozilla Mozilla's set of trusted CA certificates
+    ca-certificates-utils   Common CA certificates (utilities)
+    coreutils               The basic file, shell and text manipulation utilities of the GNU operating s
+    cryptsetup              Userspace setup tool for transparent encryption of block devices using dm-crypt
+    curl                    command line tool and library for transferring data with URLs
+    ......
+  #+end_example
+
 ** 好玩的配置
 
 #+BEGIN_SRC sh
@@ -99,6 +120,12 @@ pacman 在使用时通常是一个操作选项(大写字母)加上一些额外�
   # pacman进度条吃糖果动画
   grep "ILoveCandy" /etc/pacman.conf >/dev/null || sudo sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
 #+END_SRC
+
+*** 忽略某些软件包的更新
+#+begin_src conf
+  # vim /etc/pacman.conf
+  IgnorePkg = package1 package2 package3
+#+end_src
 
 ** 常见问题
 
@@ -119,7 +146,7 @@ pacman 在使用时通常是一个操作选项(大写字母)加上一些额外�
    #+begin_info
    我碰到这个问题是因为在执行一次更新过程中电脑死机了, 强制关机重启后, 再次执行更新报了这个错。
 
-   谢天谢地, 系统没挂。也是第一次碰到更新过程中死机的情况，我当时还以为就要重装系统了呢。
+   谢天谢地, 系统没挂。也是第一次碰到更新过程中死机的情况，还以为要重装系统了呢。
    #+end_info
 
    解决办法:
