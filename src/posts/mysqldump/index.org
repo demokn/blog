@@ -50,6 +50,15 @@ mysqldump 是 MySQL 提供的备份工具，在备份 MySQL 数据库时，可�
 
   # 恢复备份数据
   mysql -h'地址' --port=端口号 -u'用户名' -p'密码' [数据库名称] < [备份文件名.sql]
+
+  # 仅导出表结构(不含数据)
+  mysqldump -u'用户名' --host='地址' --port='端口' -p'密码' --column-statistics=0 --set-gtid-purged=OFF --skip-lock-tables --skip-add-drop-table --no-data [库名] [表名] > [文件名.sql]
+
+  # 仅导出数据(不含表结构)
+  mysqldump -u'用户名' --host='地址' --port='端口' -p'密码' --column-statistics=0 --set-gtid-purged=OFF --skip-lock-tables --skip-add-drop-table --skip-triggers --no-create-info [库名] [表名] > [文件名.sql]
+
+  # 同时导出表结构和数据
+  mysqldump -u'用户名' --host='地址' --port='端口' -p'密码' --column-statistics=0 --set-gtid-purged=OFF --skip-lock-tables --skip-add-drop-table --skip-triggers [库名] [表名] > [文件名.sql]
 #+end_src
 
 ** 常见问题
