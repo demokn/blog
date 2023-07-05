@@ -1,0 +1,163 @@
+#+TITLE: shell中进行四则运算
+#+KEYWORDS: shell, shell arithmetic, shell script
+#+DATE: <2023-07-05 Wed 16:00>
+
+在 shell 中进行四则运算的方法很很多，这里记录一些常见的方法。
+
+#+begin_src shell
+  # 使用 expr 命令
+  sum=$(expr 2 + 3)
+  echo $sum
+  unset sum
+
+  # 使用 $((...)) 结构
+  sum=$((2 + 3))
+  echo $sum
+  unset sum
+
+  # 使用 ((...)) 结构
+  ((sum = 2 + 3))
+  echo $sum
+  unset sum
+
+  # 使用 let 命令
+  let sum="2 + 3"
+  echo $sum
+  unset sum
+
+  # 使用 bc 命令
+  sum=$(echo "2 + 3" | bc)
+  echo $sum
+  unset sum
+
+  # 使用 awk 命令
+  sum=$(awk 'BEGIN{print 2+3}')
+  echo $sum
+  unset sum
+#+end_src
+
+** =expr= 命令
+
+expr 是一个用于进行表达式求值的 Shell 命令。
+它可以执行基本的算术运算、字符串操作和逻辑运算。
+下面是 expr 命令的一些常见用法和示例：
+
+1. 算术运算
+   #+begin_src shell
+  expr 2 + 3  # 结果: 5
+  expr 5 - 2  # 结果: 3
+  expr 2 \* 3 # 结果: 6
+  expr 5 / 2  # 结果: 2
+   #+end_src
+
+2. 逻辑运算
+   #+begin_src shell
+  expr 2 = 3    # 结果: 0. 如果2等于3，则返回1，否则返回0
+  expr 2 != 3   # 结果: 1. 如果2不等于3，则返回1，否则返回0
+  expr 2 \> 3   # 结果: 0. 如果2大于3，则返回1，否则返回0
+  expr 2 \< 3   # 结果: 1. 如果2小于3，则返回1，否则返回0
+  expr 2 \>= 3  # 结果: 0. 如果2大于等于3，则返回1，否则返回0
+  expr 2 \<= 3  # 结果: 1. 如果2小于等于3，则返回1，否则返回0
+   #+end_src
+
+3. 字符串操作
+   #+begin_src shell
+  # 结果: 4. 字符串匹配, 返回匹配的字符串长度(支持正则匹配)
+  expr "Hello" : "e.*o"
+  # 结果: 5. 返回字符串长度
+  expr length "Hello"
+  # 结果: ell. 字符串截取
+  expr substr "Hello" 2 3
+   #+end_src
+
+注意事项：
+- =expr= 命令的参数和操作数之间需要用空格隔开。
+- 某些特殊字符（如 =*= ）需要进行转义，使用反斜杠 =\= 进行转义。
+
+** =$((...))= 结构
+
+=$((...))= 结构提供了一种方便的方式来进行数学计算
+#+begin_src shell
+  # 算术运算
+  echo $((2 + 3))           # 结果: 5. 加法
+  echo $((5 - 2))           # 结果: 3. 减法
+  echo $((2 * 3))           # 结果: 6. 乘法
+  echo $((5 / 2))           # 结果: 2. 除法
+  echo $((5 % 3))           # 结果: 2. 取余
+  echo $((1 << 2))          # 结果: 4. 左移
+  echo $((10 >> 2))         # 结果: 2. 右移
+  echo $((2 * (3+4)))       # 结果: 14. 使用括号控制优先级
+  x=2; y=3; echo $((x + y)) # 结果: 5. 支持变量
+
+  # 逻辑运算
+  echo $((2 == 3)) # 0
+  echo $((2 != 3)) # 1
+  echo $((2 > 3))  # 0
+  echo $((2 < 3))  # 1
+  echo $((2 >= 3)) # 0
+  echo $((2 <= 3)) # 1
+#+end_src
+
+** =((...))= 结构
+
+=((...))= 结构与带美元符号的 =$((...))= 类似。
+不同的是其结果必须直接赋值给变量, 且变量名要写在括号里面。
+#+begin_src shell
+  # 算术运算
+  ((val = 2 + 3))           # 结果: 5. 加法
+  ((val = 5 - 2))           # 结果: 3. 减法
+  ((val = 2 * 3))           # 结果: 6. 乘法
+  ((val = 5 / 2))           # 结果: 2. 除法
+  ((val = 5 % 3))           # 结果: 2. 取余
+  ((val = 1 << 2))          # 结果: 4. 左移
+  ((val = 10 >> 2))         # 结果: 2. 右移
+  ((val = 2 * (3+4)))       # 结果: 14. 使用括号控制优先级
+  x=2; y=3; ((val = x + y)) # 结果: 5. 支持变量
+
+  # 逻辑运算
+  ((val = 2 == 3)) # 0
+  ((val = 2 != 3)) # 1
+  ((val = 2 > 3))  # 0
+  ((val = 2 < 3))  # 1
+  ((val = 2 >= 3)) # 0
+  ((val = 2 <= 3)) # 1
+#+end_src
+
+** =let= 命令
+
+在 Shell 中， let 命令是用于进行算术运算的一种方式。
+它可以在 Shell 脚本中直接进行数学计算，并将结果赋值给变量。
+下面是 let 命令的一些常见用法和示例：
+#+begin_src shell
+  let val=2+3; echo $val           # 结果: 5
+  let val=5-2; echo $val           # 结果: 3
+  let val=2\*3; echo $val          # 结果: 6
+  let val="2*3"; echo $val         # 结果: 6
+  let val=5/2; echo $val           # 结果: 2
+  let val=5%3; echo $val           # 结果: 2
+  x=2; y=3; let val=x+y; echo $val # 结果: 5
+#+end_src
+
+注意事项:
+- 等号两边不能有空格
+- 计算公式可以用双引号包裹
+- 乘号需要转义, 用双引号包裹时则无需转义
+
+** =bc= 命令
+
+=bc= 命令是一种用于进行任意精度计算的工具。
+它可以在 Shell 脚本中执行数学运算，包括整数和小数的加减乘除、取余、幂运算等。
+
+#+begin_src shell
+  # echo "表达式" | bc
+  echo "2+3" | bc          # 结果: 5
+  echo "5-2" | bc          # 结果: 3
+  echo "2*3" | bc          # 结果: 6
+  echo "5/2" | bc          # 结果: 2
+  echo "5%3" | bc          # 结果: 2
+  echo "scale=2; 5/3" | bc # 结果: 1.66
+#+end_src
+
+** =awk= 命令
+
+=awk= 太过强大, 就不在这篇文章写了。
