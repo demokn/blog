@@ -112,6 +112,52 @@
 当然，如果后续确实有修改 =Dockerfile= 的需求，
 可以再执行：
 #+begin_src shell
-    git update-index --no-assume-unchange Dockerfile
+  git update-index --no-assume-unchange Dockerfile
 #+end_src
 来恢复对 =Dockerfile= 文件变动的检查。
+
+** 切换到上一个分支
+
+#+begin_src shell
+  git checkout -
+#+end_src
+
+** 移除指定源文件中行尾的空白字符
+
+#+begin_src shell
+  sed -i -E 's/\s+$//' $(git ls-files '*.cpp' '*.h')
+  # 或者使用更强大的 git grep 来搜索文件
+  sed -i -E '...' $(git grep -lw Foo '*.cpp' '*.h')
+#+end_src
+
+** 查看分支的最后一次提交时间
+
+#+begin_src shell
+  # 所有分支, 按照最后提交时间正序排列
+  git for-each-ref --sort=committerdate refs/heads/ \
+      --format='%(committerdate:short) %(refname:short)'
+  # 获取最近更新的5个分支名
+  git for-each-ref --sort=committerdate refs/heads/ \
+      --format='%(committerdate:short) %(refname:short)' | tail -5 | cut -c 12-
+  # 列出最近更新的 5 个分支名
+  git for-each-ref --sort=-committerdate --count=5 --format='%(refname:short) %(committerdate:relative)' refs/heads/
+#+end_src
+
+=git for-each-ref= 命令可用于列出和显示各种类型的引用，例如分支、标签、远程跟踪分支等。
+同时可以使用不同的选项来过滤和格式化输出。
+
+以下是一些常用的参数：
+-  =--format=<format>= : 指定输出的格式。可以使用占位符来引用不同的字段。例如  =%d=  表示引用的类型， =%H=  表示引用的完整哈希值， =%s=  表示引用的简短描述等。
+-  =--sort=<key>= : 指定排序的键。可以使用不同的键来按照不同的方式排序引用。例如  =refname=  按引用名称排序， =committerdate=  按提交时间排序等。可以使用  =-=  来表示降序排序。
+-  =--count=<n>= : 限制输出的数量，只显示前 n 个引用。
+-  =--merged=<commit>= : 仅显示已合并到指定提交的引用。
+-  =--no-merged=<commit>= : 仅显示未合并到指定提交的引用。
+-  =--contains=<commit>= : 仅显示包含指定提交的引用。
+-  =--points-at=<object>= : 仅显示指向指定对象的引用。
+-  =--merged-with=<commit>= : 仅显示与指定提交合并的引用。
+-  =--no-merged-with=<commit>= : 仅显示与指定提交未合并的引用。
+-  =--format=<format>= : 指定输出的格式。可以使用占位符来引用不同的字段。例如  =%d=  表示引用的类型， =%H=  表示引用的完整哈希值， =%s=  表示引用的简短描述等。
+-  =--points-at=<object>= : 仅显示指向指定对象的引用。
+-  =--contains=<commit>= : 仅显示包含指定提交的引用。
+-  =--merged-with=<commit>= : 仅显示与指定提交合并的引用。
+-  =--no-merged-with=<commit>= : 仅显示与指定提交未合并的引用。
