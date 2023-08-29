@@ -159,3 +159,50 @@
 -  =--contains=<commit>= : 仅显示包含指定提交的引用。
 -  =--merged-with=<commit>= : 仅显示与指定提交合并的引用。
 -  =--no-merged-with=<commit>= : 仅显示与指定提交未合并的引用。
+
+** 遍历历史所有提交, 删除指定文件的所有痕迹
+
+应用场景:
+
+之前把个人密码文件放在了 git 仓库中，而且一直有对该文件的更新。
+后面想想这种方式还是不太安全，所以要把该文件从 git 仓库移除。
+但这个文件已经存在于 git 历史中了，这时就需要遍历所有提交，抹除所有关于该文件的痕迹。
+
+#+begin_src shell
+  git filter-branch -f --index-filter 'git rm -rf --cached --ignore-unmatch YOUR_PRIVATE_FILE_PATH' HEAD
+#+end_src
+
+该命令的作用是在每个提交中执行  =git rm -rf --cached --ignore-unmatch path_to_file= ，
+将指定的文件从 Git 的索引中移除。这样，在重写历史后，该文件将不再存在于 Git 的历史记录中。
+
+注意， =git filter-branch= 是一个强大而危险的命令，它会重写 Git 的历史记录。
+在使用该命令之前，请务必备份你的代码库，并确保你了解该命令的影响和风险。
+
+** 遍历历史所有提交, 修改提交人的姓名和邮箱
+
+应用场景:
+
+更换了邮箱地址, 想把 git 历史提交记录中的邮箱地址变更为新的邮箱地址。
+
+#+begin_src shell
+  git filter-branch --env-filter '
+  OLD_EMAIL="旧的邮箱地址"
+  CORRECT_NAME="正确的作者名字"
+  CORRECT_EMAIL="正确的邮箱地址"
+  if [ "$GIT_COMMITTER_EMAIL" = "$OLD_EMAIL" ]; then
+      export GIT_COMMITTER_NAME="$CORRECT_NAME"
+      export GIT_COMMITTER_EMAIL="$CORRECT_EMAIL"
+  fi
+  if [ "$GIT_AUTHOR_EMAIL" = "$OLD_EMAIL" ]; then
+      export GIT_AUTHOR_NAME="$CORRECT_NAME"
+      export GIT_AUTHOR_EMAIL="$CORRECT_EMAIL"
+  fi
+  ' --tag-name-filter cat -- --branches --tags
+#+end_src
+
+该命令会遍历历史提交，检查每个提交的作者信息。
+如果发现与 =OLD_EMAIL= 匹配的邮箱地址，就会将作者信息替换为 =CORRECT_NAME= 和 =CORRECT_EMAIL= 。
+通过设置环境变量，将正确的作者信息应用于每个匹配的提交。
+
+注意， =git filter-branch= 是一个强大而危险的命令，它会重写 Git 的历史记录。
+在使用该命令之前，请务必备份你的代码库，并确保你了解该命令的影响和风险。
