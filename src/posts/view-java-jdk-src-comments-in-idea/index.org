@@ -1,0 +1,27 @@
+#+TITLE: 在 =IDEA= 中查看 =JDK= 源码注释
+#+KEYWORDS: 珊瑚礁上的程序员, idea, jdk源码注释
+#+DATE: <2023-11-21 Tue 22:30>
+
+1. 下载 =JDK= 源码
+
+   #+begin_src shell
+     # 以 arch linux 系统为例
+     # 安装 jdk8 的源码包
+     sudo pacman -S openjdk8-src
+     # 查看包内容(确认 src.zip 存放路径)
+     pacman -Ql openjdk8-src
+     ### 输出如下
+     # openjdk8-src /usr/
+     # openjdk8-src /usr/lib/
+     # openjdk8-src /usr/lib/jvm/
+     # openjdk8-src /usr/lib/jvm/java-8-openjdk/
+     # openjdk8-src /usr/lib/jvm/java-8-openjdk/src.zip
+     ### 输出结束
+   #+end_src
+
+2. 在 =IDEA= 中配置 JDK 源码路径
+   2.1. File -> Project Structure
+   2.2. Platform Settings -> SDKs -> Sourcepath -> 添加下载好的源码 src.zip
+
+#+ATTR_HTML: :class d-block mw-100 mx-auto :alt idea 配置截图 :title idea 配置截图
+[[./20231121-01.png]]
