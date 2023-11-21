@@ -20,8 +20,10 @@
    #+end_src
 
 2. 在 =IDEA= 中配置 JDK 源码路径
+
    2.1. File -> Project Structure
+
    2.2. Platform Settings -> SDKs -> Sourcepath -> 添加下载好的源码 src.zip
 
-#+ATTR_HTML: :class d-block mw-100 mx-auto :alt idea 配置截图 :title idea 配置截图
-[[./20231121-01.png]]
+   #+ATTR_HTML: :class d-block mw-100 mx-auto :alt idea 配置截图 :title idea 配置截图
+   [[./20231121-01.png]]
