@@ -1,0 +1,35 @@
+#+TITLE: 在离线的电脑上如何使用pip安装python依赖包
+#+KEYWORDS: 珊瑚礁上的程序员, python, pip, 离线, offline
+#+DATA: <2023-12-29 Fri 23:30>
+
+有的公司电脑是不允许连接外网的，在这种情况下，就需要想一些其他办法来为离线的电脑安装 python 依赖包。
+
+1. 在有网络连接的环境中准备依赖包：
+   在有网络连接的计算机上，使用 =pip= 下载依赖包，并将其保存到一个目录中。
+   例如，通过运行以下命令：
+
+   #+begin_src shell
+     pip download --python-version 3.x.x --no-binary=:all: -d /path/to/download/directory package_name
+   #+end_src
+
+   这将下载指定依赖包及其所有依赖项到指定目录。可以根据实际需要下载多个依赖包。
+
+   - =--python-version= 选项指定要下载的 Python 版本 (指定为目标机器上的 python 版本)
+   - =--no-binary=:all:= 选项告诉 =pip= 不要下载任何预编译的二进制包，而是只下载源码包。这对于确保包与目标 Python 版本兼容是有帮助的。
+
+2. 将下载的包复制到离线环境：
+   将下载的依赖包复制到没有网络连接的机器上，可以使用移动存储设备、网络共享或其他途径。
+
+3. 在离线环境中安装依赖包：
+   在离线环境中，使用以下命令安装依赖包：
+
+   #+begin_src shell
+     pip install --no-index --find-links=/path/to/download/directory package_name
+   #+end_src
+
+   - =--no-index= 参数告诉 =pip= 不要从 PyPI（Python Package Index）上查找包，而是直接使用本地目录。
+   - =--find-links= 参数指定查找包的本地目录。
+
+   确保 =/path/to/download/directory= 路径指向下载依赖包的目录。
+
+通过这种方式，可以在没有网络连接的环境中离线安装 Python 依赖包。
