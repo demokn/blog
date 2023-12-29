@@ -9,6 +9,37 @@
   git clone REMOTE_GIT_URL --config core.sshCommand="ssh -i ~/.ssh/id_rsa.other"
 #+end_src
 
+** 不同的目录下执行 git 使用不同的配置文件
+
+=includeIf= 是 =Git= 配置中的一个特性，用于在不同的情境下包含不同的配置文件。
+
+假设我们有两个不同的 Git 配置文件，一个用于工作，一个用于个人项目。
+我们可以根据工作目录的路径加载不同的配置文件。
+
+#+begin_src shell
+  # ~/.gitconfig
+
+  [user]
+    name = Your Name
+    email = your.email@example.com
+
+  [includeIf "gitdir:~/work/"]
+    path = ~/work/gitconfig-work
+
+  [includeIf "gitdir:~/personal/"]
+    path = ~/personal/gitconfig-personal
+#+end_src
+
+在这个例子中：
+
+如果 Git 仓库位于 =~/work/= 目录下，将加载 =~/work/gitconfig-work= 文件。
+
+如果 Git 仓库位于 =~/personal/= 目录下，将加载 =~/personal/gitconfig-personal= 文件。
+
+无论在哪个目录下，都会使用主配置文件的用户姓名和邮箱。
+
+如果我们工作和个人项目使用的 ssh 私钥不同，则可以分别在两个配置文件中配置 =core.sshCommand= 配置项。
+
 ** 判断分支是否已经合并到主干
 
 #+begin_src shell
