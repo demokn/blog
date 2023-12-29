@@ -2,6 +2,13 @@
 #+KEYWORDS: 珊瑚礁上的程序员, git, git command
 #+DATE: <2022-11-23 Wed 14:00>
 
+** 使用指定的私钥克隆仓库
+
+当具有多个私钥时， =git clone= 时可以指定私钥克隆:
+#+begin_src shell
+  git clone REMOTE_GIT_URL --config core.sshCommand="ssh -i ~/.ssh/id_rsa.other"
+#+end_src
+
 ** 判断分支是否已经合并到主干
 
 #+begin_src shell
