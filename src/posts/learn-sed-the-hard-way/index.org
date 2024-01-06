@@ -1,0 +1,47 @@
+#+TITLE: sed 小知识
+#+KEYWORDS: 珊瑚礁上的程序员, sed
+#+DATE: <2024-01-06 Sat 23:00>
+
+** 正则表达式中的 =BRE= =ERE= 和 =PCRE=
+
+=BRE（Basic Regular Expression）=
+=ERE（Extended Regular Expression）= 和
+=PCRE（Perl Compatible Regular Expression）=
+是不同的正则表达式语法规范，它们在功能和语法上有所不同。
+
+在 =GNU sed= 中默认使用的 =BRE=, 可以使用 =-E= 选项启用 =ERE=.
+
+官方给出的描述是：在 =GNU sed= 中 =BRE= 和 =ERE= 的唯一区别是对一些特殊字符如 =?=, =+=, =()=, ={}=, 和 =|= 的处理不同。
+在 =BRE= 中这些字符没有特殊的含义，除非他们被转义字符 =\= 转义。
+而在 =ERE= 中是完全反过来的，这些特殊字符都是具有特殊含义的。
+
+#+begin_quote
+Basic and extended regular expressions are two variations on the syntax of the specified pattern. Basic Regular Expression (BRE) syntax is the default in sed (and similarly in grep). Use the POSIX-specified -E option (-r, --regexp-extended) to enable Extended Regular Expression (ERE) syntax.
+
+In GNU sed, the only difference between basic and extended regular expressions is in the behavior of a few special characters: ‘?’, ‘+’, parentheses, braces (‘{}’), and ‘|’.
+
+With basic (BRE) syntax, these characters do not have special meaning unless prefixed with a backslash (‘\’); While with extended (ERE) syntax it is reversed: these characters are special unless they are prefixed with backslash (‘\’).
+#+end_quote
+
+放几个相关链接
+
+- [[https://www.gnu.org/software/sed/manual/html_node/BRE-vs-ERE.html#BRE-vs-ERE][GNU sed: BRE-vs-ERE]]
+- [[https://www.baeldung.com/linux/bre-ere-pcre-syntax][Baeldung: The Differences Between BRE, ERE, and PCRE Syntax in Linux]]
+- [[https://zerodayhacker.com/basic-or-extended-regex/][Basic or extended regex?]]
+- [[https://learnbyexample.github.io/gnu-bre-ere-cheatsheet/][GNU BRE/ERE cheatsheet and differences between grep, sed and awk]]
+- [[https://learnbyexample.github.io/learn_gnused/breere-regular-expressions.html][BRE/ERE Regular Expressions]]
+
+** 在匹配行的上一行插入代码并保持缩进
+
+源文件：
+#+begin_example
+  1
+      2
+  3
+#+end_example
+
+目的要在 =2= 这一行的上面一行插入 =666= 且要保持跟 =2= 这一行相同的缩进
+
+#+begin_src shell
+  sed -i 's/^\(\(.*\)2\)$/\2666\n\1/' YOUR_FILE.txt
+#+end_src
