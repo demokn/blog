@@ -1,0 +1,43 @@
+#+TITILE: 如何查看当前正在运行的shell是bash zsh 还是 *sh
+#+KEYWORDS: 珊瑚礁上的程序员, which shell
+#+DATE: <2024-01-07 Sun 00:00>
+
+** 方式一: =echo $0=
+
+=$0= 表示当前正在执行的脚本或命令的名称。
+
+#+begin_src shell
+  echo $0
+#+end_src
+
+输出如下：
+#+begin_example
+  bash
+#+end_example
+
+在交互式的终端中执行，它将显示当前使用的 shell 的名称，例如 bash、zsh 等。
+
+如果在一个脚本中运行这个命令，它将输出脚本文件的名称。
+例如，如果有一个脚本文件名为  =myscript.sh= ，并在其中包含了 =echo $0= ，那么当运行这个脚本时，它将输出 =myscript.sh= 。
+
+** 方式二: =ps -p $$=
+
+=$$= 表示当前正在执行的 shell 进程的 =PID= 。
+
+#+begin_src shell
+  ps -p $$
+#+end_src
+
+输出如下：
+#+begin_example
+      PID TTY          TIME CMD
+   424568 pts/0    00:00:00 bash
+#+end_example
+
+** 不可取的方式： =echo $SHELL=
+
+=$SHELL= 表示当前登录用户的 =默认 shell= 的路径
+
+注意是 =默认shell=, 而不一定是当前使用的 shell。
+
+例如我默认使用的是 =zsh=, 当我临时切换到 =bash= 下时, =$SHELL= 变量并不会改变。
