@@ -1,6 +1,8 @@
-#+TITILE: 如何查看当前正在运行的shell是bash zsh 还是 *sh
+#+TITLE: 如何查看当前正在运行的shell是bash zsh 还是 *sh
 #+KEYWORDS: 珊瑚礁上的程序员, which shell
 #+DATE: <2024-01-07 Sun 00:00>
+
+如题，有时候登入一台陌生的服务器，我们可能想要先确认下我在使用的是哪个 =shell=.
 
 ** 方式一: =echo $0=
 
