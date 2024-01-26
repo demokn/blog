@@ -63,7 +63,7 @@ split 命令是支持管道操作符的，
 
 - =-a4= : 指定文件后缀长度为 4 位
 - =-d= : 指定使用数字作为文件序号，而不是字母
-- =--additional-suffix\equal.txt= : 指定为所有文件再添加额外的后缀为 =.txt=
+- ~--additional-suffix=.txt~ : 指定为所有文件再添加额外的后缀为 =.txt=
 
 如上命令将得到三个文件，分别是
 #+begin_example
