@@ -1,0 +1,86 @@
+#+TITLE: Manjaro/Archlinux 使用PKGBUILD 安装指定版本的软件
+#+KEYWORDS: 珊瑚礁上的程序员, Arch Linux, Manjaro, Pacman, PKGBUILD, makepkg
+#+DATE: <2024-03-26 Tue 23:30>
+
+使用 =Manjaro= 发行版有好长一段时间了。
+期间也修改过 =aur= 库中的 =PKGBUILD= 文件来安装指定版本的软件。
+最近 =phpstorm= 启动报错，便想用重装的方式简单粗暴的来解决。
+因为要安装旧版本的（新版本要登录账号，嫌麻烦），所以还是要借助 =aur= 中的 =PKGBUILD= 来实现安装。
+
+操作步骤倒是很简单：
+1. 从 =AUR= 库中下载 phpstorm 的 =PKGBUILD= 源文件
+2. 从 =JetBrain= 官网下载指定版本的 phpstorm 安装包
+3. 将 =PKGBUILD= 和 phpstorm 安装包放在同一个目录下
+4. 对 =PKGBUILD= 文件做如下简单修改
+   - =pkgver= 变量修改为本地 phpstorm 安装包的版本号
+   - =source= 变量修改为本地的 phpstorm 安装包名称
+   - =b2sums= 变量修改为 =SKIP= (注意大写)
+5. 执行 =makepkg -si= 命令构建和安装即可
+
+顺便借这个机会简单学习下 =PKGBUILD= 文件的语法。
+直接以注释的方式贴出来：
+#+begin_src shell
+  # 语法跟shell几乎完全一致，只不过预定义了一些变量的名称和含义
+  # 如果需要自定义一些变量，建议使用下划线_开头，以避免跟预定义变量冲突
+  # # 开头表示注释
+
+  # 设置软件包的基本信息
+  pkgbase=phpstorm          # 定义软件包的基本名称
+  pkgname=(phpstorm phpstorm-jre)  # 定义软件包的名称，包括 phpstorm 和 phpstorm-jre
+  pkgver=2021.1.4           # 定义软件包的版本号
+  pkgrel=1                  # 定义软件包的发布版本号
+  pkgdesc='Lightweight and Smart PHP IDE'  # 定义软件包的描述信息
+  arch=('x86_64' 'i686')    # 定义软件包支持的架构
+  license=('custom:jetbrains')  # 定义软件包的许可证类型
+  url='https://www.jetbrains.com/phpstorm/'  # 定义软件包的官方网站 URL
+  depends=('glib2' 'python')  # 定义软件包的依赖项
+  options=('!strip')         # 定义软件包的编译选项
+  source=("PhpStorm-${pkgver%b*}.tar.gz")  # 定义软件包的源文件
+
+  # 源文件的校验和，这里使用了 SKIP，表示校验和不可用或不适用
+  b2sums=('SKIP')
+
+  # 定义打包 phpstorm 软件包的操作
+  package_phpstorm() {
+    # 定义 phpstorm 软件包的可选依赖项
+    optdepends=('phpstorm-jre: JetBrains custom Java Runtime (Recommended)'
+                'java-runtime: JRE - Required if phpstorm-jre is not installed'
+                'gnome-keyring: save login/deployment credentials safely'
+                'java-openjfx: rendering Markdown files')
+
+    # 从源目录中复制 PhpStorm 到目标安装目录
+    # _buildver 是自定义的变量, 值是执行shell命令从文件名中提取的 PhpStorm 版本号
+    _buildver="$(ls | grep -Eo 'PhpStorm-[[:digit:]]+\.[[:digit:]]{2,5}\.[[:digit:]]+' | sort -r | head -1 | sed 's#PhpStorm-##')"
+    # install 命令是 gnu coreutils 包中提供的, 因为没用过这个命令, 最开始我还以为时 PKGBUILD 预定义的方法
+    install -dm755 "${pkgdir}"/opt/
+    install -dm755 "${pkgdir}"/usr/bin/
+    install -dm755 "${pkgdir}"/usr/share/applications/
+    install -dm755 "${pkgdir}"/usr/share/pixmaps/
+    cp -a "${srcdir}"/PhpStorm-${_buildver:?_buildver unset}/ "${pkgdir}"/opt/${pkgbase}
+    rm -rf "${pkgdir}"/opt/${pkgbase}/jbr
+    ln -s /opt/${pkgbase}/bin/${pkgbase}.sh "${pkgdir}"/usr/bin/${pkgbase}
+
+    # 将 svg 图标安装到目标目录
+    install -D -m 644 "${pkgdir}"/opt/${pkgbase}/bin/${pkgbase}.svg "${pkgdir}"/usr/share/pixmaps/${pkgbase}.svg
+  }
+
+  # 定义打包 phpstorm-jre 软件包的操作
+  package_phpstorm-jre() {
+    pkgdesc='JBR (JetBrains Runtime) for PhpStorm - a patched JRE'  # 定义 phpstorm-jre 软件包的描述信息
+    url='https://github.com/JetBrains/JetBrainsRuntime'  # 定义 phpstorm-jre 软件包的官方网站 URL
+
+    # 从源目录中复制 JBR 到目标安装目录
+    _buildver="$(ls | grep -Eo 'PhpStorm-[[:digit:]]+\.[[:digit:]]{2,5}\.[[:digit:]]+' | sort -r | head -1 | sed 's#PhpStorm-##')"
+    install -d -m 755 "${pkgdir}"/opt/${pkgbase}
+    cp -a "${srcdir}"/PhpStorm-${_buildver:?_buildver unset}/jbr "${pkgdir}"/opt/${pkgbase}
+  }
+#+end_src
+
+一个很好的入门参考：
+- [[https://linux.cn/article-13843-1.html][Arch Linux 软件包制作入门]]
+- [[https://itsfoss.com/create-pkgbuild/][Creating a PKGBUILD to Make Packages for Arch Linux]]
+
+更深入的学习推荐查看 =manpage= ：
+- =man PKGBUILD=
+- =man makepkg=
+- =man install=
