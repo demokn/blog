@@ -55,7 +55,7 @@
 
 (defvar kn/site-name "珊瑚礁上的程序员"
   "项目/站点名称.")
-(defvar kn/site-url "https://blog.demokn.com/"
+(defvar kn/site-url "https://demokn.github.io/blog"
   "网站地址.")
 (defvar kn/posts-url (concat kn/site-url "posts/")
   "文章地址.")
@@ -68,13 +68,13 @@
 ;; 对于引用的外部CSS库，最好是下载到本地.
 ;; 使用CDN引用的话，google search 可能无法爬取，导致“移动设备易用性”检查出现错误.
 (defvar kn/html-head
-  "<link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\">
-<link rel=\"stylesheet\" href=\"/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css\">
-<link rel=\"stylesheet\" href=\"/assets/lib/font-awesome/5.12.1/all.min.css\">
+  (concat "<link rel=\"icon\" href=\"" kn/site-url "/favicon.ico\" type=\"image/x-icon\">
+<link rel=\"stylesheet\" href=\"" kn/site-url "/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css\">
+<link rel=\"stylesheet\" href=\"" kn/site-url "/assets/lib/font-awesome/5.12.1/all.min.css\">
 <link rel=\"stylesheet\" type=\"text/css\" href=\"https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek\"/>
-<link rel=\"stylesheet\" href=\"/assets/css/site.css\">
-<link rel=\"stylesheet\" href=\"/assets/css/highlight.css\">
-")
+<link rel=\"stylesheet\" href=\"" kn/site-url "/assets/css/site.css\">
+<link rel=\"stylesheet\" href=\"" kn/site-url "/assets/css/highlight.css\">
+"))
 
 (defun kn/src-path (sub-path)
   "获取项目源码子路径.  SUB-PATH."
@@ -419,7 +419,7 @@ Return output file name."
          :base-directory kn/src-dir
          :base-extension (regexp-opt '("ico" "jpg" "jpeg" "png" "gif" "svg" "css" "js" "pdf"))
          :recursive t
-         :include '("CNAME" "robots.txt" "404.html")
+         :include '("robots.txt" "404.html")
 
          :publishing-directory kn/pub-dir
          :publishing-function #'org-publish-attachment)
