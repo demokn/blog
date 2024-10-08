@@ -22,6 +22,9 @@
 (require 'ox-publish)
 (require 'ox-rss)
 
+(setq debug-on-error t)
+(setq org-startup-folded nil)
+
 ;; 在本地导出图片即可, 无需每次编译都重新导出
 ;; (with-eval-after-load 'ob-plantuml
 ;;   (let ((jar-name "plantuml.jar")
@@ -85,10 +88,26 @@
   (expand-file-name sub-path kn/pub-dir))
 
 (defun kn--pre/postamble-format (name)
-  "读取snippets目录下的代码片段文件, 返回格式化的pre/postamble内容.  NAME."
-  `(("en" ,(with-temp-buffer
-             (insert-file-contents (expand-file-name (format "%s.html" name) (kn/src-path "snippets")))
-             (buffer-string)))))
+  "读取snippets目录下的代码片段文件, 返回格式化的pre/postamble内容.
+NAME 是代码片段的文件名（不含扩展名）。"
+  (let ((file-path (expand-file-name (format "%s.html" name) (kn/src-path "snippets")))
+        ;; 定义占位符和实际变量值的映射表
+        (placeholders `(("{{kn/site-url}}" . ,kn/site-url)
+                        ("{{kn/site-name}}" . ,kn/site-name)
+                        ;; 这里可以继续添加更多占位符
+                        )))
+    (if (file-exists-p file-path)
+        (let ((content (with-temp-buffer
+                         (insert-file-contents file-path)
+                         (buffer-string))))
+          ;; 替换占位符
+          (dolist (placeholder placeholders)
+            (setq content (replace-regexp-in-string (car placeholder) (cdr placeholder) content)))
+          ;; 返回替换后的内容
+          `(("en" ,content)))
+      (progn
+        (message "文件 %s 不存在，使用默认内容" file-path)
+        `(("en" "<!-- Default content -->"))))))
 
 (defun kn--insert-snippet (filename)
   "读取snippets目录下的代码片段文件, 返回文件内容.  FILENAME."
