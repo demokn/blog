@@ -22,8 +22,11 @@
 (require 'ox-publish)
 (require 'ox-rss)
 
+(message "Emacs Version: %s\nOrg Version: %s"
+         (emacs-version)
+         (org-version))
+
 (setq debug-on-error t)
-(setq org-startup-folded nil)
 
 ;; 在本地导出图片即可, 无需每次编译都重新导出
 ;; (with-eval-after-load 'ob-plantuml
@@ -57,63 +60,54 @@
 ;;       pub-asset pub-asset-relative-name)))
 
 (defvar kn/site-name "珊瑚礁上的程序员"
-  "项目/站点名称.")
-(defvar kn/site-url "https://demokn.github.io/blog"
+  "网站名称.")
+(defvar kn/site-url "https://demokn.github.io/blog/"
   "网站地址.")
-(defvar kn/posts-url (concat kn/site-url "posts/")
-  "文章地址.")
 
 (defvar kn/src-dir (expand-file-name "src/" (file-name-directory (or load-file-name buffer-file-name)))
-  "项目源码根目录.")
+  "项目源码根目录(绝对路径).")
 (defvar kn/pub-dir (expand-file-name "public/" (file-name-directory (or load-file-name buffer-file-name)))
-  "项目发布根目录.")
+  "项目发布根目录(绝对路径).")
 
 ;; 对于引用的外部CSS库，最好是下载到本地.
 ;; 使用CDN引用的话，google search 可能无法爬取，导致“移动设备易用性”检查出现错误.
 (defvar kn/html-head
-  (concat "<link rel=\"icon\" href=\"" kn/site-url "/favicon.ico\" type=\"image/x-icon\">
-<link rel=\"stylesheet\" href=\"" kn/site-url "/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css\">
-<link rel=\"stylesheet\" href=\"" kn/site-url "/assets/lib/font-awesome/5.12.1/all.min.css\">
+  (concat "<link rel=\"icon\" href=\"" kn/site-url "favicon.ico\" type=\"image/x-icon\">
+<link rel=\"stylesheet\" href=\"" kn/site-url "assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css\">
+<link rel=\"stylesheet\" href=\"" kn/site-url "assets/lib/font-awesome/5.12.1/all.min.css\">
 <link rel=\"stylesheet\" type=\"text/css\" href=\"https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek\"/>
-<link rel=\"stylesheet\" href=\"" kn/site-url "/assets/css/site.css\">
-<link rel=\"stylesheet\" href=\"" kn/site-url "/assets/css/highlight.css\">
+<link rel=\"stylesheet\" href=\"" kn/site-url "assets/css/site.css\">
+<link rel=\"stylesheet\" href=\"" kn/site-url "assets/css/highlight.css\">
 "))
 
-(defun kn/src-path (sub-path)
-  "获取项目源码子路径.  SUB-PATH."
-  (expand-file-name sub-path kn/src-dir))
-
-(defun kn/pub-path (sub-path)
-  "获取项目发布子路径.  SUB-PATH."
-  (expand-file-name sub-path kn/pub-dir))
-
 (defun kn--pre/postamble-format (name)
-  "读取snippets目录下的代码片段文件, 返回格式化的pre/postamble内容.
+  "读取 snippets 目录下的代码片段文件，返回格式化的 pre/postamble 内容.
 NAME 是代码片段的文件名（不含扩展名）。"
-  (let ((file-path (expand-file-name (format "%s.html" name) (kn/src-path "snippets")))
-        ;; 定义占位符和实际变量值的映射表
-        (placeholders `(("{{kn/site-url}}" . ,kn/site-url)
-                        ("{{kn/site-name}}" . ,kn/site-name)
-                        ;; 这里可以继续添加更多占位符
-                        )))
+  (let* ((file-path (format "%s.html" name))
+         ;; 定义占位符和实际变量值的映射表
+         (placeholders `(("{{kn/site-url}}" . ,kn/site-url)
+                         ("{{kn/site-name}}" . ,kn/site-name)
+                         ;; 这里可以继续添加更多占位符
+                         ))
+         ;; 调用 kn--read-snippet 读取文件内容
+         (content (kn--read-snippet file-path)))
+    ;; 替换占位符
+    (dolist (placeholder placeholders)
+      (setq content (replace-regexp-in-string (car placeholder) (cdr placeholder) content)))
+    ;; 返回替换后的内容
+    `(("en" ,content))))
+
+(defun kn--read-snippet (filename)
+  "读取 snippets 目录下的代码片段文件，返回文件内容.
+FILENAME 是文件名。"
+  (let ((file-path (concat kn/src-dir "snippets/" filename)))
     (if (file-exists-p file-path)
-        (let ((content (with-temp-buffer
-                         (insert-file-contents file-path)
-                         (buffer-string))))
-          ;; 替换占位符
-          (dolist (placeholder placeholders)
-            (setq content (replace-regexp-in-string (car placeholder) (cdr placeholder) content)))
-          ;; 返回替换后的内容
-          `(("en" ,content)))
+        (with-temp-buffer
+          (insert-file-contents file-path)
+          (buffer-string))
       (progn
         (message "文件 %s 不存在，使用默认内容" file-path)
-        `(("en" "<!-- Default content -->"))))))
-
-(defun kn--insert-snippet (filename)
-  "读取snippets目录下的代码片段文件, 返回文件内容.  FILENAME."
-  (with-temp-buffer
-    (insert-file-contents (expand-file-name filename (kn/src-path "snippets")))
-    (buffer-string)))
+        "<!-- Default content -->"))))
 
 (defun kn/org-html-publish-site-to-html (plist filename pub-dir)
   "Publish site's non-post org file to HTML.
@@ -134,8 +128,8 @@ Return output file name."
         (goto-char (point-max))
         (search-backward "</body>")
         (insert "\n</div>\n</div>\n</div>\n")
-        (insert (kn--insert-snippet "analytics.js.html"))
-        (insert (kn--insert-snippet "statcounter.js.html"))
+        (insert (kn--read-snippet "analytics.js.html"))
+        (insert (kn--read-snippet "statcounter.js.html"))
         (save-buffer)
         (kill-buffer)))
     file-path))
@@ -159,7 +153,6 @@ Return output file name."
       (plist-put plist
                  :subtitle (format "发布于 %s"
                                    (format-time-string "%Y-%m-%d" (org-publish-find-date filename project))))))
-
   (let* ((file-path (org-html-publish-to-html plist filename pub-dir)))
     (save-window-excursion
       (with-current-buffer (find-file-noselect file-path)
@@ -171,10 +164,10 @@ Return output file name."
         (goto-char (point-max))
         (search-backward "</body>")
         (unless (equal "archive.org" (file-name-nondirectory filename))
-          (insert (kn--insert-snippet "disqus.js.html")))
+          (insert (kn--read-snippet "disqus.js.html")))
         (insert "\n</div>\n</div>\n</div>\n")
-        (insert (kn--insert-snippet "analytics.js.html"))
-        (insert (kn--insert-snippet "statcounter.js.html"))
+        (insert (kn--read-snippet "analytics.js.html"))
+        (insert (kn--read-snippet "statcounter.js.html"))
         (save-buffer)
         (kill-buffer)))
     file-path))
@@ -228,6 +221,7 @@ representation for the files to include, as returned by
     (concat (format "#+TITLE: %s\n" title)
             (format "#+KEYWORDS: %s\n\n" title)
             (org-list-to-subtree sitemap nil '(:istart "" :icount "")))))
+
 (defun kn/org-publish-sitemap-format-rss-entry (entry style project)
   "Default format for posts rss site map ENTRY, as a string.
 
@@ -244,7 +238,7 @@ PROJECT is the current project."
                 ;; pubdate))
                 (moddate pubdate)
                 (link (concat (file-name-sans-extension entry) ".html"))) ;; 文件后缀改为 .html
-           (message "文件: %s\n发布时间: %s\n更新时间: %s" file pubdate moddate)
+           (message "文件: %s\n链接: %s\n发布时间: %s\n更新时间: %s" file link pubdate moddate)
            ;; (message (org-publish-find-property file :title project))
            ;; (message (org-publish-find-property file :date project))
 
@@ -324,12 +318,12 @@ Return output file name."
 (defvar kn/org-publish-project-alist
   (list
    (list "blog-posts" ;; 文章发布
-         :base-directory (kn/src-path "posts")
+         :base-directory (concat kn/src-dir "posts/")
          :base-extension "org"
          :recursive t
          :exclude (regexp-opt '("archive.org" "rss.org"))
 
-         :publishing-directory (kn/pub-path "posts")
+         :publishing-directory (concat kn/pub-dir "posts/")
          :publishing-function #'kn/org-html-publish-post-to-html
 
          :with-toc nil ;; 是否包含目录
@@ -363,15 +357,15 @@ Return output file name."
          :sitemap-format-entry #'kn/org-publish-sitemap-format-archive-entry)
 
    (list "blog-posts-rss" ;; 文章 RSS 订阅
-         :base-directory (kn/src-path "posts")
+         :base-directory (concat kn/src-dir "posts/")
          :base-extension "org"
          :recursive t
          :exclude (regexp-opt '("archive.org" "rss.org"))
 
-         :publishing-directory (kn/pub-path "posts")
+         :publishing-directory (concat kn/pub-dir "posts/")
          :publishing-function #'kn/org-rss-publish-to-rss
 
-         :html-link-home kn/posts-url
+         :html-link-home (concat kn/site-url "posts/")
          :html-home/up-format ""
          :html-link-use-abs-url t
          :html-link-org-files-as-html t
