@@ -1,7 +1,7 @@
 #+TITLE: 珊瑚礁上的程序员
 #+KEYWORDS: 珊瑚礁上的程序员, 博客, 首页, Homepage
 #+COMMENT: google site verification
-#+HTML_HEAD_EXTRA: <meta name="google-site-verification" content="KeCMK1ZsjmPvHYLVcu5CSFEOxguXNd9bPi_ZCSiQ-xw" />
+#+HTML_HEAD_EXTRA: <meta name="google-site-verification" content="JO5R4m3C3ntHUtl0I8cNm9DGB0KUgY0XlF9nDobc03E" />
 #+COMMENT: bing site verification
 #+HTML_HEAD_EXTRA: <meta name="msvalidate.01" content="250222ED2307A2C2DD118348301C7C19" />
 
