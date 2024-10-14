@@ -17,11 +17,11 @@
     (package-install pkg)))
 
 ;; 加载依赖包
-(require 'dash)
 (require 'org)
 (require 'ox-publish)
 (require 'ox-rss)
 
+;; 输出 Emacs 和 Org 版本信息
 (message "Emacs Version: %s\nOrg Version: %s"
          (emacs-version)
          (org-version))
@@ -62,12 +62,12 @@
 (defvar kn/site-name "珊瑚礁上的程序员"
   "网站名称.")
 (defvar kn/site-url "https://demokn.github.io/blog/"
-  "网站地址.")
+  "网站URL.")
 
 (defvar kn/src-dir (expand-file-name "src/" (file-name-directory (or load-file-name buffer-file-name)))
-  "项目源码根目录(绝对路径).")
+  "源码目录的绝对路径.")
 (defvar kn/pub-dir (expand-file-name "public/" (file-name-directory (or load-file-name buffer-file-name)))
-  "项目发布根目录(绝对路径).")
+  "发布目录的绝对路径.")
 
 ;; 对于引用的外部CSS库，最好是下载到本地.
 ;; 使用CDN引用的话，google search 可能无法爬取，导致“移动设备易用性”检查出现错误.
@@ -78,7 +78,8 @@
 <link rel=\"stylesheet\" type=\"text/css\" href=\"https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek\"/>
 <link rel=\"stylesheet\" href=\"" kn/site-url "assets/css/site.css\">
 <link rel=\"stylesheet\" href=\"" kn/site-url "assets/css/highlight.css\">
-"))
+")
+  "HTML头部引用的CSS样式等信息.")
 
 (defun kn--pre/postamble-format (name)
   "读取 snippets 目录下的代码片段文件，返回格式化的 pre/postamble 内容.
@@ -110,13 +111,14 @@ FILENAME 是文件名。"
         "<!-- Default content -->"))))
 
 (defun kn/org-html-publish-site-to-html (plist filename pub-dir)
-  "Publish site's non-post org file to HTML.
+  "发布非博客文章, 如 index.org, about.org, 404.org 等, 将其从 Org 文件转换为 HTML.
+PLIST: 项目属性列表.
+FILENAME: 要发布的 Org 文件名.
+PUB-DIR: 发布目录.
+返回值: 生成的 HTML 文件路径.
 
-FILENAME is the filename of the Org file to be published.  PLIST
-is the property list for the given project.  PUB-DIR is the
-publishing directory.
-
-Return output file name."
+该函数是对 `org-html-publish-to-html' 的包装, 主要用于在生成的 html 内容前后
+添加自定义的代码."
   (let* ((file-path (org-html-publish-to-html plist filename pub-dir)))
     (save-window-excursion
       (with-current-buffer (find-file-noselect file-path)
@@ -134,18 +136,15 @@ Return output file name."
         (kill-buffer)))
     file-path))
 
-(defun kn/org-publish-sitemap--valid-entries (entries)
-  "ENTRIES."
-  (-filter (lambda (x) (car x)) entries))
-
 (defun kn/org-html-publish-post-to-html (plist filename pub-dir)
-  "Publish site's post org file to HTML.
+  "发布博客文章，将其从 Org 格式转换为 HTML.
+PLIST: 项目属性列表.
+FILENAME: 要发布的 Org 文件名.
+PUB-DIR: 发布目录.
+返回值: 生成的 HTML 文件路径.
 
-FILENAME is the filename of the Org file to be published.  PLIST
-is the property list for the given project.  PUB-DIR is the
-publishing directory.
-
-Return output file name."
+该函数是对 `org-html-publish-to-html' 的包装, 主要用于在生成的 html 内容前后
+添加自定义的代码."
   (let* ((project (cons 'blog plist)))
     (plist-put plist
                :subtitle nil)
@@ -172,23 +171,35 @@ Return output file name."
         (kill-buffer)))
     file-path))
 
-(defun kn/org-publish-sitemap-publish-archive (title sitemap)
-  "Default posts archive site map, as a string.
+(defun kn/org-publish-sitemap--valid-entries (entries)
+  "ENTRIES."
+  (seq-filter (lambda (x) (car x)) entries))
 
-TITLE is the the title of the site map.  SITEMAP is an internal
-representation for the files to include, as returned by
-‘org-list-to-lisp’.  PROJECT is the current project."
+(defun kn/org-publish-sitemap-publish-archive (title entries)
+  "自定义的站点地图函数, 用于发布博客归档(Archive)页面.
+
+TITLE: 站点地图的标题, 通常由 :sitemap-title 设置,
+如果没有设置 :sitemap-title, 则可能为空.
+
+ENTRIES: 站点地图的条目列表, 每个条目通常包括文件的基本信息(如路径、标题、
+时间戳等), 由 `org-list-to-lisp' 函数生成."
+  ;; 逐个打印 entries 中的元素, 调试用
+  (dolist (entry entries)
+    (message "Entry: %s" entry))
   (let* ((title  (format "%s - Archive" kn/site-name))
-         (posts (cdr sitemap))
+         (posts (cdr entries))
          (posts (kn/org-publish-sitemap--valid-entries posts)))
-    (concat (format "#+TITLE: %s\n#+KEYWORDS:%s, Archive\n#+OPTIONS: title:nil\n\n" title kn/site-name)
-            "#+HTML: <header><h1>Blog Archive</h1></header>"
-            "\n#+BEGIN_archive\n"
-            (mapconcat (lambda (li)
-                         (format "@@html:<li>@@ %s @@html:</li>@@" (car li)))
-                       (seq-filter #'car posts)
-                       "\n")
-            "\n#+END_archive\n")))
+    (concat
+     "#+TITLE: " title "\n"
+     "#+KEYWORDS: " kn/site-name "\n"
+     "#+OPTIONS: title:nil\n\n"
+     "#+HTML: <header><h1>Blog Archive</h1></header>\n"
+     "#+BEGIN_archive\n"
+     (mapconcat (lambda (li)
+                  (format "@@html:<li>@@ %s @@html:</li>@@" (car li)))
+                (seq-filter #'car posts)
+                "\n") "\n"
+     "#+END_archive\n")))
 
 (defun kn/org-publish-sitemap-format-archive-entry (entry style project)
   "Default format for posts archive site map ENTRY, as a string.
@@ -243,6 +254,7 @@ PROJECT is the current project."
            ;; (message (org-publish-find-property file :date project))
 
            (with-temp-buffer
+             (org-mode)
              ;; 用链接的方式, title 会取成文件路径
              ;; (insert (format "* [[file:%s][%s]]\n" file title))
              (insert (format "* %s\n" title))
