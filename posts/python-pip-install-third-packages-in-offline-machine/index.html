@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>在离线的电脑上如何使用pip安装python依赖包</title>
+<meta name="keywords" content="珊瑚礁上的程序员, python, pip, 离线, offline" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">在离线的电脑上如何使用pip安装python依赖包</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2023-12-29</p>
+</header><p>
+有的公司电脑是不允许连接外网的，在这种情况下，就需要想一些其他办法来为离线的电脑安装 python 依赖包。
+</p>
+
+<ol class="org-ol">
+<li><p>
+在有网络连接的环境中准备依赖包：
+在有网络连接的计算机上，使用 <code>pip</code> 下载依赖包，并将其保存到一个目录中。
+例如，通过运行以下命令：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">pip download --python-version 3.x.x --no-binary=:all: -d /path/to/download/directory package_name
+</pre>
+</div>
+
+<p>
+这将下载指定依赖包及其所有依赖项到指定目录。可以根据实际需要下载多个依赖包。
+</p>
+
+<ul class="org-ul">
+<li><code>--python-version</code> 选项指定要下载的 Python 版本 (指定为目标机器上的 python 版本)</li>
+<li><code>--no-binary</code>:all:= 选项告诉 <code>pip</code> 不要下载任何预编译的二进制包，而是只下载源码包。这对于确保包与目标 Python 版本兼容是有帮助的。</li>
+</ul></li>
+
+<li>将下载的包复制到离线环境：
+将下载的依赖包复制到没有网络连接的机器上，可以使用移动存储设备、网络共享或其他途径。</li>
+
+<li><p>
+在离线环境中安装依赖包：
+在离线环境中，使用以下命令安装依赖包：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">pip install --no-index --find-links=/path/to/download/directory package_name
+</pre>
+</div>
+
+<ul class="org-ul">
+<li><code>--no-index</code> 参数告诉 <code>pip</code> 不要从 PyPI（Python Package Index）上查找包，而是直接使用本地目录。</li>
+<li><code>--find-links</code> 参数指定查找包的本地目录。</li>
+</ul>
+
+<p>
+确保 <code>/path/to/download/directory</code> 路径指向下载依赖包的目录。
+</p></li>
+</ol>
+
+<p>
+通过这种方式，可以在没有网络连接的环境中离线安装 Python 依赖包。
+</p>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java 碎片化知识点</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Java" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Java 碎片化知识点</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2023-08-25</p>
+</header>
+<section id="outline-container-orgdafa5a8" class="outline-2">
+<h2 id="orgdafa5a8">获取当前时间戳</h2>
+<div class="outline-text-2" id="text-orgdafa5a8">
+<div class="org-src-container">
+<pre class="src src-java"><span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">time</span>.<span class="org-type">Instant</span>;
+
+<span class="org-comment-delimiter">//</span><span class="org-comment">10&#20301;&#26102;&#38388;&#25139;, 1692893144</span>
+<span class="org-type">long</span> <span class="org-variable-name">epochSecond</span> = Instant.now().getEpochSecond();
+<span class="org-comment-delimiter">//</span><span class="org-comment">10&#20301;&#26102;&#38388;&#25139;, &#25972;&#22411;, 1692893144</span>
+<span class="org-type">int</span> <span class="org-variable-name">epochSecond1</span> = (<span class="org-type">int</span>) Instant.now().getEpochSecond();
+<span class="org-comment-delimiter">//</span><span class="org-comment">13&#20301;&#26102;&#38388;&#25139;, 1692893144845</span>
+<span class="org-type">long</span> <span class="org-variable-name">epochMilli</span> = Instant.now().toEpochMilli();
+<span class="org-comment-delimiter">//</span><span class="org-comment">13&#20301;&#26102;&#38388;&#25139;, 1692893144845</span>
+<span class="org-type">long</span> <span class="org-variable-name">currentTimeMillis</span> = System.currentTimeMillis();
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org28f647f" class="outline-2">
+<h2 id="org28f647f">时间戳转 <code>LocalDateTime</code></h2>
+<div class="outline-text-2" id="text-org28f647f">
+<div class="org-src-container">
+<pre class="src src-java"><span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">time</span>.<span class="org-type">Instant</span>;
+<span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">time</span>.<span class="org-type">LocalDateTime</span>;
+<span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">time</span>.<span class="org-type">ZoneId</span>;
+
+<span class="org-type">LocalDateTime</span> <span class="org-variable-name">localDateTime</span> = Instant.ofEpochSecond(1692893364).atZone(ZoneId.systemDefault()).toLocalDateTime();
+<span class="org-type">LocalDateTime</span> <span class="org-variable-name">localDateTime1</span> = LocalDateTime.ofInstant(Instant.ofEpochSecond(1692893364), ZoneId.systemDefault());
+<span class="org-type">LocalDateTime</span> <span class="org-variable-name">localDateTime2</span> = Instant.ofEpochMilli(1692893364596L).atZone(ZoneId.systemDefault()).toLocalDateTime();
+<span class="org-type">LocalDateTime</span> <span class="org-variable-name">localDateTime3</span> = LocalDateTime.ofInstant(Instant.ofEpochMilli(1692893364596L), ZoneId.systemDefault());
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org045a336" class="outline-2">
+<h2 id="org045a336">格式化 <code>LocalDateTime</code></h2>
+<div class="outline-text-2" id="text-org045a336">
+<div class="org-src-container">
+<pre class="src src-java"><span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">time</span>.<span class="org-type">LocalDateTime</span>;
+<span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">time</span>.<span class="org-constant">format</span>.<span class="org-type">DateTimeFormatter</span>;
+
+<span class="org-comment-delimiter">//</span><span class="org-comment">2023-08-25 00:20:53</span>
+<span class="org-comment-delimiter">//</span><span class="org-comment">java8 &#25512;&#33616;&#20351;&#29992; DateTimeFormatter &#26469;&#26684;&#24335;&#21270;</span>
+<span class="org-type">String</span> <span class="org-variable-name">format</span> = LocalDateTime.now().format(DateTimeFormatter.ofPattern(<span class="org-string">"yyyy-MM-dd HH:mm:ss"</span>));
+</pre>
+</div>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Manjaro/Archlinux 使用PKGBUILD 安装指定版本的软件</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Arch Linux, Manjaro, Pacman, PKGBUILD, makepkg" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Manjaro/Archlinux 使用PKGBUILD 安装指定版本的软件</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2024-03-26</p>
+</header><p>
+使用 <code>Manjaro</code> 发行版有好长一段时间了。
+期间也修改过 <code>aur</code> 库中的 <code>PKGBUILD</code> 文件来安装指定版本的软件。
+最近 <code>phpstorm</code> 启动报错，便想用重装的方式简单粗暴的来解决。
+因为要安装旧版本的（新版本要登录账号，嫌麻烦），所以还是要借助 <code>aur</code> 中的 <code>PKGBUILD</code> 来实现安装。
+</p>
+
+<p>
+操作步骤倒是很简单：
+</p>
+<ol class="org-ol">
+<li>从 <code>AUR</code> 库中下载 phpstorm 的 <code>PKGBUILD</code> 源文件</li>
+<li>从 <code>JetBrain</code> 官网下载指定版本的 phpstorm 安装包</li>
+<li>将 <code>PKGBUILD</code> 和 phpstorm 安装包放在同一个目录下</li>
+<li>对 <code>PKGBUILD</code> 文件做如下简单修改
+<ul class="org-ul">
+<li><code>pkgver</code> 变量修改为本地 phpstorm 安装包的版本号</li>
+<li><code>source</code> 变量修改为本地的 phpstorm 安装包名称</li>
+<li><code>b2sums</code> 变量修改为 <code>SKIP</code> (注意大写)</li>
+</ul></li>
+<li>执行 <code>makepkg -si</code> 命令构建和安装即可</li>
+</ol>
+
+<p>
+顺便借这个机会简单学习下 <code>PKGBUILD</code> 文件的语法。
+直接以注释的方式贴出来：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#35821;&#27861;&#36319;shell&#20960;&#20046;&#23436;&#20840;&#19968;&#33268;&#65292;&#21482;&#19981;&#36807;&#39044;&#23450;&#20041;&#20102;&#19968;&#20123;&#21464;&#37327;&#30340;&#21517;&#31216;&#21644;&#21547;&#20041;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#22914;&#26524;&#38656;&#35201;&#33258;&#23450;&#20041;&#19968;&#20123;&#21464;&#37327;&#65292;&#24314;&#35758;&#20351;&#29992;&#19979;&#21010;&#32447;_&#24320;&#22836;&#65292;&#20197;&#36991;&#20813;&#36319;&#39044;&#23450;&#20041;&#21464;&#37327;&#20914;&#31361;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment"># &#24320;&#22836;&#34920;&#31034;&#27880;&#37322;</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#35774;&#32622;&#36719;&#20214;&#21253;&#30340;&#22522;&#26412;&#20449;&#24687;</span>
+<span class="org-variable-name">pkgbase</span>=phpstorm          <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#36719;&#20214;&#21253;&#30340;&#22522;&#26412;&#21517;&#31216;</span>
+<span class="org-variable-name">pkgname</span>=(phpstorm phpstorm-jre)  <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#36719;&#20214;&#21253;&#30340;&#21517;&#31216;&#65292;&#21253;&#25324; phpstorm &#21644; phpstorm-jre</span>
+<span class="org-variable-name">pkgver</span>=2021.1.4           <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#36719;&#20214;&#21253;&#30340;&#29256;&#26412;&#21495;</span>
+<span class="org-variable-name">pkgrel</span>=1                  <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#36719;&#20214;&#21253;&#30340;&#21457;&#24067;&#29256;&#26412;&#21495;</span>
+<span class="org-variable-name">pkgdesc</span>=<span class="org-string">'Lightweight and Smart PHP IDE'</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#36719;&#20214;&#21253;&#30340;&#25551;&#36848;&#20449;&#24687;</span>
+<span class="org-variable-name">arch</span>=(<span class="org-string">'x86_64'</span> <span class="org-string">'i686'</span>)    <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#36719;&#20214;&#21253;&#25903;&#25345;&#30340;&#26550;&#26500;</span>
+<span class="org-variable-name">license</span>=(<span class="org-string">'custom:jetbrains'</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#36719;&#20214;&#21253;&#30340;&#35768;&#21487;&#35777;&#31867;&#22411;</span>
+<span class="org-variable-name">url</span>=<span class="org-string">'https://www.jetbrains.com/phpstorm/'</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#36719;&#20214;&#21253;&#30340;&#23448;&#26041;&#32593;&#31449; URL</span>
+<span class="org-variable-name">depends</span>=(<span class="org-string">'glib2'</span> <span class="org-string">'python'</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#36719;&#20214;&#21253;&#30340;&#20381;&#36182;&#39033;</span>
+<span class="org-variable-name">options</span>=(<span class="org-string">'!strip'</span>)         <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#36719;&#20214;&#21253;&#30340;&#32534;&#35793;&#36873;&#39033;</span>
+<span class="org-variable-name">source</span>=(<span class="org-string">"PhpStorm-${pkgver%b*}.tar.gz"</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#36719;&#20214;&#21253;&#30340;&#28304;&#25991;&#20214;</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#28304;&#25991;&#20214;&#30340;&#26657;&#39564;&#21644;&#65292;&#36825;&#37324;&#20351;&#29992;&#20102; SKIP&#65292;&#34920;&#31034;&#26657;&#39564;&#21644;&#19981;&#21487;&#29992;&#25110;&#19981;&#36866;&#29992;</span>
+<span class="org-variable-name">b2sums</span>=(<span class="org-string">'SKIP'</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#25171;&#21253; phpstorm &#36719;&#20214;&#21253;&#30340;&#25805;&#20316;</span>
+<span class="org-function-name">package_phpstorm</span>() {
+  <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041; phpstorm &#36719;&#20214;&#21253;&#30340;&#21487;&#36873;&#20381;&#36182;&#39033;</span>
+  <span class="org-variable-name">optdepends</span>=(<span class="org-string">'phpstorm-jre: JetBrains custom Java Runtime (Recommended)'</span>
+              <span class="org-string">'java-runtime: JRE - Required if phpstorm-jre is not installed'</span>
+              <span class="org-string">'gnome-keyring: save login/deployment credentials safely'</span>
+              <span class="org-string">'java-openjfx: rendering Markdown files'</span>)
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">&#20174;&#28304;&#30446;&#24405;&#20013;&#22797;&#21046; PhpStorm &#21040;&#30446;&#26631;&#23433;&#35013;&#30446;&#24405;</span>
+  <span class="org-comment-delimiter"># </span><span class="org-comment">_buildver &#26159;&#33258;&#23450;&#20041;&#30340;&#21464;&#37327;, &#20540;&#26159;&#25191;&#34892;shell&#21629;&#20196;&#20174;&#25991;&#20214;&#21517;&#20013;&#25552;&#21462;&#30340; PhpStorm &#29256;&#26412;&#21495;</span>
+  <span class="org-variable-name">_buildver</span>=<span class="org-string">"$(ls | grep -Eo 'PhpStorm-[[:digit:]]+\.[[:digit:]]{2,5}\.[[:digit:]]+' | sort -r | head -1 | sed 's#PhpStorm-##')"</span>
+  <span class="org-comment-delimiter"># </span><span class="org-comment">install &#21629;&#20196;&#26159; gnu coreutils &#21253;&#20013;&#25552;&#20379;&#30340;, &#22240;&#20026;&#27809;&#29992;&#36807;&#36825;&#20010;&#21629;&#20196;, &#26368;&#24320;&#22987;&#25105;&#36824;&#20197;&#20026;&#26102; PKGBUILD &#39044;&#23450;&#20041;&#30340;&#26041;&#27861;</span>
+  install -dm755 <span class="org-string">"${pkgdir}"</span>/opt/
+  install -dm755 <span class="org-string">"${pkgdir}"</span>/usr/bin/
+  install -dm755 <span class="org-string">"${pkgdir}"</span>/usr/share/applications/
+  install -dm755 <span class="org-string">"${pkgdir}"</span>/usr/share/pixmaps/
+  cp -a <span class="org-string">"${srcdir}"</span>/PhpStorm-${<span class="org-variable-name">_buildver</span>:?_buildver unset}/ <span class="org-string">"${pkgdir}"</span>/opt/${<span class="org-variable-name">pkgbase</span>}
+  rm -rf <span class="org-string">"${pkgdir}"</span>/opt/${<span class="org-variable-name">pkgbase</span>}/jbr
+  ln -s /opt/${<span class="org-variable-name">pkgbase</span>}/bin/${<span class="org-variable-name">pkgbase</span>}.sh <span class="org-string">"${pkgdir}"</span>/usr/bin/${<span class="org-variable-name">pkgbase</span>}
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">&#23558; svg &#22270;&#26631;&#23433;&#35013;&#21040;&#30446;&#26631;&#30446;&#24405;</span>
+  install -D -m 644 <span class="org-string">"${pkgdir}"</span>/opt/${<span class="org-variable-name">pkgbase</span>}/bin/${<span class="org-variable-name">pkgbase</span>}.svg <span class="org-string">"${pkgdir}"</span>/usr/share/pixmaps/${<span class="org-variable-name">pkgbase</span>}.svg
+}
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041;&#25171;&#21253; phpstorm-jre &#36719;&#20214;&#21253;&#30340;&#25805;&#20316;</span>
+<span class="org-function-name">package_phpstorm-jre</span>() {
+  <span class="org-variable-name">pkgdesc</span>=<span class="org-string">'JBR (JetBrains Runtime) for PhpStorm - a patched JRE'</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041; phpstorm-jre &#36719;&#20214;&#21253;&#30340;&#25551;&#36848;&#20449;&#24687;</span>
+  <span class="org-variable-name">url</span>=<span class="org-string">'https://github.com/JetBrains/JetBrainsRuntime'</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">&#23450;&#20041; phpstorm-jre &#36719;&#20214;&#21253;&#30340;&#23448;&#26041;&#32593;&#31449; URL</span>
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">&#20174;&#28304;&#30446;&#24405;&#20013;&#22797;&#21046; JBR &#21040;&#30446;&#26631;&#23433;&#35013;&#30446;&#24405;</span>
+  <span class="org-variable-name">_buildver</span>=<span class="org-string">"$(ls | grep -Eo 'PhpStorm-[[:digit:]]+\.[[:digit:]]{2,5}\.[[:digit:]]+' | sort -r | head -1 | sed 's#PhpStorm-##')"</span>
+  install -d -m 755 <span class="org-string">"${pkgdir}"</span>/opt/${<span class="org-variable-name">pkgbase</span>}
+  cp -a <span class="org-string">"${srcdir}"</span>/PhpStorm-${<span class="org-variable-name">_buildver</span>:?_buildver unset}/jbr <span class="org-string">"${pkgdir}"</span>/opt/${<span class="org-variable-name">pkgbase</span>}
+}
+</pre>
+</div>
+
+<p>
+一个很好的入门参考：
+</p>
+<ul class="org-ul">
+<li><a href="https://linux.cn/article-13843-1.html">Arch Linux 软件包制作入门</a></li>
+<li><a href="https://itsfoss.com/create-pkgbuild/">Creating a PKGBUILD to Make Packages for Arch Linux</a></li>
+</ul>
+
+<p>
+更深入的学习推荐查看 <code>manpage</code> ：
+</p>
+<ul class="org-ul">
+<li><code>man PKGBUILD</code></li>
+<li><code>man makepkg</code></li>
+<li><code>man install</code></li>
+</ul>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>
