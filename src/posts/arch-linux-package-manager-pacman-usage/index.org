@@ -72,7 +72,7 @@ pacman 在使用时通常是一个操作选项(大写字母)加上一些额外�
   - =pacman -Sc= 清理未安装软件包的缓存
   - =pacman -Scc= 清理所有软件包的缓存
 
-** 一些复杂命令
+** 一些复合命令
 
 - 查看所有已安装的软件包及其描述, 每个软件包占一行
   #+begin_src shell
@@ -94,6 +94,14 @@ pacman 在使用时通常是一个操作选项(大写字母)加上一些额外�
   #+begin_src shell
     max_len=$(pacman -Q | awk '{if (length($1) > max) max=length($1)}; END {print max}'); pacman -Q | cut -d ' ' -f 1 | xargs pacman -Qi | awk -v w="$max_len" '/^Name/ {printf "%-"w"s", $3}; /^Description/ {print $0}' | sed 's/Description[[:space:]]*: / /'
     # awk '{if (length($1) > max) max=length($1)}; END {print max}'  命令对  pacman -Q  命令的输出进行处理，计算出软件包名称的最大长度
+  #+end_src
+
+- 列出所有主动安装的包及其大小，并按照包的大小倒序排列
+  #+begin_src shell
+    pacman -Qe --info | awk '/^Name/{name=$3}/^Installed Size/{print name ": " $4 $5}' | sort -h -r -k2
+    # 1. pacman -Qe --info：列出所有主动安装的包及其详细信息。
+    # 2. awk '/^Name/{name=$3}/^Installed Size/{print name ": " $4 $5}'：提取包名和安装大小。
+    # 3. sort -h -r -k2：按大小倒序（-r）排列，并根据人类可读格式（-h）进行排序。
   #+end_src
 
   输出示例:
