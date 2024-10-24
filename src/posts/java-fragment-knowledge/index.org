@@ -40,3 +40,140 @@
   //java8 推荐使用 DateTimeFormatter 来格式化
   String format = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 #+end_src
+
+** 枚举类之间的相互依赖问题
+
+场景是，目前项目中已经有一个书籍的枚举类 =BookEnum= （此处为代指），现在有新的需求需要为书籍增加分类。
+最简单的做法是在 =BookEnum= 中新增一个 =private String category= 字段来表示作者。
+但这样存在的问题是:
+
+1. 分类都是字符串，同一个分类需要重复定义
+2. 后续如果继续还要给书籍增加属性，还要继续扩展这个 =BookEnum= 枚举类，会造成越来越臃肿
+
+基于上述 2 点，现考虑新增一个作者的枚举类 =CategoryEnum= 。
+书籍和分类的关系维护在 =CategoryEnum= 枚举类中。
+同时 =需要保证每本书都要定义所属类别，且, 有且只能有一个类别= 。
+
+具体代码实现如下：
+
+#+begin_src java
+  public class Main {
+      public static void main(String[] args) {
+          System.out.println("Main方法--开始");
+          System.out.println("BookEnum.B1是否定义了归属类别: " + CategoryEnum.defined(BookEnum.B1));
+          System.out.println("Main方法--结束");
+      }
+  }
+#+end_src
+
+#+begin_src java
+  public enum BookEnum {
+
+      B1("Book1"),
+      B2("Book2"),
+      ;
+
+      private final String code;
+      private final String desc;
+
+      static {
+          System.out.println("BookEnum 静态代码块--开始");
+          System.out.println("BookEnum 静态代码块--结束");
+      }
+
+      BookEnum(String desc) {
+          this.code = name();
+          this.desc = desc;
+          System.out.println("BookEnum 构造函数" + code);
+      }
+
+      public String getCode() {
+          return code;
+      }
+
+      public String getDesc() {
+          return desc;
+      }
+  }
+#+end_src
+
+#+begin_src java
+  import java.util.*;
+  import java.util.concurrent.ConcurrentHashMap;
+
+  public enum CategoryEnum {
+
+      C1("CAT1", Arrays.asList(BookEnum.B1)),
+      C2("CAT2", Arrays.asList(BookEnum.B2)), //如果注释掉该行代码, 会因为BookEnum.B2没有定义所属Category而抛出异常
+      //C3("CAT3", Arrays.asList(BookEnum.B2)), //如果打开该行注释, 会因为BookEnum.B2同时归属于两个Category而抛出异常
+      ;
+
+      private final String code;
+      private final String desc;
+      private final Set<BookEnum> types;
+
+      private static final Map<BookEnum, CategoryEnum> BOOK_CATEGORY_MAPPING = new ConcurrentHashMap<>();
+
+      static {
+          System.out.println("CategoryEnum 静态代码块--开始");
+          initializeBookCategoryMap();
+          System.out.println("CategoryEnum 静态代码块--结束");
+      }
+
+      private static void initializeBookCategoryMap() {
+          for (CategoryEnum category : CategoryEnum.values()) {
+              for (BookEnum book : category.getTypes()) {
+                  if (defined(book)) {
+                      throw new RuntimeException("重复定义所属类别: " + book.getCode());
+                  }
+                  BOOK_CATEGORY_MAPPING.put(book, category);
+              }
+          }
+
+          for (BookEnum book : BookEnum.values()) {
+              if (!defined(book)) {
+                  throw new RuntimeException("未定义所属类别：" + book.getCode());
+              }
+          }
+      }
+
+      CategoryEnum(String desc, List<BookEnum> types) {
+          this.code = name();
+          this.desc = desc;
+          this.types = new HashSet<>(types);
+          System.out.println("CategoryEnum 构造函数" + code);
+      }
+
+      public String getCode() {
+          return code;
+      }
+
+      public String getDesc() {
+          return desc;
+      }
+
+      public Set<BookEnum> getTypes() {
+          return types;
+      }
+
+      public static boolean defined(BookEnum bookEnum) {
+          return BOOK_CATEGORY_MAPPING.containsKey(bookEnum);
+      }
+  }
+#+end_src
+
+执行 Main 方法的输出为：
+
+#+begin_example
+  Main方法--开始
+  BookEnum 构造函数B1
+  BookEnum 构造函数B2
+  BookEnum 静态代码块--开始
+  BookEnum 静态代码块--结束
+  CategoryEnum 构造函数C1
+  CategoryEnum 构造函数C2
+  CategoryEnum 静态代码块--开始
+  CategoryEnum 静态代码块--结束
+  BookEnum.B1是否定义了归属类别: true
+  Main方法--结束
+#+end_example
