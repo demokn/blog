@@ -1,4 +1,4 @@
-#+TITLE: Arch 包管理工具 pacman 使用总结
+#+TITLE: Arch Linux 包管理工具 pacman 使用总结
 #+KEYWORDS: 珊瑚礁上的程序员, Arch Linux, Pacman
 #+DATE: <2020-01-08 Wed>
 
