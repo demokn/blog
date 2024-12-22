@@ -1,0 +1,172 @@
+#+TITLE: SpringBoot 学习笔记
+#+KEYWORDS: 珊瑚礁上的程序员, Java, SpringBoot
+#+DATE: <2024-12-22 Sun>
+
+* Spring Initializr 生成的 SpringBoot 项目默认 pom.xml
+
+#+begin_src xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-parent</artifactId>
+      <version>2.7.18</version>
+      <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.example</groupId>
+    <artifactId>demo</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>demo</name>
+    <description>Demo project for Spring Boot</description>
+    <url/>
+    <licenses>
+      <license/>
+    </licenses>
+    <developers>
+      <developer/>
+    </developers>
+    <scm>
+      <connection/>
+      <developerConnection/>
+      <tag/>
+      <url/>
+    </scm>
+    <properties>
+      <java.version>8</java.version>
+    </properties>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter</artifactId>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+      </plugins>
+    </build>
+
+  </project>
+#+end_src
+
+注意：当没有引入 =spring-boot-starter-web= 依赖时，启动应用后立即结束，并不会作为常驻进程。
+
+* SpringBoot 项目打包运行
+
+1. 引入打包插件
+
+      #+begin_src xml
+        <build>
+          <plugins>
+            <plugin>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+          </plugins>
+        </build>
+      #+end_src
+
+2. 执行打包命令
+
+      #+begin_src shell
+        mvn package
+      #+end_src
+
+打包成功后可以在 =target= 目录下找到生成的 JAR 包文件
+
+3. 运行 JAR 包
+
+#+begin_src shell
+  java -jar my-application.jar
+  # 覆盖配置文件中的参数
+  java -jar my-application.jar --spring.profiles.active=dev --server.port=8080
+#+end_src
+
+* main 方法中的 =String[] args= 参数
+
+#+begin_src java
+  public static void main(String[] args) {
+      System.out.println(Arrays.toString(args));
+      SpringApplication.run(MyApplication.class, args);
+  }
+#+end_src
+
+当执行 =java -jar my-application --spring.profiles.active=dev --server.port=8080= 时，
+将看到 args 的输出内容为 ["--spring.profiles.active=dev", "--server.port=8080"].
+
+所以，也可以自己在 main 方法中构造好参数，传入 SpringApplication.run() 方法。例如
+
+#+begin_src java
+  public static void main(String[] args) {
+      String[] arg = new String[1];
+      arg[0] = "--spring.profiles.active=prod";
+      SpringApplication.run(MyApplication.class, arg);
+  }
+#+end_src
+
+* SpringBoot 中配置文件的优先级
+
+从上至下优先级越来越高。
+同级别的路径中 properties 配置文件的优先级比 yml 配置文件的优先级高。
+
+1. classpath 中的 application.yml
+2. classpath 中的 config/application.yml
+3. 当前工作目录中的 application.yml
+4. 当前工作目录中的 config/application.yml
+
+注意：当前工作目录是指执行 java 命令时所处的目录。
+
+* SpringBoot 多环境配置
+
+** 在同一个 yml 配置文件中配置不同的环境
+
+#+begin_src yaml
+  spring:
+    profiles:
+      active: dev
+
+  ---
+  spring:
+    profiles: dev
+
+  server:
+    port: 8081
+
+  ---
+  spring:
+    profiles: test
+
+  server:
+    port: 8082
+
+  ---
+  spring:
+    profiles: prod
+
+  server:
+    port: 8083
+#+end_src
+
+默认是 =dev= 环境，可以打包后执行 =java -jar my-application.jar --spring.profiles.active=prod= 测试效果.
+
+注意： =spring.profiles=dev= 被标记为已废弃的方式，
+现在推荐使用 =spring.config.activete.on-profile=dev= 这种方式.
+
+** 使用不同的文件配置多个环境
+
+1. =application.yml= 公共配置
+2. =application-dev.yml= 开发环境配置
+3. =application-test.yml= 测试环境配置
+4. =application-prod.yml= 生产环境配置
