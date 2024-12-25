@@ -159,7 +159,8 @@
     port: 8083
 #+end_src
 
-默认是 =dev= 环境，可以打包后执行 =java -jar my-application.jar --spring.profiles.active=prod= 测试效果.
+可以看到配置文件中默认激活的是 =dev= 环境，
+可以打包后执行 =java -jar my-application.jar --spring.profiles.active=prod= 指定激活的环境.
 
 注意： =spring.profiles=dev= 被标记为已废弃的方式，
 现在推荐使用 =spring.config.activete.on-profile=dev= 这种方式.
@@ -170,3 +171,106 @@
 2. =application-dev.yml= 开发环境配置
 3. =application-test.yml= 测试环境配置
 4. =application-prod.yml= 生产环境配置
+
+** 使用 =spring.profiles.include= 包含其他配置文件
+
+比如，将数据库，缓存，消息队列等配置放置在不同的配置文件中，在主配置文件中使用 =include= 加载这些配置。
+
+假设有如下配置文件:
+#+begin_example
+  application-db.yml
+  application-kafka.yml
+  application-redis.yml
+#+end_example
+
+主配置文件中可以这样配置:
+#+begin_src yaml
+  spring:
+    profiles:
+      include: db,kafka,redis
+#+end_src
+
+启动应用后可以看到如下输出:
+#+begin_example
+  The following 3 profiles are active: "db", "kafka", "redis"
+#+end_example
+
+如果有相同的配置， 优先级顺序也是左边(db)优先级低， 右边(redis)优先级高。主配置文件中配置优先级是最低的。
+
+注意： =include= 的配置文件是不包含文件名中 =application-= 前缀的。如果写错了，启动时也是不会报错的，可能不容易发现。
+
+** 使用 =spring.profiles.group= 对配置文件分组
+
+主配置文件中配置内容如下：
+#+begin_src yaml
+  spring:
+    profiles:
+      active: prod
+      group:
+        dev: db,redis
+        prod: db,kafka
+#+end_src
+
+启动时可以看到如下输出:
+#+begin_example
+  The following 3 profiles are active: "prod", "db", "kafka"
+#+end_example
+
+同样，如果有相同配置时，由左至右优先级越来越高。
+
+** =springboot= 配置文件中读取 =pom.xml= 文件中属性
+
+=pom.xml= 文件中包含如下内容：
+#+begin_src xml
+  <profiles>
+    <profile>
+      <id>env_dev</id>
+      <properties>
+        <profile>dev</profile>
+      </properties>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+
+    <profile>
+      <id>env_prod</id>
+      <properties>
+        <profile>prod</profile>
+      </properties>
+    </profile>
+  </profiles>
+#+end_src
+
+=application.yml= 配置文件可以使用 =@属性名@= 占位符读取 =pom.xml= 中对应的配置属性值：
+#+begin_src yaml
+  spring:
+    profiles:
+      active: @profile@
+#+end_src
+
+启动时可以看到如下输出:
+#+begin_example
+  The following 1 profile is active: "dev"
+#+end_example
+
+这种配置方式带来的好处是开发阶段在 =Idea= 的 Maven 工具栏中可以直接通过勾选不同的环境来启动不同的环境。
+
+在使用 =Maven= 打包时，可以通过 =-P env_prod= 来指定激活的 =profile= .
+
+如果想要激活的 =profile= 不存在，可以在控制台看到如下警告：
+#+begin_example
+    [WARNING] The requested profile "prod" could not be activated because it does not exist.
+#+end_example
+
+此时，使用的将是 =pom.xml= 配置了 =<activeByDefault>= 默认激活的配置。
+而如果没有配置任何默认激活的配置，也会打包成功，只是 =application.yml= 中的占位符 =@profile@= 将不会被替换。
+当执行 jar 时会报错:
+#+begin_example
+  ERROR org.springframework.boot.SpringApplication - Application run failed
+  org.yaml.snakeyaml.scanner.ScannerException: while scanning for the next token
+  found character '@' that cannot start any token. (Do not use @ for indentation)
+   in 'reader', line 6, column 13:
+          active: @profile@
+                  ^
+#+end_example
