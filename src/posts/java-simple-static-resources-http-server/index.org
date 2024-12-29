@@ -1,0 +1,182 @@
+TITLE: 使用 Java 实现一个极简的静态资源 HTTP 服务器
+#+KEYWORDS: 珊瑚礁上的程序员, Java
+#+DATE: <2024-12-29 Sun>
+
+有的时候需要在本机起一个简易的 =HTTP= 服务器，只需要简单的访问静态资源就可以。
+比如，自建一些镜像站点，如 =emacs= 插件镜像, =gradle wrapper= 镜像等。
+
+平时在自己的电脑上会用一些简单的方法，比如 PHP 内置的 HTTP 服务器。
+只需要一个简单的命令 =php -S 127.0.0.1:8080= 就可以在当前工作目录启动一个 =HTTP= 服务。
+
+最近在离线的电脑上也有这个诉求，电脑无法联网，没有安装 =nginx= 或 =php= ，但是有 =Java= 开发环境。
+于是考虑用 =Java= 起一个简易的 =HTTP= 服务，且尽量不引入外部依赖。
+
+** 需求分析
+
+目标是构建一个简单的 =HTTP= 服务器，它能够：
+
+1. 监听指定端口（默认为 8080）
+2. 提供从指定目录（默认为当前目录）读取的静态文件
+3. 支持通过命令行参数动态指定端口和静态文件目录
+4. 简单的访问日志记录
+
+** 代码编写
+
+#+begin_src java
+  import com.sun.net.httpserver.HttpServer;
+  import com.sun.net.httpserver.HttpHandler;
+  import com.sun.net.httpserver.HttpExchange;
+
+  import java.io.IOException;
+  import java.io.InputStream;
+  import java.io.OutputStream;
+  import java.nio.file.Files;
+  import java.nio.file.Path;
+  import java.nio.file.Paths;
+  import java.util.HashMap;
+  import java.util.Map;
+
+  public class SimpleHttpServer {
+
+      private static int port = 8080; // 默认端口
+      private static String root = "."; // 默认静态资源目录
+
+      public static void main(String[] args) throws IOException {
+          // 解析命令行参数
+          parseCommandLineArgs(args);
+
+          // 将 root 转换为绝对路径并检查目录是否存在
+          Path rootPath = validateAndGetAbsolutePath(root);
+
+          // 启动 HTTP 服务器
+          startServer(port, rootPath);
+      }
+
+      private static void parseCommandLineArgs(String[] args) {
+          Map<String, String> argsMap = new HashMap<>();
+          for (String arg : args) {
+              String[] splitArg = arg.split("=");
+              if (splitArg.length == 2) {
+                  argsMap.put(splitArg[0], splitArg[1]);
+              }
+          }
+
+          // 提取端口号和静态目录
+          if (argsMap.containsKey("--port")) {
+              try {
+                  port = Integer.parseInt(argsMap.get("--port"));
+              } catch (NumberFormatException e) {
+                  System.out.println("Invalid port number, using default port 8080");
+              }
+          }
+
+          if (argsMap.containsKey("--root")) {
+              root = argsMap.get("--root");
+          }
+      }
+
+      private static Path validateAndGetAbsolutePath(String rootDir) {
+          // 获取相对路径并转换为绝对路径
+          Path path = Paths.get(rootDir).toAbsolutePath();
+
+          // 检查目录是否存在
+          if (!Files.exists(path) || !Files.isDirectory(path)) {
+              System.out.println("Error: The directory does not exist or is not a directory: " + path);
+              System.exit(1); // 目录无效，退出程序
+          }
+
+          return path;
+      }
+
+      private static void startServer(int port, Path rootPath) throws IOException {
+          // 创建 HTTP 服务器，监听指定的端口
+          HttpServer server = HttpServer.create(new java.net.InetSocketAddress(port), 0);
+
+          // 设置 handler，处理所有的 HTTP 请求
+          server.createContext("/", new HttpHandler() {
+                  @Override
+                  public void handle(HttpExchange exchange) throws IOException {
+                      // 获取请求的文件路径
+                      String requestedFile = exchange.getRequestURI().getPath();
+                      if (requestedFile.equals("/")) {
+                          requestedFile = "/index.html";  // 默认返回 index.html
+                      }
+
+                      Path filePath = Paths.get(rootPath.toString() + requestedFile);
+
+                      if (Files.exists(filePath) && !Files.isDirectory(filePath)) {
+                          // 文件存在则读取并返回
+                          exchange.sendResponseHeaders(200, Files.size(filePath));
+
+                          try (InputStream inputStream = Files.newInputStream(filePath);
+                               OutputStream outputStream = exchange.getResponseBody()) {
+                              Files.copy(filePath, outputStream);
+                          }
+
+                          System.out.println("200 - File found and served: " + filePath);
+                      } else {
+                          // 文件不存在则返回 404，并打印日志
+                          String response = "404 Not Found";
+                          exchange.sendResponseHeaders(404, response.getBytes().length);
+                          exchange.getResponseBody().write(response.getBytes());
+
+                          System.out.println("404 - File not found: " + filePath);
+                      }
+                      exchange.getResponseBody().close();
+                  }
+              });
+
+          // 启动服务器
+          server.start();
+          System.out.println("Server started at http://localhost:" + port);
+          System.out.println("Serving static files from: " + rootPath);
+      }
+  }
+#+end_src
+
+** 编译
+
+#+begin_src shell
+  javac SimpleHttpServer.java
+#+end_src
+
+** 运行
+
+#+begin_src shell
+  java SimpleHttpServer
+#+end_src
+
+可以看到输出
+#+begin_example
+  Server started at http://localhost:8080
+  Serving static files from: /tmp/simple-http-server/.
+#+end_example
+
+尝试浏览器访问正常，搞定。
+
+也可以启动时指定端口和服务根目录
+#+begin_src shell
+  java SimpleHttpServer --port=8090 --root=/tmp
+#+end_src
+
+如果还想打成 =Jar= 包的话，还可以继续这么干...
+
+** 打包后运行
+
+1. 创建 =MANIFEST.MF= 文件，指定入口类 =Main-Class= 。
+
+=MANIFEST.MF= 文件内容：
+#+begin_src java
+  Manifest-Version: 1.0
+  Main-Class: SimpleHttpServer
+#+end_src
+
+2. 打包为 =JAR= 文件：
+#+begin_src shell
+  jar cvfm SimpleHttpServer.jar MANIFEST.MF SimpleHttpServer*.class
+#+end_src
+
+3. 运行 =JAR= 文件：
+#+begin_src shell
+  java -jar SimpleHttpServer.jar --port=8080 --root=/path/to/static
+#+end_src
