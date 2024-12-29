@@ -1,4 +1,4 @@
-TITLE: 使用 Java 实现一个极简的静态资源 HTTP 服务器
+#+TITLE: 使用 Java 实现一个极简的静态资源 HTTP 服务器
 #+KEYWORDS: 珊瑚礁上的程序员, Java
 #+DATE: <2024-12-29 Sun>
 
@@ -165,18 +165,18 @@ TITLE: 使用 Java 实现一个极简的静态资源 HTTP 服务器
 
 1. 创建 =MANIFEST.MF= 文件，指定入口类 =Main-Class= 。
 
-=MANIFEST.MF= 文件内容：
-#+begin_src java
-  Manifest-Version: 1.0
-  Main-Class: SimpleHttpServer
-#+end_src
+   =MANIFEST.MF= 文件内容：
+   #+begin_src java
+     Manifest-Version: 1.0
+     Main-Class: SimpleHttpServer
+   #+end_src
 
 2. 打包为 =JAR= 文件：
-#+begin_src shell
-  jar cvfm SimpleHttpServer.jar MANIFEST.MF SimpleHttpServer*.class
-#+end_src
+   #+begin_src shell
+     jar cvfm SimpleHttpServer.jar MANIFEST.MF SimpleHttpServer*.class
+   #+end_src
 
 3. 运行 =JAR= 文件：
-#+begin_src shell
-  java -jar SimpleHttpServer.jar --port=8080 --root=/path/to/static
-#+end_src
+   #+begin_src shell
+     java -jar SimpleHttpServer.jar --port=8080 --root=/path/to/static
+   #+end_src
