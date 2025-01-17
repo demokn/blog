@@ -1,0 +1,547 @@
+#+TITLE: Maven 学习笔记
+#+KEYWORDS: 珊瑚礁上的程序员, Java, Maven
+#+DATE: <2025-01-12 Sun 19:00>
+
+* 通过命令行创建空的 =maven= 项目骨架
+
+** 1. 从 Maven 模板创建项目
+#+begin_src shell
+  mvn archetype:generate \
+      -DgroupId=com.example \
+      -DartifactId=my-maven-demo \
+      -DarchetypeArtifactId=maven-archetype-quickstart \
+      -DinteractiveMode=false
+#+end_src
+
+#+begin_example
+  ...
+  [INFO] ----------------------------------------------------------------------------
+  [INFO] Using following parameters for creating project from Old (1.x) Archetype: maven-archetype-quickstart:1.0
+  [INFO] ----------------------------------------------------------------------------
+  [INFO] Parameter: basedir, Value: /tmp
+  [INFO] Parameter: package, Value: com.example
+  [INFO] Parameter: groupId, Value: com.example
+  [INFO] Parameter: artifactId, Value: my-maven-demo
+  [INFO] Parameter: packageName, Value: com.example
+  [INFO] Parameter: version, Value: 1.0-SNAPSHOT
+  [INFO] project created from Old (1.x) Archetype in dir: /tmp/my-maven-demo
+  [INFO] ------------------------------------------------------------------------
+  [INFO] BUILD SUCCESS
+  [INFO] ------------------------------------------------------------------------
+  [INFO] Total time:  3.908 s
+  [INFO] Finished at: 2025-01-17T23:21:31+08:00
+  [INFO] ------------------------------------------------------------------------
+#+end_example
+
+** 2. 生成的项目目录结构
+#+begin_example
+  $ tree my-maven-demo
+  maven-demo
+  ├── pom.xml
+  └── src
+      ├── main
+      │   └── java
+      │       └── com
+      │           └── example
+      │               └── App.java
+      └── test
+          └── java
+              └── com
+                  └── example
+                      └── AppTest.java
+
+  10 directories, 3 files
+#+end_example
+
+** 3. 生成 =pom.xml= 文件内容
+生成的内容如下, 仅包含一个 jUnit 依赖项.
+#+begin_src xml
+  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>my-maven-demo</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>maven-demo</name>
+    <url>http://maven.apache.org</url>
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8.1</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </project>
+#+end_src
+
+** 4. 更新 =pom.xml= 文件
+4.1 增加编译器属性，告诉 Maven 使用指定的 JDK 版本来编译源码
+#+begin_src xml
+  <properties>
+    <!-- 指定项目构建时的源文件编码格式, 防止源文件中的非 ASCII 字符出现乱码 -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- 指定项目源代码所使用的 Java 版本 -->
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <!-- 指定编译后的字节码目标版本 -->
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+#+end_src
+
+4.2 升级到 jUnit4
+#+begin_src xml
+  <dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.13.2</version>
+    <scope>test</scope>
+  </dependency>
+#+end_src
+
+* Maven 项目构建与运行
+接上面创建的 maven 项目骨架，继续进行项目的编译与打包.
+
+** 1. 增加依赖项
+为更好的演示打包的效果, 增加一个依赖项.
+#+begin_src xml
+  <dependency>
+    <groupId>commons-codec</groupId>
+    <artifactId>commons-codec</artifactId>
+    <version>1.17.2</version>
+  </dependency>
+#+end_src
+
+** 2. 编写代码
+2.1 编写代码
+=src/main/java/com/example/App.java=
+#+begin_src java
+  package com.example;
+
+  import org.apache.commons.codec.digest.DigestUtils;
+
+  public class App {
+      public static void main(String[] args) {
+
+          if (args.length < 1) {
+              System.err.println("请输入任意字符串!");
+              System.exit(0);
+          }
+          System.out.println("SHA-256哈希值为: " + sha256hex(args[0]));
+      }
+
+      public static String sha256hex(String input) {
+          return DigestUtils.sha256Hex(input);
+      }
+  }
+#+end_src
+
+2.2 编写单元测试
+=com/example/AppTest.java=
+#+begin_src java
+  package com.example;
+
+  import org.junit.Test;
+
+  import static org.junit.Assert.*;
+
+  public class AppTest {
+
+      @Test
+      public void sha256hex() {
+          assertEquals("8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", App.sha256hex("123456"));
+      }
+  }
+#+end_src
+
+** 3. maven 构建
+执行 =mvn package= 完成构建
+#+begin_example
+  $ mvn package
+  [INFO] Scanning for projects...
+  [INFO]
+  [INFO] ---------------------< com.example:my-maven-demo >----------------------
+  [INFO] Building my-maven-demo 1.0-SNAPSHOT
+  [INFO]   from pom.xml
+  [INFO] --------------------------------[ jar ]---------------------------------
+  [INFO]
+  [INFO] --- resources:3.3.1:resources (default-resources) @ my-maven-demo ---
+  [INFO] skip non existing resourceDirectory /tmp/my-maven-demo/src/main/resources
+  [INFO]
+  [INFO] --- compiler:3.13.0:compile (default-compile) @ my-maven-demo ---
+  [INFO] Recompiling the module because of changed source code.
+  [INFO] Compiling 1 source file with javac [debug target 1.8] to target/classes
+  [INFO]
+  [INFO] --- resources:3.3.1:testResources (default-testResources) @ my-maven-demo ---
+  [INFO] skip non existing resourceDirectory /tmp/my-maven-demo/src/test/resources
+  [INFO]
+  [INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ my-maven-demo ---
+  [INFO] Recompiling the module because of changed dependency.
+  [INFO] Compiling 1 source file with javac [debug target 1.8] to target/test-classes
+  [INFO]
+  [INFO] --- surefire:3.2.5:test (default-test) @ my-maven-demo ---
+  [INFO] Using auto detected provider org.apache.maven.surefire.junit4.JUnit4Provider
+  [INFO]
+  [INFO] -------------------------------------------------------
+  [INFO]  T E S T S
+  [INFO] -------------------------------------------------------
+  [INFO] Running com.example.AppTest
+  [INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.111 s -- in com.example.AppTest
+  [INFO]
+  [INFO] Results:
+  [INFO]
+  [INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+  [INFO]
+  [INFO]
+  [INFO] --- jar:3.4.1:jar (default-jar) @ my-maven-demo ---
+  [INFO] Building jar: /tmp/my-maven-demo/target/my-maven-demo-1.0-SNAPSHOT.jar
+  [INFO] ------------------------------------------------------------------------
+  [INFO] BUILD SUCCESS
+  [INFO] ------------------------------------------------------------------------
+  [INFO] Total time:  4.145 s
+  [INFO] Finished at: 2025-01-16T23:40:30+08:00
+  [INFO] ------------------------------------------------------------------------
+#+end_example
+
+** 4. 运行构建后得到的 jar 包
+4.1 尝试执行
+#+begin_src shell
+  java -cp target/my-maven-demo-1.0-SNAPSHOT.jar com.example.App 123456
+#+end_src
+
+发现报错了, 报错原因是根据当前的 pom 文件配置, Maven 不会将项目中的依赖项 =commons-codec= 添加到 jar 文件中。
+#+begin_example
+Exception in thread "main" java.lang.NoClassDefFoundError: org/apache/commons/codec/digest/DigestUtils
+        at com.example.App.sha256hex(App.java:16)
+        at com.example.App.main(App.java:12)
+Caused by: java.lang.ClassNotFoundException: org.apache.commons.codec.digest.DigestUtils
+        at java.net.URLClassLoader.findClass(URLClassLoader.java:387)
+        at java.lang.ClassLoader.loadClass(ClassLoader.java:418)
+        at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:352)
+        at java.lang.ClassLoader.loadClass(ClassLoader.java:351)
+        ... 2 more
+#+end_example
+
+4.2 使用 =maven-shade-plugin= 插件来生成 =fat-jar= - 将所有依赖项打包进同一个 jar 文件中
+
+更新 =pom.xml=
+#+begin_src xml
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <!-- 指定该插件的 shade 目标在 Maven 的 package 阶段执行 -->
+          <!-- 也就是当运行 mvn package 命令时，该插件的 shade 目标将被自动触发 -->
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+#+end_src
+
+4.3 重新构建 =mvn clean package=
+
+#+begin_example
+  ...
+  [INFO] --- jar:3.4.1:jar (default-jar) @ my-maven-demo ---
+  [INFO] Building jar: /tmp/my-maven-demo/target/my-maven-demo-1.0-SNAPSHOT.jar
+  [INFO]
+  [INFO] --- shade:3.6.0:shade (default) @ my-maven-demo ---
+  [INFO] Including commons-codec:commons-codec:jar:1.17.2 in the shaded jar.
+  [INFO] Dependency-reduced POM written at: /tmp/my-maven-demo/dependency-reduced-pom.xml
+  [WARNING] commons-codec-1.17.2.jar, my-maven-demo-1.0-SNAPSHOT.jar define 1 overlapping resource:
+  [WARNING]   - META-INF/MANIFEST.MF
+  [WARNING] maven-shade-plugin has detected that some files are
+  [WARNING] present in two or more JARs. When this happens, only one
+  [WARNING] single version of the file is copied to the uber jar.
+  [WARNING] Usually this is not harmful and you can skip these warnings,
+  [WARNING] otherwise try to manually exclude artifacts based on
+  [WARNING] mvn dependency:tree -Ddetail=true and the above output.
+  [WARNING] See https://maven.apache.org/plugins/maven-shade-plugin/
+  [INFO] Replacing original artifact with shaded artifact.
+  [INFO] Replacing /tmp/my-maven-demo/target/my-maven-demo-1.0-SNAPSHOT.jar with /tmp/my-maven-demo/target/my-maven-demo-1.0-SNAPSHOT-shaded.jar
+  [INFO] ------------------------------------------------------------------------
+  [INFO] BUILD SUCCESS
+  [INFO] ------------------------------------------------------------------------
+  [INFO] Total time:  4.268 s
+  [INFO] Finished at: 2025-01-16T23:58:36+08:00
+  [INFO] ------------------------------------------------------------------------
+#+end_example
+
+可以看到生成了两个 jar 包, 查看一下它们的文件大小
+#+begin_example
+  $ ls -lh target
+  ...
+  -rw-r--r-- 1 demo demo 365K Jan 16 23:58 my-maven-demo-1.0-SNAPSHOT.jar
+  -rw-r--r-- 1 demo demo 2.9K Jan 16 23:58 original-my-maven-demo-1.0-SNAPSHOT.jar
+  ...
+#+end_example
+
+** 5. 第 2 次运行
+5.1 尝试运行
+#+begin_example
+  $ java -cp target/my-maven-demo-1.0-SNAPSHOT.jar com.example.App 123456
+  SHA-256哈希值为: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+#+end_example
+
+5.2 很好, 现在执行成功了。但是能不能直接作为 jar 包执行而不用指定主类呢
+#+begin_example
+  ➜ java -jar target/my-maven-demo-1.0-SNAPSHOT.jar
+  no main manifest attribute, in target/my-maven-demo-1.0-SNAPSHOT.jar
+#+end_example
+
+5.3 很遗憾，还不可以，可以通过配置 maven-shade-plugin 插件来指定主类
+#+begin_src xml
+  <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>3.6.0</version>
+    <executions>
+      <execution>
+        <phase>package</phase>
+        <goals>
+          <goal>shade</goal>
+        </goals>
+        <configuration>
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <mainClass>com.example.App</mainClass>
+            </transformer>
+          </transformers>
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
+#+end_src
+
+** 6. 第 3 次运行
+6.1 重新打包
+#+begin_src shell
+  mvn clean package
+#+end_src
+
+6.2 作为 jar 包执行
+#+begin_example
+  ➜ java -jar target/my-maven-demo-1.0-SNAPSHOT.jar
+  请输入任意字符串!
+
+  ➜ java -jar target/my-maven-demo-1.0-SNAPSHOT.jar 123456
+  SHA-256哈希值为: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+#+end_example
+
+* 7. 完整的 pom 文件
+#+begin_src xml
+  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>my-maven-demo</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>my-maven-demo</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+      <!-- 指定项目构建时的源文件编码格式, 防止源文件中的非 ASCII 字符出现乱码 -->
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <!-- 指定项目源代码所使用的 Java 版本 -->
+      <maven.compiler.source>1.8</maven.compiler.source>
+      <!-- 指定编译后的字节码目标版本 -->
+      <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.13.2</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.17.2</version>
+      </dependency>
+    </dependencies>
+
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.6.0</version>
+          <executions>
+            <!-- 指定该插件的 shade 目标在 Maven 的 package 阶段执行 -->
+            <!-- 也就是当运行 mvn package 命令时，该插件的 shade 目标将被自动触发 -->
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>shade</goal>
+              </goals>
+              <configuration>
+                <transformers>
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                    <mainClass>com.example.App</mainClass>
+                  </transformer>
+                </transformers>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
+
+  </project>
+#+end_src
+
+* 8. 体验更高版本的 maven-archetype-quickstart
+8.1 在步骤 1 的输出中可以看到默认使用的 maven-archetype-quickstart 版本是 1.0.
+通过官网查看目前的最新版本已经是 1.5 了, 体验一下新版本.
+可以直接指定 java 编译器版本, jUnit 版本等。
+#+begin_src shell
+  mvn archetype:generate \
+      -DgroupId=com.example \
+      -DartifactId=maven-demo \
+      -DarchetypeArtifactId=maven-archetype-quickstart \
+      -DarchetypeVersion=1.5 \
+      -DinteractiveMode=false \
+      -DjavaCompilerVersion=1.8 \
+      -DjunitVersion=4.13.2
+#+end_src
+
+#+begin_example
+  ...
+  [INFO] ----------------------------------------------------------------------------
+  [INFO] Using following parameters for creating project from Archetype: maven-archetype-quickstart:1.5
+  [INFO] ----------------------------------------------------------------------------
+  [INFO] Parameter: groupId, Value: com.example
+  [INFO] Parameter: artifactId, Value: maven-demo
+  [INFO] Parameter: version, Value: 1.0-SNAPSHOT
+  [INFO] Parameter: package, Value: com.example
+  [INFO] Parameter: packageInPathFormat, Value: com/example
+  [INFO] Parameter: version, Value: 1.0-SNAPSHOT
+  [INFO] Parameter: package, Value: com.example
+  [INFO] Parameter: javaCompilerVersion, Value: 1.8
+  [INFO] Parameter: groupId, Value: com.example
+  [INFO] Parameter: junitVersion, Value: 4.13.2
+  [INFO] Parameter: artifactId, Value: maven-demo
+  [WARNING] Don't override file /tmp/maven-demo/src/main/java/com/example
+  [WARNING] Don't override file /tmp/maven-demo/src/test/java/com/example
+  [WARNING] CP Don't override file /tmp/maven-demo/.mvn
+  [INFO] Project created from Archetype in dir: /tmp/maven-demo
+  [INFO] ------------------------------------------------------------------------
+  [INFO] BUILD SUCCESS
+  [INFO] ------------------------------------------------------------------------
+  [INFO] Total time:  1.926 s
+  [INFO] Finished at: 2025-01-17T23:53:49+08:00
+  [INFO] ------------------------------------------------------------------------
+#+end_example
+
+8.2 查看项目目录
+#+begin_example
+  ➜ tree -a maven-demo
+  maven-demo
+  ├── .mvn
+  │   ├── jvm.config
+  │   └── maven.config
+  ├── pom.xml
+  └── src
+      ├── main
+      │   └── java
+      │       └── com
+      │           └── example
+      │               └── App.java
+      └── test
+          └── java
+              └── com
+                  └── example
+                      └── AppTest.java
+
+  11 directories, 5 files
+#+end_example
+
+8.3 pom 文件内容
+#+begin_src xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>maven-demo</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>maven-demo</name>
+    <!-- FIXME change it to the project's website -->
+    <url>http://www.example.com</url>
+
+    <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <maven.compiler.source>1.8</maven.compiler.source>
+      <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.13.2</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+
+    <build>
+      <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+        <plugins>
+          <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+          <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>3.4.0</version>
+          </plugin>
+          <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+          <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.3.1</version>
+          </plugin>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.13.0</version>
+          </plugin>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.3.0</version>
+          </plugin>
+          <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.4.2</version>
+          </plugin>
+          <plugin>
+            <artifactId>maven-install-plugin</artifactId>
+            <version>3.1.2</version>
+          </plugin>
+          <plugin>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <version>3.1.2</version>
+          </plugin>
+          <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+          <plugin>
+            <artifactId>maven-site-plugin</artifactId>
+            <version>3.12.1</version>
+          </plugin>
+          <plugin>
+            <artifactId>maven-project-info-reports-plugin</artifactId>
+            <version>3.6.1</version>
+          </plugin>
+        </plugins>
+      </pluginManagement>
+    </build>
+  </project>
+#+end_src
