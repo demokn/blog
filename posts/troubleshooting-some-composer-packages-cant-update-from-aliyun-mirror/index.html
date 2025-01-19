@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Composer 依赖包安装版本与已发布最新版不符且无法更新</title>
+<meta name="keywords" content="珊瑚礁上的程序员, composer, overtrue/wechat, 版本不符" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Composer 依赖包安装版本与已发布最新版不符且无法更新</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2019-12-05</p>
+</header><p>
+项目中使用了 <code>overtrue/wechat</code> 微信开发相关SDK包，最近需要用的个别接口，SDK中竟然没有封装。
+想想应该不会呀，毕竟这个包这么好用，而且开发一直很活跃。
+</p>
+
+<p>
+下面以 开放平台 &gt; 第三方平台 &gt; <a href="https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Mini_Programs/code/query_quota.html">查询服务商的当月提审限额(quota)和加急次数</a> 接口为例。
+</p>
+
+<ul class="org-ul">
+<li>在本地项目中全局搜了一下接口请求地址 <code>wxa/queryquota</code> ，确实没有搜到；</li>
+<li>更新一下本地的包 <code>composer update overtrue/wechat -vvv</code> ， 再搜一遍，依旧没有；（新接口还没接入？）</li>
+<li>在该包的 <a href="https://github.com/overtrue/wechat">Github 仓库</a> 同样也搜一下接口请求地址，竟然搜到了；（新增的代码还没发布？）</li>
+<li>切换到该包的 <a href="https://github.com/overtrue/wechat/tree/4.2.11">最新Tag 4.2.11</a>, 这段代码依旧存在，说明已经发布了啊；</li>
+<li>再到 <a href="https://packagist.org/packages/overtrue/wechat">packagist.org</a> 确认一下，该包的最新稳定版确实是 4.2.11 啊，确认已经成功发布了；</li>
+</ul>
+
+<p>
+那就说明是我本地代码的问题了，继续排查本地
+</p>
+
+<ul class="org-ul">
+<li>查看 <code>composer.json</code> 中指定的包版本是 <code>"overtrue/wechat": "^4.2"</code> ，这也没毛病啊；</li>
+<li>查看 <code>composer.lock</code> 中安装的具体版本是 <code>"version": "4.3.0"</code> ，这下把我整懵了（哪来的 4.3.0 的版本？比Github上的最新版还要新？）；</li>
+<li>再看 <code>composer.lock</code> ， <code>"time": "2019-08-13T11:53:50+00:00"</code> 表示本地安装版本的最后更新时间，这也不对啊，最新版4.2.11的最后更新时间是 <code>2019-11-27</code> 才对；</li>
+<li>再看 <code>composer.lock</code> ， <code>"reference": "426ea825664bcb1078f59a060ac07645e1e6fd9f"</code> 表示本地安装版本的 <code>commit hash</code> ，这和仓库中的最新版的 commit hash 也对不上；</li>
+<li>在Github仓库中查了一下这个 commit hash <a href="https://github.com/overtrue/wechat/tree/426ea825664bcb1078f59a060ac07645e1e6fd9f">426ea825664bcb1078f59a060ac07645e1e6fd9f</a>, 确实查到了, 而且更新时间也跟这个 commit hash 对上了；</li>
+<li>因为本地使用的是 <a href="https://developer.aliyun.com/composer">阿里云的composer镜像</a> ，就怀疑是不是镜像出了问题；那就试试从源码更新 <code>composer update overtrue/wechat --prefer-source -vvv</code> ，更新后还是没变化；</li>
+<li>删除本地已安装的代码 <code>rm -rf vendor/overtrue</code> ，再试一次从源码更新 <code>composer update overtrue/wechat --prefer-source -vvv</code> ，成功安装了 4.2.11 的版本， <code>composer.lock</code> 中显示的最后更新时间和commit hash都对上了，新接口相关的代码也出现了；</li>
+<li>然后又试了一下，删除本地已安装的代码，还是从镜像安装 <code>composer update overtrue/wechat -vvv</code> ，依旧成功安装了 4.2.11 的版本；</li>
+<li>至此，问题解决，原因不详~</li>
+</ul>
+
+<p>
+贴一下更新成功前后的 <code>composer.lock</code> 关于该包的信息描述。
+</p>
+
+<p>
+<b>更新成功前：</b>
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span class="org-keyword">"name"</span>: <span class="org-string">"overtrue/wechat"</span>,
+    <span class="org-keyword">"version"</span>: <span class="org-string">"4.3.0"</span>,
+    <span class="org-keyword">"source"</span>: {
+        <span class="org-keyword">"type"</span>: <span class="org-string">"git"</span>,
+        <span class="org-keyword">"url"</span>: <span class="org-string">"https://github.com/overtrue/wechat.git"</span>,
+        <span class="org-keyword">"reference"</span>: <span class="org-string">"426ea825664bcb1078f59a060ac07645e1e6fd9f"</span>
+    },
+    <span class="org-keyword">"dist"</span>: {
+        <span class="org-keyword">"type"</span>: <span class="org-string">"zip"</span>,
+        <span class="org-keyword">"url"</span>: <span class="org-string">"https://api.github.com/repos/overtrue/wechat/zipball/426ea825664bcb1078f59a060ac07645e1e6fd9f"</span>,
+        <span class="org-keyword">"reference"</span>: <span class="org-string">"426ea825664bcb1078f59a060ac07645e1e6fd9f"</span>,
+        <span class="org-keyword">"shasum"</span>: <span class="org-string">""</span>,
+        <span class="org-keyword">"mirrors"</span>: [
+            {
+                <span class="org-keyword">"url"</span>: <span class="org-string">"https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%"</span>,
+                <span class="org-keyword">"preferred"</span>: <span class="org-constant">true</span>
+            }
+        ]
+    },
+    <span class="org-keyword">"require"</span>: {
+        <span class="org-keyword">"easywechat-composer/easywechat-composer"</span>: <span class="org-string">"^1.1"</span>,
+        <span class="org-keyword">"ext-fileinfo"</span>: <span class="org-string">"*"</span>,
+        <span class="org-keyword">"ext-openssl"</span>: <span class="org-string">"*"</span>,
+        <span class="org-keyword">"ext-simplexml"</span>: <span class="org-string">"*"</span>,
+        <span class="org-keyword">"guzzlehttp/guzzle"</span>: <span class="org-string">"^6.2"</span>,
+        <span class="org-keyword">"monolog/monolog"</span>: <span class="org-string">"^1.22"</span>,
+        <span class="org-keyword">"overtrue/socialite"</span>: <span class="org-string">"~2.0"</span>,
+        <span class="org-keyword">"php"</span>: <span class="org-string">"&gt;=7.1"</span>,
+        <span class="org-keyword">"pimple/pimple"</span>: <span class="org-string">"^3.0"</span>,
+        <span class="org-keyword">"psr/simple-cache"</span>: <span class="org-string">"^1.0"</span>,
+        <span class="org-keyword">"symfony/cache"</span>: <span class="org-string">"^3.3 || ^4.3"</span>,
+        <span class="org-keyword">"symfony/http-foundation"</span>: <span class="org-string">"^2.7 || ^3.0 || ^4.0"</span>,
+        <span class="org-keyword">"symfony/psr-http-message-bridge"</span>: <span class="org-string">"^0.3 || ^1.0"</span>
+    },
+    <span class="org-keyword">"require-dev"</span>: {
+        <span class="org-keyword">"friendsofphp/php-cs-fixer"</span>: <span class="org-string">"^2.15"</span>,
+        <span class="org-keyword">"mikey179/vfsstream"</span>: <span class="org-string">"^1.6"</span>,
+        <span class="org-keyword">"mockery/mockery"</span>: <span class="org-string">"^1.0"</span>,
+        <span class="org-keyword">"phpstan/phpstan"</span>: <span class="org-string">"^0.11.12"</span>,
+        <span class="org-keyword">"phpunit/phpunit"</span>: <span class="org-string">"~6.5"</span>,
+        <span class="org-keyword">"symfony/event-dispatcher"</span>: <span class="org-string">"^4.0"</span>
+    },
+    <span class="org-keyword">"suggest"</span>: {
+        <span class="org-keyword">"symfony/event-dispatcher"</span>: <span class="org-string">"Required to use EasyWeChat events component (^4.0)."</span>
+    },
+    <span class="org-keyword">"type"</span>: <span class="org-string">"library"</span>,
+    <span class="org-keyword">"autoload"</span>: {
+        <span class="org-keyword">"psr-4"</span>: {
+            <span class="org-keyword">"EasyWeChat\\"</span>: <span class="org-string">"src/"</span>
+        },
+        <span class="org-keyword">"files"</span>: [
+            <span class="org-string">"src/Kernel/Support/Helpers.php"</span>,
+            <span class="org-string">"src/Kernel/Helpers.php"</span>
+        ]
+    },
+    <span class="org-keyword">"notification-url"</span>: <span class="org-string">"https://packagist.org/downloads/"</span>,
+    <span class="org-keyword">"license"</span>: [
+        <span class="org-string">"MIT"</span>
+    ],
+    <span class="org-keyword">"authors"</span>: [
+        {
+            <span class="org-keyword">"name"</span>: <span class="org-string">"overtrue"</span>,
+            <span class="org-keyword">"email"</span>: <span class="org-string">"anzhengchao@gmail.com"</span>
+        }
+    ],
+    <span class="org-keyword">"description"</span>: <span class="org-string">"&#24494;&#20449;SDK"</span>,
+    <span class="org-keyword">"keywords"</span>: [
+        <span class="org-string">"sdk"</span>,
+        <span class="org-string">"wechat"</span>,
+        <span class="org-string">"weixin"</span>,
+        <span class="org-string">"weixin-sdk"</span>
+    ],
+    <span class="org-keyword">"time"</span>: <span class="org-string">"2019-08-13T11:53:50+00:00"</span>
+}
+</pre>
+</div>
+
+<p>
+<b>更新成功后：</b>
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span class="org-keyword">"name"</span>: <span class="org-string">"overtrue/wechat"</span>,
+    <span class="org-keyword">"version"</span>: <span class="org-string">"4.2.11"</span>,
+    <span class="org-keyword">"source"</span>: {
+        <span class="org-keyword">"type"</span>: <span class="org-string">"git"</span>,
+        <span class="org-keyword">"url"</span>: <span class="org-string">"https://github.com/overtrue/wechat.git"</span>,
+        <span class="org-keyword">"reference"</span>: <span class="org-string">"853e0772e6aa53a71edf1b5d251c7ff1e6b2a2bf"</span>
+    },
+    <span class="org-keyword">"dist"</span>: {
+        <span class="org-keyword">"type"</span>: <span class="org-string">"zip"</span>,
+        <span class="org-keyword">"url"</span>: <span class="org-string">"https://api.github.com/repos/overtrue/wechat/zipball/853e0772e6aa53a71edf1b5d251c7ff1e6b2a2bf"</span>,
+        <span class="org-keyword">"reference"</span>: <span class="org-string">"853e0772e6aa53a71edf1b5d251c7ff1e6b2a2bf"</span>,
+        <span class="org-keyword">"shasum"</span>: <span class="org-string">""</span>,
+        <span class="org-keyword">"mirrors"</span>: [
+            {
+                <span class="org-keyword">"url"</span>: <span class="org-string">"https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%"</span>,
+                <span class="org-keyword">"preferred"</span>: <span class="org-constant">true</span>
+            }
+        ]
+    },
+    <span class="org-keyword">"require"</span>: {
+        <span class="org-keyword">"easywechat-composer/easywechat-composer"</span>: <span class="org-string">"^1.1"</span>,
+        <span class="org-keyword">"ext-fileinfo"</span>: <span class="org-string">"*"</span>,
+        <span class="org-keyword">"ext-openssl"</span>: <span class="org-string">"*"</span>,
+        <span class="org-keyword">"ext-simplexml"</span>: <span class="org-string">"*"</span>,
+        <span class="org-keyword">"guzzlehttp/guzzle"</span>: <span class="org-string">"^6.2"</span>,
+        <span class="org-keyword">"monolog/monolog"</span>: <span class="org-string">"^1.22 || ^2.0"</span>,
+        <span class="org-keyword">"overtrue/socialite"</span>: <span class="org-string">"~2.0"</span>,
+        <span class="org-keyword">"php"</span>: <span class="org-string">"&gt;=7.1"</span>,
+        <span class="org-keyword">"pimple/pimple"</span>: <span class="org-string">"^3.0"</span>,
+        <span class="org-keyword">"psr/simple-cache"</span>: <span class="org-string">"^1.0"</span>,
+        <span class="org-keyword">"symfony/cache"</span>: <span class="org-string">"^3.3 || ^4.3"</span>,
+        <span class="org-keyword">"symfony/event-dispatcher"</span>: <span class="org-string">"^4.3"</span>,
+        <span class="org-keyword">"symfony/http-foundation"</span>: <span class="org-string">"^2.7 || ^3.0 || ^4.0"</span>,
+        <span class="org-keyword">"symfony/psr-http-message-bridge"</span>: <span class="org-string">"^0.3 || ^1.0"</span>
+    },
+    <span class="org-keyword">"require-dev"</span>: {
+        <span class="org-keyword">"friendsofphp/php-cs-fixer"</span>: <span class="org-string">"^2.15"</span>,
+        <span class="org-keyword">"mikey179/vfsstream"</span>: <span class="org-string">"^1.6"</span>,
+        <span class="org-keyword">"mockery/mockery"</span>: <span class="org-string">"^1.2.3"</span>,
+        <span class="org-keyword">"phpstan/phpstan"</span>: <span class="org-string">"^0.11.12"</span>,
+        <span class="org-keyword">"phpunit/phpunit"</span>: <span class="org-string">"^7.5"</span>
+    },
+    <span class="org-keyword">"type"</span>: <span class="org-string">"library"</span>,
+    <span class="org-keyword">"autoload"</span>: {
+        <span class="org-keyword">"psr-4"</span>: {
+            <span class="org-keyword">"EasyWeChat\\"</span>: <span class="org-string">"src/"</span>
+        },
+        <span class="org-keyword">"files"</span>: [
+            <span class="org-string">"src/Kernel/Support/Helpers.php"</span>,
+            <span class="org-string">"src/Kernel/Helpers.php"</span>
+        ]
+    },
+    <span class="org-keyword">"notification-url"</span>: <span class="org-string">"https://packagist.org/downloads/"</span>,
+    <span class="org-keyword">"license"</span>: [
+        <span class="org-string">"MIT"</span>
+    ],
+    <span class="org-keyword">"authors"</span>: [
+        {
+            <span class="org-keyword">"name"</span>: <span class="org-string">"overtrue"</span>,
+            <span class="org-keyword">"email"</span>: <span class="org-string">"anzhengchao@gmail.com"</span>
+        }
+    ],
+    <span class="org-keyword">"description"</span>: <span class="org-string">"&#24494;&#20449;SDK"</span>,
+    <span class="org-keyword">"keywords"</span>: [
+        <span class="org-string">"sdk"</span>,
+        <span class="org-string">"wechat"</span>,
+        <span class="org-string">"weixin"</span>,
+        <span class="org-string">"weixin-sdk"</span>
+    ],
+    <span class="org-keyword">"time"</span>: <span class="org-string">"2019-11-27T16:38:00+00:00"</span>
+}
+</pre>
+</div>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

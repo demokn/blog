@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Orgmode 示例</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Emacs, Orgmode" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Orgmode 示例</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2025-01-19</p>
+</header>
+<section id="outline-container-org88e6d29" class="outline-2">
+<h2 id="org88e6d29">标题</h2>
+<div class="outline-text-2" id="text-org88e6d29">
+<pre class="example" id="org4fe742f">
+* 一级标题
+** 二级标题
+*** 三级标题（以此类推）
+</pre>
+</div>
+</section>
+
+<section id="outline-container-org35cb194" class="outline-2">
+<h2 id="org35cb194">字体</h2>
+<div class="outline-text-2" id="text-org35cb194">
+<p>
+<b>粗体</b>
+</p>
+
+<p>
+<i>斜体</i>
+</p>
+
+<p>
+<del>删除线</del>
+</p>
+
+<p>
+<span class="underline">下划线</span>
+</p>
+
+<p>
+等宽字: <code>code(推荐)</code> 或 <code>code</code>
+</p>
+
+<p>
+下标: H_2 O
+</p>
+
+<p>
+上标: E=mc^2
+</p>
+
+<pre class="example" id="org5b28da0">
+*粗体*
+/斜体/
++删除线+
+_下划线_
+等宽字: =code= 或 ~code~
+下标: H_2 O
+上标: E=mc^2
+</pre>
+</div>
+</section>
+
+<section id="outline-container-org1b6c896" class="outline-2">
+<h2 id="org1b6c896">列表</h2>
+<div class="outline-text-2" id="text-org1b6c896">
+<ul class="org-ul">
+<li>无序列表以 <code>-</code> 或 <code>+</code> 开头</li>
+<li>有序列表以 <code>1.</code> 或者 <code>1)</code> 开头</li>
+<li>描述列表用 <code>::</code></li>
+<li>列表层级用缩进体现</li>
+</ul>
+<p>
+&#x2014;
+</p>
+<ul class="org-ul">
+<li>无序列表 1
+<ul class="org-ul">
+<li>无序列表 1.1</li>
+<li>无序列表 1.2</li>
+</ul></li>
+<li>无序列表 2
+<ul class="org-ul">
+<li>无序列表 2.1</li>
+<li>&#x2026;</li>
+</ul></li>
+</ul>
+<p>
+&#x2014;
+</p>
+<ol class="org-ol">
+<li>有序列表 1
+<ol class="org-ol">
+<li>有序列表 1.1</li>
+<li>有序列表 1.2</li>
+</ol></li>
+<li>有序列表 2
+<ol class="org-ol">
+<li>有序列表 2.1</li>
+<li>有序列表 2.2</li>
+</ol></li>
+<li>指定序号其实是无效的, 导出 html 时会自动编号 20</li>
+<li value="20">如果确实想指定序号, 使用 <code>[@20]</code> 20</li>
+</ol>
+<hr>
+<p>
+描述列表（Definition List）是 Org-mode 中的一种列表类型，用于列出术语及其定义的场景，例如词汇表、概念说明、API 参数说明等。
+</p>
+<dl class="org-dl">
+<dt>Emacs</dt><dd>一款强大的文本编辑器</dd>
+<dt>Org-mode</dt><dd>Emacs 的标记语言，用于任务管理和笔记记录</dd>
+<dt>Markdown</dt><dd>一种轻量级的标记语言</dd>
+</dl>
+
+<pre class="example" id="orgf26f995">
+- 无序列表 1
+  + 无序列表 1.1
+  + 无序列表 1.2
+- 无序列表 2
+  - 无序列表 2.1
+  + ...
+---
+1. 有序列表 1
+   1) 有序列表 1.1
+   1) 有序列表 1.2
+1. 有序列表 2
+   1. 有序列表 2.1
+   2) 有序列表 2.2
+20. 指定序号其实是无效的, 导出 html 时会自动编号 20
+20. [@20]如果确实想指定序号, 使用 =[@20]= 20
+--------
+描述列表（Definition List）是 Org-mode 中的一种列表类型，用于列出术语及其定义的场景，例如词汇表、概念说明、API 参数说明等。
+- Emacs :: 一款强大的文本编辑器
+- Org-mode :: Emacs 的标记语言，用于任务管理和笔记记录
+- Markdown :: 一种轻量级的标记语言
+</pre>
+</div>
+</section>
+
+<section id="outline-container-org41242c8" class="outline-2">
+<h2 id="org41242c8">表格</h2>
+<div class="outline-text-2" id="text-org41242c8">
+<p>
+基础示例
+</p>
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-right">
+
+<col  class="org-right">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-right">Phone</th>
+<th scope="col" class="org-right">Age</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Peter</td>
+<td class="org-right">1234</td>
+<td class="org-right">17</td>
+</tr>
+
+<tr>
+<td class="org-left">Anna</td>
+<td class="org-right">4321</td>
+<td class="org-right">25</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+指定列宽（导出时无效）
+</p>
+<table>
+
+
+<colgroup>
+<col  class="org-right">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">one</td>
+<td class="org-left">some</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">two</td>
+<td class="org-left">boring</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">This is a long text</td>
+<td class="org-left">column</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+对齐方式（导出时有效）
+</p>
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-center">
+
+<col  class="org-right">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">左对齐</td>
+<td class="org-center">居中对齐</td>
+<td class="org-right">右对齐</td>
+</tr>
+
+<tr>
+<td class="org-left">this is long text to test align</td>
+<td class="org-center">this is long text to test align</td>
+<td class="org-right">this is long text to test align</td>
+</tr>
+</tbody>
+</table>
+
+<pre class="example" id="org51c383a">
+基础示例
+| Name  | Phone | Age |
+|-------+-------+-----|
+| Peter |  1234 |  17 |
+| Anna  |  4321 |  25 |
+
+指定列宽（导出时无效）
+|---+---------------------+--------|
+|   | &lt;6&gt;                 |        |
+| 1 | one                 | some   |
+| 2 | two                 | boring |
+| 3 | This is a long text | column |
+|---+---------------------+--------|
+
+对齐方式（导出时有效）
+|---------------------------------+---------------------------------+---------------------------------|
+| &lt;l&gt;                             |               &lt;c&gt;               |                             &lt;r&gt; |
+| 左对齐                            |             居中对齐              |                            右对齐 |
+| this is long text to test align | this is long text to test align | this is long text to test align |
+|---------------------------------+---------------------------------+---------------------------------|
+</pre>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>
