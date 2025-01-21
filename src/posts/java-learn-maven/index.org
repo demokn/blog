@@ -4,7 +4,7 @@
 
 * 通过命令行创建空的 =maven= 项目骨架
 
-** 1. 从 Maven 模板创建项目[fn: Thanks to https://mkyong.com/maven/how-to-create-a-java-project-with-maven/]
+** 1. 从 Maven 模板创建项目[fn:: Thanks to https://mkyong.com/maven/how-to-create-a-java-project-with-maven/]
 #+begin_src shell
   mvn archetype:generate \
       -DgroupId=com.example \
@@ -222,7 +222,7 @@ Caused by: java.lang.ClassNotFoundException: org.apache.commons.codec.digest.Dig
         ... 2 more
 #+end_example
 
-4.2 使用 =maven-shade-plugin[fn: Homepage of maven-shade-plugin https://maven.apache.org/plugins/maven-shade-plugin/index.html]= 插件来生成 =fat-jar= - 将所有依赖项打包进同一个 jar 文件中
+4.2 使用 =maven-shade-plugin=[fn:: Homepage of maven-shade-plugin https://maven.apache.org/plugins/maven-shade-plugin/index.html] 插件来生成 =fat-jar= - 将所有依赖项打包进同一个 jar 文件中
 
 更新 =pom.xml=
 #+begin_src xml
@@ -404,7 +404,7 @@ Caused by: java.lang.ClassNotFoundException: org.apache.commons.codec.digest.Dig
 
 * 8. 体验更高版本的 maven-archetype-quickstart
 8.1 在步骤 1 的输出中可以看到默认使用的 maven-archetype-quickstart 版本是 1.0.
-通过官网查看目前的最新版本已经是 1.5 了, 体验一下新版本[fn: Homepage of maven-archetype-quickstart https://maven.apache.org/archetypes/maven-archetype-quickstart/].
+通过官网查看目前的最新版本已经是 1.5 了, 体验一下新版本[fn:: Homepage of maven-archetype-quickstart https://maven.apache.org/archetypes/maven-archetype-quickstart/].
 可以直接指定 java 编译器版本, jUnit 版本等。
 #+begin_src shell
   mvn archetype:generate \
