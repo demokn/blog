@@ -1,6 +1,6 @@
 .elpa/
 .org-timestamps/
-public/
+dist/
 /src/sitemap.org
 /src/posts/archive.org
 /src/posts/rss.org

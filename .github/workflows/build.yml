@@ -26,6 +26,6 @@ jobs:
           # personal_token: ${{ secrets.ACCESS_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: ./public
+          publish_dir: ./dist
           destination_dir: ./
           force_orphan: true

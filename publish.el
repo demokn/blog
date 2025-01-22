@@ -66,7 +66,7 @@
 
 (defvar kn/src-dir (expand-file-name "src/" (file-name-directory (or load-file-name buffer-file-name)))
   "源码目录的绝对路径.")
-(defvar kn/pub-dir (expand-file-name "public/" (file-name-directory (or load-file-name buffer-file-name)))
+(defvar kn/pub-dir (expand-file-name "dist/" (file-name-directory (or load-file-name buffer-file-name)))
   "发布目录的绝对路径.")
 
 ;; 对于引用的外部CSS库，最好是下载到本地.
@@ -473,7 +473,9 @@ Return output file name."
         (org-html-doctype "html5")
         (org-html-html5-fancy t)
         (org-html-validation-link nil)
-        (org-html-htmlize-output-type 'css))
+        (org-html-htmlize-output-type 'css)
+        (org-html-table-default-attributes
+         '(:class "table table-sm")))
     (org-publish-all)))
 
 (provide 'publish)
