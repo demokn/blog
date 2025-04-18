@@ -119,6 +119,11 @@ pacman 在使用时通常是一个操作选项(大写字母)加上一些额外�
     ......
   #+end_example
 
+- 列出所有在 aur 中已经不存在的软件包
+#+begin_src shell
+  yay -Qm | while read pkg _; do yay -Si "$pkg" >/dev/null || echo "$pkg"; done
+#+end_src
+
 ** 好玩的配置
 
 #+BEGIN_SRC sh
