@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shell 中大括号的用法</title>
+<meta name="keywords" content="珊瑚礁上的程序员, shell, bash, braces, 大括号" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Shell 中大括号的用法</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2023-05-19</p>
+</header><p>
+在 shell 中，大括号的作用主要包括:
+</p>
+
+<ol class="org-ol">
+<li>大括号(表达式)扩展</li>
+<li>变量(字符串)操作</li>
+</ol>
+
+<p>
+巧用大括号可以极大的提高 shell 编程的便捷性。
+</p>
+
+<section id="outline-container-org1831565" class="outline-2">
+<h2 id="org1831565">表达式扩展</h2>
+<div class="outline-text-2" id="text-org1831565">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#29983;&#25104;&#24207;&#21015;&#21270;&#30340;&#20869;&#23481;</span>
+<span class="org-builtin">echo</span> {1..10}
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: 1 2 3 4 5 6 7 8 9 10</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#25968;&#20540;&#31867;&#22411;&#21487;&#20197;&#25351;&#23450;&#27493;&#36827;&#20540;</span>
+<span class="org-builtin">echo</span> {1..10..2}
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: 1 3 5 7 9</span>
+<span class="org-builtin">echo</span> {a..f}
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: a b c d e f</span>
+<span class="org-builtin">echo</span> {A..F}
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: A B C D E F</span>
+<span class="org-builtin">echo</span> {X..c}
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: X Y Z [ \ ] ^ _ ` a b c</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#23545;&#36887;&#21495;&#20998;&#21106;&#30340;&#36827;&#34892;&#23637;&#24320;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#27880;: &#36887;&#21495;&#21069;&#21518;&#19981;&#33021;&#26377;&#31354;&#26684;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#22914;&#26524;&#23383;&#31526;&#20013;&#30830;&#23454;&#26377;&#31354;&#26684;, &#38656;&#35201;&#29992; \ &#36716;&#20041;</span>
+<span class="org-builtin">echo</span> file_{aa,ab,ac}.txt
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: file_aa.txt file_ab.txt file_ac.txt</span>
+<span class="org-builtin">echo</span> file_{a,b}{1..2}.txt
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: file_a1.txt file_a2.txt file_b1.txt file_b2.txt</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#25903;&#25345;&#23884;&#22871;&#29992;&#27861;</span>
+<span class="org-builtin">echo</span> file_{a,{1..3},b}.txt
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: file_a.txt file_1.txt file_2.txt file_3.txt file_b.txt</span>
+
+<span class="org-builtin">echo</span> hello{,,}
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: hello hello hello</span>
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-orgb580333" class="outline-2">
+<h2 id="orgb580333">字符串操作</h2>
+<div class="outline-text-2" id="text-orgb580333">
+<p>
+使用大括号进行字符串操作，例如删除字符、替换字符等。具体的操作符包括：
+</p>
+
+<ul class="org-ul">
+<li><code>${var#pattern}</code> ：从变量 var 的开头删除最短匹配 pattern 的子串。</li>
+<li><code>${var##pattern}</code> ：从变量 var 的开头删除最长匹配 pattern 的子串。</li>
+<li><code>${var%pattern}</code> ：从变量 var 的结尾删除最短匹配 pattern 的子串。</li>
+<li><code>${var%%pattern}</code> ：从变量 var 的结尾删除最长匹配 pattern 的子串。</li>
+<li><code>${var/pattern/string}</code> ：将变量 var 中第一个匹配 pattern 的子串替换为 string。</li>
+<li><code>${var//pattern/string}</code> ：将变量 var 中所有匹配 pattern 的子串替换为 string。</li>
+</ul>
+
+<p>
+示例：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-variable-name">filename</span>=<span class="org-string">"example.tar.gz"</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">filename</span>%.gz}   <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;&#65306;example.tar</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">filename</span>%%.*}  <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;&#65306;example</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">filename</span>#*.}   <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;&#65306;tar.gz</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">filename</span>##*.}  <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;&#65306;gz</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">filename</span>/gz/zip}  <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;&#65306;example.tar.zip</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">filename</span>//a/A}  <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;&#65306;exAmple.tAr.gz</span>
+</pre>
+</div>
+
+<p>
+其他用法:
+</p>
+
+<ul class="org-ul">
+<li>${#var} : 获取变量 var 的长度</li>
+<li>${var:-default} : 变量 var 为空或未设置, 则取默认值</li>
+<li>${var:=default} : 变量 var 为空或未设置, 则取默认值, 并将默认值赋值给变量 var</li>
+<li>${var:?message} : 变量 var 为空或未设置, 则输出 message 并退出</li>
+<li>${var:+other} : 如果变量 var 不为空, 则输出 other, 否则输出空</li>
+<li>${var:offset} : 从 offset 处截取字符串到末尾, 如果 offset 为负数, 必须加前置空格</li>
+<li>${var:offset:length} : 从 offset 处截取指定长度的字符串</li>
+</ul>
+
+<p>
+示例:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-variable-name">foo</span>=hello
+<span class="org-variable-name">bar</span>=
+<span class="org-builtin">echo</span> ${#<span class="org-variable-name">foo</span>} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: 5</span>
+<span class="org-builtin">echo</span> ${#<span class="org-variable-name">bar</span>} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: 0</span>
+
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">foo</span>:-default value} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: hello</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">bar</span>:-default value} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: default value</span>
+<span class="org-builtin">echo</span> $<span class="org-variable-name">foo</span> <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: hello</span>
+<span class="org-builtin">echo</span> $<span class="org-variable-name">bar</span> <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;:</span>
+
+<span class="org-variable-name">foo</span>=hello
+<span class="org-variable-name">bar</span>=
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">foo</span>:=default value} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: hello</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">bar</span>:=default value} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: default value</span>
+<span class="org-builtin">echo</span> $<span class="org-variable-name">foo</span> <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: hello</span>
+<span class="org-builtin">echo</span> $<span class="org-variable-name">bar</span> <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: default value</span>
+
+<span class="org-variable-name">foo</span>=hello
+<span class="org-variable-name">bar</span>=
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">foo</span>:?&#26410;&#35774;&#32622;} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: hello</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">bar</span>:?&#26410;&#35774;&#32622;} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;:  bar: &#26410;&#35774;&#32622; (&#24182;&#36864;&#20986;)</span>
+<span class="org-builtin">echo</span> $<span class="org-variable-name">foo</span> <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: hello</span>
+<span class="org-builtin">echo</span> $<span class="org-variable-name">bar</span> <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;:</span>
+
+<span class="org-variable-name">foo</span>=hello
+<span class="org-variable-name">bar</span>=
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">foo</span>:+foo&#24050;&#35774;&#32622;} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: foo&#24050;&#35774;&#32622;</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">bar</span>:+bar&#24050;&#35774;&#32622;} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;:</span>
+<span class="org-builtin">echo</span> $<span class="org-variable-name">foo</span> <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: hello</span>
+<span class="org-builtin">echo</span> $<span class="org-variable-name">bar</span> <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;:</span>
+
+<span class="org-variable-name">string</span>=01234567890abcdefgh
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">string</span>:7} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: 7890abcdefgh</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">string</span>:7:0} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;:</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">string</span>:7:2} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: 78</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">string</span>:7:-2} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: 7890abcdef</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">string</span>: -7} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: bcdefgh</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">string</span>: -7:0} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;:</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">string</span>: -7:2} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: bc</span>
+<span class="org-builtin">echo</span> ${<span class="org-variable-name">string</span>: -7:-2} <span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20986;: bcdef</span>
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-orgfbd2d31" class="outline-2">
+<h2 id="orgfbd2d31">参考</h2>
+<div class="outline-text-2" id="text-orgfbd2d31">
+<ul class="org-ul">
+<li><a href="https://www.gnu.org/software/bash/manual/html_node/Brace-Expansion.html">GNU Manual: Brace Expansion</a></li>
+<li><a href="https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html">GNU Manual: Shell Parameter Expansion</a></li>
+</ul>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

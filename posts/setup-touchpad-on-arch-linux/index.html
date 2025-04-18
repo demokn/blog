@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Arch Linux 下调教笔记本的触控板</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Arch Linux, Touchpad, 触摸板, 触控板" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Arch Linux 下调教笔记本的触控板</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2021-05-25</p>
+</header><blockquote>
+<p>
+生命不息，折腾不止。
+</p>
+</blockquote>
+
+<p>
+最近主力窗口管理器从 <code>xfwm</code> 切换到了 <code>dwm</code> 。
+</p>
+
+<p>
+当然也就意味着放弃了 <code>xfce</code> 这一整套桌面环境。
+</p>
+
+<p>
+随之带来的问题就是在系统使用过程中每碰到一个问题，或者产生某种想自定义的想法，那都是一顿折腾。
+</p>
+
+<p>
+比如这次的想法就是，实现触摸板的触碰即点击（单指触碰即等同于点击鼠标左键）。
+</p>
+
+<p>
+在 <code>xfce</code> 桌面环境实现这个相当简单，只需要在 <code>xfce4-settings</code> 的 <code>Mouse and Touchpad</code> 子菜单中找到相关选项勾选即可。
+</p>
+
+<p>
+现在，我们要通过 <code>Xorg</code> 的配置文件来实现。
+</p>
+
+<p>
+首先要知道 <code>X Server</code> 默认是使用 <code>libinput</code> 驱动来处理输入设备的。
+</p>
+
+<p>
+我们可以通过查看 <code>xorg</code> 的日志文件来确认触摸板是不是通过 <code>libinput</code> 来管理的：
+</p>
+
+<pre class="example" id="org7916004">
+$ grep "Using input driver" ~/.local/share/xorg/Xorg.0.log
+[  5949.867] (II) Using input driver 'libinput' for 'Power Button'
+[  5949.874] (II) Using input driver 'libinput' for 'Video Bus'
+[  5949.880] (II) Using input driver 'libinput' for 'Video Bus'
+[  5949.887] (II) Using input driver 'libinput' for 'Power Button'
+[  5949.896] (II) Using input driver 'libinput' for 'hm1091_techfront: hm1091_techfr'
+[  5949.907] (II) Using input driver 'libinput' for 'ELAN2203:00 04F3:309A Mouse'
+[  5949.915] (II) Using input driver 'libinput' for 'ELAN2203:00 04F3:309A Touchpad'
+[  5949.925] (II) Using input driver 'libinput' for 'Huawei WMI hotkeys'
+[  5949.930] (II) Using input driver 'libinput' for 'AT Translated Set 2 keyboard'
+[  5949.936] (II) Using input driver 'libinput' for 'ETPS/2 Elantech Touchpad'
+</pre>
+
+<p>
+可以看到触摸板(touchpad)确实是使用 <code>libinput</code> 管理的。
+</p>
+
+<p>
+接下里就是修改配置文件了。
+</p>
+
+<p>
+Arch 在 <code>/usr/share/X11/xorg.conf.d</code> 目录下提供了 xorg 的默认配置文件。
+</p>
+
+<p>
+可以在该目录下找到 <code>libinput</code> 的默认配置文件，复制到 <code>/etc/X11/xorg.conf.d</code> 目录下。
+或者直接在 <code>/etc/X11/xorg.conf.d</code> 目录下新建一个配置文件 <code>40-libinput-touchpad.conf</code> ，内容如下：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-conf">Section <span class="org-string">"InputClass"</span>
+    Identifier <span class="org-string">"libinput touchpad catchall"</span>
+    MatchIsTouchpad <span class="org-string">"on"</span>
+    MatchDevicePath <span class="org-string">"/dev/input/event*"</span>
+    Driver <span class="org-string">"libinput"</span>
+    Option <span class="org-string">"Tapping"</span> <span class="org-string">"on"</span>
+    Option <span class="org-string">"TappingButtonMap"</span> <span class="org-string">"lrm"</span>
+    Option <span class="org-string">"NaturalScrolling"</span> <span class="org-string">"true"</span>
+EndSection
+</pre>
+</div>
+
+<p>
+我这里配置了：
+</p>
+
+<ul class="org-ul">
+<li><code>Option "Tapping" "on"</code>: 触摸即点击</li>
+<li><code>Option "TappingButtonMap" "lrm"</code>: 单指、两指、三指触摸分别对应左键、右键、中键点击</li>
+<li><code>Option "NaturalScrolling" "true"</code>: 自然滚动（反方向滚动）</li>
+</ul>
+
+<p>
+当然还有更多配置项可以通过 <code>man 4 libinput</code> 来查看 man-page。
+</p>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

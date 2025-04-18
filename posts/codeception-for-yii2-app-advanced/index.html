@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>使用 Codeception 对 Yii2 进行 API 测试</title>
+<meta name="keywords" content="珊瑚礁上的程序员, codeception, yii2 framework, api testing, 单元测试, API测试" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">使用 Codeception 对 Yii2 进行 API 测试</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2020-02-02</p>
+</header>
+<section id="outline-container-org0f6e3c6" class="outline-2">
+<h2 id="org0f6e3c6">前言</h2>
+<div class="outline-text-2" id="text-org0f6e3c6">
+<p>
+Yii2 官方兼容 <a href="https://github.com/Codeception/Codeception">Codeception</a> 测试框架，你可以创建以下类型的测试：
+</p>
+
+<ul class="org-ul">
+<li><a href="https://codeception.com/docs/05-UnitTests">单元测试</a>: 验证一个独立的代码单元是否按照期望的方式运行</li>
+<li><a href="https://codeception.com/docs/04-FunctionalTests">功能测试</a>: 在浏览器模拟器中以用户视角来验证期望的场景是否发生</li>
+<li><p>
+<a href="https://codeception.com/docs/03-AcceptanceTests">验收测试</a>: 在真实的浏览器中以用户视角验证期望的场景是否发生
+</p>
+
+<p>
+Yii 为 <a href="https://github.com/yiisoft/yii2-app-basic">yii2-app-basic</a> 和 <a href="https://github.com/yiisoft/yii2-app-advanced">yii2-app-advanced</a> 应用模板均提供了对上述三种类型都支持的开箱即用的测试套件。
+</p>
+
+<p>
+这次我们要做的是基于 <code>yii2-app-advanced</code> 模板, 为其增加API测试套件，用于测试API接口。
+</p></li>
+</ul>
+</div>
+</section>
+
+<section id="outline-container-orga7f3d84" class="outline-2">
+<h2 id="orga7f3d84">搭建项目</h2>
+<div class="outline-text-2" id="text-orga7f3d84">
+<ol class="org-ol">
+<li><p>
+从模板创建项目
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">composer create-project --prefer-dist yiisoft/yii2-app-advanced acme
+</pre>
+</div></li>
+
+<li><p>
+准备测试环境
+</p>
+<div class="org-src-container">
+<pre class="src src-sh"><span class="org-builtin">cd</span> acme
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#21021;&#22987;&#21270;&#39033;&#30446;</span>
+php init --env=Development --overwrite=y
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#21019;&#24314;&#27979;&#35797;&#29992;&#25968;&#25454;&#24211;, &#19982; common/config/test-local.php &#20013;&#30340;&#37197;&#32622;&#20445;&#25345;&#19968;&#33268;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#25191;&#34892;&#25968;&#25454;&#24211;&#36801;&#31227;, &#27880;&#24847;, &#20351;&#29992;&#30340;&#26159; yii_test, &#32780;&#19981;&#26159; yii</span>
+php yii_test migrate/up
+</pre>
+</div></li>
+
+<li><p>
+执行 <code>./vendor/bin/codecept run</code> 以启动测试
+</p>
+
+<div class="alert alert-primary info" id="org1d44826">
+<p>
+假设你已经全局安装了 <code>codeception</code>, 后面均直接使用 <code>codecept</code> 命令, 不再加上路径了。
+</p>
+
+</div>
+
+<p>
+这里执行的测试内容为 advanced 模板项目中自带的测试，同时覆盖了单元测试， 功能测试和验收测试。输出内容如下：
+</p>
+
+<pre class="example" id="org72080a1">
+➜ ./vendor/bin/codecept run
+Codeception PHP Testing Framework v4.0.3
+Powered by PHPUnit 8.5.2 by Sebastian Bergmann and contributors.
+Running with seed:
+
+[common\tests]: tests from /home/demo/Code/learning/yii2-app-advanced/common
+
+Common\tests.unit Tests (3) -----------------------------------------------------------------------------------------------------------------------------
+✔ LoginFormTest: Login no user (0.01s)
+✔ LoginFormTest: Login wrong password (0.42s)
+✔ LoginFormTest: Login correct (0.46s)
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+...此处有省略...
+
+[backend\tests]: tests from /home/demo/Code/learning/yii2-app-advanced/backend
+
+Backend\tests.functional Tests (1) ----------------------------------------------------------------------------------------------------------------------
+✔ LoginCest: Login user (0.43s)
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Backend\tests.unit Tests (0) ----------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Time: 4.53 seconds, Memory: 30.00 MB
+
+OK (43 tests, 121 assertions)
+</pre></li>
+</ol>
+</div>
+</section>
+
+<section id="outline-container-orga347de9" class="outline-2">
+<h2 id="orga347de9">创建API测试套件</h2>
+<div class="outline-text-2" id="text-orga347de9">
+<p>
+首先需要明确的是 yii2 advanced 模板属于多应用项目，分为 frontend 和 backend ， 当然还可以按需继续添加其他应用。
+我们需要在多个应用中分别创建API测试套件。此处以 frontend 应用为例。
+</p>
+
+<ol class="org-ol">
+<li>进入应用根目录 <code>cd frontend</code></li>
+
+<li><p>
+创建API测试套件 <code>codecept generate:suite api</code> , 输出如下
+</p>
+
+<pre class="example" id="orgc29e2dd">
+➜ codecept generate:suite api
+Helper \frontend\tests\Helper\Api was created in /path/acme/frontend/tests/_support/Helper/Api.php
+Actor ApiTester was created in /path/acme/frontend/tests/_support/ApiTester.php
+Suite config api.suite.yml was created.
+
+Next steps:
+1. Edit api.suite.yml to enable modules for this suite
+2. Create first test with generate:cest testName ( or test|cept) command
+3. Run tests of this suite with codecept run api command
+Suite api generated
+</pre>
+
+<p>
+由输出可知，该命令共生成了三个文件。
+查看其中 <code>tests/api.suite.yml</code> 文件内容如下:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><span class="org-variable-name">actor</span>: ApiTester
+<span class="org-variable-name">modules</span>:
+    <span class="org-variable-name">enabled</span>:
+<span class="org-yaml-tab">        </span>- \frontend\tests\Helper\Api
+</pre>
+</div></li>
+
+<li><p>
+修改 <code>api.suite.yml</code> 文件, 修改后内容如下:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><span class="org-variable-name">suite_namespace</span>: frontend\tests\api
+<span class="org-variable-name">actor</span>: ApiTester
+<span class="org-variable-name">modules</span>:
+    <span class="org-variable-name">enabled</span>:
+<span class="org-yaml-tab">        </span>- \frontend\tests\Helper\Api
+<span class="org-yaml-tab">        </span><span class="org-variable-name">- REST</span>:
+<span class="org-yaml-tab">        </span><span class="org-variable-name">      depends</span>: Yii2
+<span class="org-variable-name">config</span>:
+    - Yii2
+</pre>
+</div></li>
+
+<li><p>
+composer 安装API测试所需依赖（ <code>api.suite.yml</code> 中启用的 <code>REST</code> 模块）
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">composer require codeception/module-rest --dev
+</pre>
+</div></li>
+
+<li><p>
+执行 <code>codecept run api</code>
+</p>
+
+<p>
+目的是为了验证配置是否正确, 依赖是否安装, 同时生成 <code>tests/_support/_generated/ApiTesterActions.php</code> 文件
+</p></li>
+</ol>
+</div>
+</section>
+
+<section id="outline-container-org2b56389" class="outline-2">
+<h2 id="org2b56389">创建测试</h2>
+<div class="outline-text-2" id="text-org2b56389">
+<ol class="org-ol">
+<li><p>
+先随便写个常见的登录接口
+</p>
+
+<p>
+新建 <code>frontend/controllers/ApiController.php</code> 控制器文件, 内容如下：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-php-php-tag">&lt;?php</span>
+
+<span class="org-php-namespace-declaration">namespace</span> <span class="org-type">frontend\controllers</span>;
+
+<span class="org-php-import-declaration">use</span> <span class="org-type">yii\web\Controller</span>;
+
+<span class="org-php-class-declaration">class</span> <span class="org-type">ApiController</span> <span class="org-php-class-declaration-spec">extends</span> <span class="org-type">Controller</span>
+{
+    <span class="org-php-keyword">public</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">enableCsrfValidation</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">false</span>;
+
+    <span class="org-php-keyword">public</span> <span class="org-php-keyword">function</span> <span class="org-php-function-name">actionLogin</span>()
+    {
+    <span class="org-php-keyword">return</span> <span class="org-php-function-call-traditional">json_encode</span>([
+        <span class="org-php-string">'code'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> 200,
+        <span class="org-php-string">'data'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> [
+        <span class="org-php-string">'token'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-string">'some random string'</span>,
+        ],
+        <span class="org-php-string">'message'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-string">'OK'</span>,
+    ]);
+    }
+}
+</pre>
+</div></li>
+
+<li><p>
+生成测试类
+</p>
+
+<p>
+执行 <code>codecept generate:cest api LoginCest</code> 以生成 <code>tests/api/LoginCest.php</code> 测试类，然后在测试类中添加测试方法，修改后文件内容如下：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-php-php-tag">&lt;?php</span>
+
+<span class="org-php-namespace-declaration">namespace</span> <span class="org-type">frontend\tests\api</span>;
+
+<span class="org-php-import-declaration">use</span> <span class="org-type">Codeception\Util\HttpCode</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">frontend\tests\ApiTester</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">yii\helpers\Url</span>;
+
+<span class="org-php-class-declaration">class</span> <span class="org-type">LoginCest</span>
+{
+    <span class="org-php-keyword">public</span> <span class="org-php-keyword">function</span> <span class="org-php-function-name">_before</span>(<span class="org-type">ApiTester</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">I</span>)
+    {
+    }
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">tests</span>
+    <span class="org-php-keyword">public</span> <span class="org-php-keyword">function</span> <span class="org-php-function-name">tryToTest</span>(<span class="org-type">ApiTester</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">I</span>)
+    {
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">I</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">wantTo</span>(<span class="org-php-string">'&#30331;&#24405;'</span>);
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">I</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">haveHttpHeader</span>(<span class="org-php-string">'Accept'</span>, <span class="org-php-string">'application/json'</span>);
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">I</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">haveHttpHeader</span>(<span class="org-php-string">'Content-Type'</span>, <span class="org-php-string">'application/json'</span>);
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">I</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">sendPOST</span>(<span class="org-php-constant">Url</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">toRoute</span>(<span class="org-php-string">'/api/login'</span>), [<span class="org-php-string">'username'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-string">'username'</span>, <span class="org-php-string">'password'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-string">'password'</span>]);
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">I</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">seeResponseCodeIs</span>(<span class="org-php-constant">HttpCode</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">OK</span>);
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">I</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">canSeeResponseIsJson</span>();
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">I</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">canSeeResponseContainsJson</span>([<span class="org-php-string">'code'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> 200]);
+    }
+}
+</pre>
+</div></li>
+
+<li><p>
+执行测试 <code>codecept run api LoginCest</code>, 输出如下
+</p>
+
+<pre class="example" id="org0e49336">
+➜ codecept run api LoginCest
+Codeception PHP Testing Framework v4.0.3
+Powered by PHPUnit 8.5.2 by Sebastian Bergmann and contributors.
+Running with seed:
+
+Frontend\tests.api Tests (1) ----------------------------------------------------------------------------------------------------------------------------
+✔ LoginCest: 登录 (0.01s)
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Time: 127 ms, Memory: 12.00 MB
+
+OK (1 test, 4 assertions)
+
+</pre></li>
+</ol>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

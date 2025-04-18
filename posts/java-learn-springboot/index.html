@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SpringBoot 学习笔记</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Java, SpringBoot" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">SpringBoot 学习笔记</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2024-12-22</p>
+</header>
+<section id="outline-container-org7bb599c" class="outline-2">
+<h2 id="org7bb599c">Spring Initializr 生成的 SpringBoot 项目默认 pom.xml</h2>
+<div class="outline-text-2" id="text-org7bb599c">
+<div class="org-src-container">
+<pre class="src src-xml"><span class="org-nxml-processing-instruction-delimiter">&lt;?</span><span class="org-nxml-processing-instruction-target">xml</span> <span class="org-nxml-processing-instruction-content">version="1.0" encoding="UTF-8"</span><span class="org-nxml-processing-instruction-delimiter">?&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">project</span> <span class="org-nxml-namespace-attribute-xmlns">xmlns</span>=<span class="org-string">"http://maven.apache.org/POM/4.0.0"</span> <span class="org-nxml-namespace-attribute-xmlns">xmlns</span><span class="org-nxml-namespace-attribute-colon">:</span><span class="org-nxml-namespace-attribute-prefix">xsi</span>=<span class="org-string">"http://www.w3.org/2001/XMLSchema-instance"</span>
+         <span class="org-nxml-attribute-prefix">xsi</span><span class="org-nxml-attribute-colon">:</span><span class="org-nxml-attribute-local-name">schemaLocation</span>=<span class="org-string">"http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">modelVersion</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">4.0.0</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">modelVersion</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">parent</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">org.springframework.boot</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">spring-boot-starter-parent</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">2.7.18</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">relativePath</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-tag-delimiter">&gt;</span> <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">lookup parent from repository</span><span class="org-comment-delimiter"> --&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">parent</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">com.example</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">demo</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">0.0.1-SNAPSHOT</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">name</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">demo</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">name</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">description</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">Demo project for Spring Boot</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">description</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">url</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">licenses</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">license</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">licenses</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">developers</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">developer</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">developers</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">scm</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">connection</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">developerConnection</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">tag</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">url</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">scm</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">java.version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">8</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">java.version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependencies</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">org.springframework.boot</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">spring-boot-starter</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">org.springframework.boot</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">spring-boot-starter-test</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">scope</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">test</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">scope</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependencies</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">build</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugins</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">org.springframework.boot</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">spring-boot-maven-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugins</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">build</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">project</span><span class="org-nxml-tag-delimiter">&gt;</span>
+</pre>
+</div>
+
+<p>
+注意：当没有引入 <code>spring-boot-starter-web</code> 依赖时，启动应用后立即结束，并不会作为常驻进程。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org694a4df" class="outline-2">
+<h2 id="org694a4df">SpringBoot 项目打包运行</h2>
+<div class="outline-text-2" id="text-org694a4df">
+<ol class="org-ol">
+<li><p>
+引入打包插件
+</p>
+
+<div class="org-src-container">
+<pre class="src src-xml"><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">build</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugins</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">org.springframework.boot</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">spring-boot-maven-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugins</span><span class="org-nxml-tag-delimiter">&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">build</span><span class="org-nxml-tag-delimiter">&gt;</span>
+</pre>
+</div></li>
+
+<li><p>
+执行打包命令
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">mvn package
+</pre>
+</div></li>
+</ol>
+
+<p>
+打包成功后可以在 <code>target</code> 目录下找到生成的 JAR 包文件
+</p>
+
+<ol class="org-ol">
+<li>运行 JAR 包</li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-shell">java -jar my-application.jar
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#35206;&#30422;&#37197;&#32622;&#25991;&#20214;&#20013;&#30340;&#21442;&#25968;</span>
+java -jar my-application.jar --spring.profiles.active=dev --server.port=8080
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org231a180" class="outline-2">
+<h2 id="org231a180">main 方法中的 <code>String[] args</code> 参数</h2>
+<div class="outline-text-2" id="text-org231a180">
+<div class="org-src-container">
+<pre class="src src-java"><span class="org-keyword">public</span> <span class="org-keyword">static</span> <span class="org-type">void</span> <span class="org-function-name">main</span>(<span class="org-type">String</span>[] <span class="org-variable-name">args</span>) {
+    System.out.println(Arrays.toString(args));
+    SpringApplication.run(MyApplication.<span class="org-keyword">class</span>, args);
+}
+</pre>
+</div>
+
+<p>
+当执行 <code>java -jar my-application --spring.profiles.active=dev --server.port=8080</code> 时，
+将看到 args 的输出内容为 [&ldquo;&#x2013;spring.profiles.active=dev&rdquo;, &ldquo;&#x2013;server.port=8080&rdquo;].
+</p>
+
+<p>
+所以，也可以自己在 main 方法中构造好参数，传入 SpringApplication.run() 方法。例如
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span class="org-keyword">public</span> <span class="org-keyword">static</span> <span class="org-type">void</span> <span class="org-function-name">main</span>(<span class="org-type">String</span>[] <span class="org-variable-name">args</span>) {
+    <span class="org-type">String</span>[] <span class="org-variable-name">arg</span> = <span class="org-keyword">new</span> <span class="org-type">String</span>[1];
+    arg[0] = <span class="org-string">"--spring.profiles.active=prod"</span>;
+    SpringApplication.run(MyApplication.<span class="org-keyword">class</span>, arg);
+}
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org1b7f19a" class="outline-2">
+<h2 id="org1b7f19a">SpringBoot 中配置文件的优先级</h2>
+<div class="outline-text-2" id="text-org1b7f19a">
+<p>
+从上至下优先级越来越高。
+同级别的路径中 properties 配置文件的优先级比 yml 配置文件的优先级高。
+</p>
+
+<ol class="org-ol">
+<li>classpath 中的 application.yml</li>
+<li>classpath 中的 config/application.yml</li>
+<li>当前工作目录中的 application.yml</li>
+<li>当前工作目录中的 config/application.yml</li>
+</ol>
+
+<p>
+注意：当前工作目录是指执行 java 命令时所处的目录。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org17409a4" class="outline-2">
+<h2 id="org17409a4">SpringBoot 多环境配置</h2>
+<div class="outline-text-2" id="text-org17409a4">
+</div>
+<div id="outline-container-org798d54f" class="outline-3">
+<h3 id="org798d54f">在同一个 yml 配置文件中配置不同的环境</h3>
+<div class="outline-text-3" id="text-org798d54f">
+<div class="org-src-container">
+<pre class="src src-yaml"><span class="org-variable-name">spring</span>:
+  <span class="org-variable-name">profiles</span>:
+    <span class="org-variable-name">active</span>: dev
+
+<span class="org-comment">---</span>
+<span class="org-variable-name">spring</span>:
+  <span class="org-variable-name">profiles</span>: dev
+
+<span class="org-variable-name">server</span>:
+  <span class="org-variable-name">port</span>: 8081
+
+<span class="org-comment">---</span>
+<span class="org-variable-name">spring</span>:
+  <span class="org-variable-name">profiles</span>: test
+
+<span class="org-variable-name">server</span>:
+  <span class="org-variable-name">port</span>: 8082
+
+<span class="org-comment">---</span>
+<span class="org-variable-name">spring</span>:
+  <span class="org-variable-name">profiles</span>: prod
+
+<span class="org-variable-name">server</span>:
+  <span class="org-variable-name">port</span>: 8083
+</pre>
+</div>
+
+<p>
+可以看到配置文件中默认激活的是 <code>dev</code> 环境，
+可以打包后执行 <code>java -jar my-application.jar --spring.profiles.active=prod</code> 指定激活的环境.
+</p>
+
+<p>
+注意： <code>spring.profiles=dev</code> 被标记为已废弃的方式，
+现在推荐使用 <code>spring.config.activete.on-profile=dev</code> 这种方式.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org2734310" class="outline-3">
+<h3 id="org2734310">使用不同的文件配置多个环境</h3>
+<div class="outline-text-3" id="text-org2734310">
+<ol class="org-ol">
+<li><code>application.yml</code> 公共配置</li>
+<li><code>application-dev.yml</code> 开发环境配置</li>
+<li><code>application-test.yml</code> 测试环境配置</li>
+<li><code>application-prod.yml</code> 生产环境配置</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org51d62cb" class="outline-3">
+<h3 id="org51d62cb">使用 <code>spring.profiles.include</code> 包含其他配置文件</h3>
+<div class="outline-text-3" id="text-org51d62cb">
+<p>
+比如，将数据库，缓存，消息队列等配置放置在不同的配置文件中，在主配置文件中使用 <code>include</code> 加载这些配置。
+</p>
+
+<p>
+假设有如下配置文件:
+</p>
+<pre class="example" id="org86f8929">
+application-db.yml
+application-kafka.yml
+application-redis.yml
+</pre>
+
+<p>
+主配置文件中可以这样配置:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span class="org-variable-name">spring</span>:
+  <span class="org-variable-name">profiles</span>:
+    <span class="org-variable-name">include</span>: db,kafka,redis
+</pre>
+</div>
+
+<p>
+启动应用后可以看到如下输出:
+</p>
+<pre class="example" id="org6f0e013">
+The following 3 profiles are active: "db", "kafka", "redis"
+</pre>
+
+<p>
+如果有相同的配置， 优先级顺序也是左边(db)优先级低， 右边(redis)优先级高。主配置文件中配置优先级是最低的。
+</p>
+
+<p>
+注意： <code>include</code> 的配置文件是不包含文件名中 <code>application-</code> 前缀的。如果写错了，启动时也是不会报错的，可能不容易发现。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc40d932" class="outline-3">
+<h3 id="orgc40d932">使用 <code>spring.profiles.group</code> 对配置文件分组</h3>
+<div class="outline-text-3" id="text-orgc40d932">
+<p>
+主配置文件中配置内容如下：
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span class="org-variable-name">spring</span>:
+  <span class="org-variable-name">profiles</span>:
+    <span class="org-variable-name">active</span>: prod
+    <span class="org-variable-name">group</span>:
+      <span class="org-variable-name">dev</span>: db,redis
+      <span class="org-variable-name">prod</span>: db,kafka
+</pre>
+</div>
+
+<p>
+启动时可以看到如下输出:
+</p>
+<pre class="example" id="orgdf710cf">
+The following 3 profiles are active: "prod", "db", "kafka"
+</pre>
+
+<p>
+同样，如果有相同配置时，由左至右优先级越来越高。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7602cfb" class="outline-3">
+<h3 id="org7602cfb"><code>springboot</code> 配置文件中读取 <code>pom.xml</code> 文件中属性</h3>
+<div class="outline-text-3" id="text-org7602cfb">
+<p>
+<code>pom.xml</code> 文件中包含如下内容：
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">profiles</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">profile</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">id</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">env_dev</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">id</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">profile</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">dev</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">profile</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">activation</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">activeByDefault</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">true</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">activeByDefault</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">activation</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">profile</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">profile</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">id</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">env_prod</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">id</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">profile</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">prod</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">profile</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">profile</span><span class="org-nxml-tag-delimiter">&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">profiles</span><span class="org-nxml-tag-delimiter">&gt;</span>
+</pre>
+</div>
+
+<p>
+<code>application.yml</code> 配置文件可以使用 <code>@属性名@</code> 占位符读取 <code>pom.xml</code> 中对应的配置属性值：
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><span class="org-variable-name">spring</span>:
+  <span class="org-variable-name">profiles</span>:
+    <span class="org-variable-name">active</span>: @profile@
+</pre>
+</div>
+
+<p>
+启动时可以看到如下输出:
+</p>
+<pre class="example" id="orgb6f293b">
+The following 1 profile is active: "dev"
+</pre>
+
+<p>
+这种配置方式带来的好处是开发阶段在 <code>Idea</code> 的 Maven 工具栏中可以直接通过勾选不同的环境来启动不同的环境。
+</p>
+
+<p>
+在使用 <code>Maven</code> 打包时，可以通过 <code>-P env_prod</code> 来指定激活的 <code>profile</code> .
+</p>
+
+<p>
+如果想要激活的 <code>profile</code> 不存在，可以在控制台看到如下警告：
+</p>
+<pre class="example" id="orgb542025">
+[WARNING] The requested profile "prod" could not be activated because it does not exist.
+</pre>
+
+<p>
+此时，使用的将是 <code>pom.xml</code> 配置了 <code>&lt;activeByDefault&gt;</code> 默认激活的配置。
+而如果没有配置任何默认激活的配置，也会打包成功，只是 <code>application.yml</code> 中的占位符 <code>@profile@</code> 将不会被替换。
+当执行 jar 时会报错:
+</p>
+<pre class="example" id="org0ddc39d">
+ERROR org.springframework.boot.SpringApplication - Application run failed
+org.yaml.snakeyaml.scanner.ScannerException: while scanning for the next token
+found character '@' that cannot start any token. (Do not use @ for indentation)
+ in 'reader', line 6, column 13:
+        active: @profile@
+                ^
+</pre>
+</div>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

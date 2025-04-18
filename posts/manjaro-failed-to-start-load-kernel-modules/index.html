@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Manjaro(ArchLinux)加载内核模块失败</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Manjaro, Archlinux, failed to start load kernel modules, failed to mount /boot/efi" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Manjaro(ArchLinux)加载内核模块失败</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2020-07-28</p>
+</header>
+<section id="outline-container-orgb4a3c55" class="outline-2">
+<h2 id="orgb4a3c55">前言</h2>
+<div class="outline-text-2" id="text-orgb4a3c55">
+<p>
+笔记本上安装的 <code>Win10</code> 和 <code>Manjaro</code> 双系统, 使用 <code>Grub2</code> 引导。
+前几天在 <code>Manjaro</code> 系统执行系统升级 <code>pacman -Syyuu</code>, 重启后发现无法正常进入 <code>Manjaro</code> 系统。
+报错信息如下：
+</p>
+<pre class="example" id="org1cc140e">
+[FAILED] Failed to start Load Kernel Modules.
+[FAILED] Failed to mount /boot/efi.
+[DEPEND] Dependency failed for Local File System.
+</pre>
+</div>
+</section>
+
+<section id="outline-container-org6ffdfbc" class="outline-2">
+<h2 id="org6ffdfbc">解决方案</h2>
+<div class="outline-text-2" id="text-org6ffdfbc">
+<p>
+出现这个问题的最直观原因就是升级了linux内核，导致系统无法正常启动。
+而更深层次的原因（“为什么升级了linux内核，就导致了系统无法正常启动”），可能是多种多样的。
+</p>
+
+<p>
+所以，解决方案也有两种。
+第一种，内核降级，回滚到升级前的版本（治标）。
+第二种，找到深层次的原因，对症下药（治本）。
+</p>
+</div>
+
+<div id="outline-container-org1278040" class="outline-3">
+<h3 id="org1278040">方案一：内核降级</h3>
+<div class="outline-text-3" id="text-org1278040">
+<ol class="org-ol">
+<li><p>
+进入紧急模式(Emergency Mode)
+</p>
+
+<p>
+当系统停止在报错页面后，尝试按键 <code>Ctrl + Alt + F2</code> 打开一个新的终端(tty)，使用 <code>root</code> 用户登入系统;
+</p></li>
+
+<li><p>
+确认升级之前的内核版本号
+</p>
+
+<p>
+可以从pacman的日志文件 <code>/var/log/pacman.log</code> 中找到需要的信息：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">cat /var/log/pacman.log | grep <span class="org-string">"upgraded linux"</span> | tail -n10
+</pre>
+</div>
+
+<pre class="example" id="orga135398">
+[2020-04-26T16:28:36+0800] [ALPM] upgraded linux-firmware (20200320.r1602.edf390c-1 -&gt; 20200421.r1628.78c0348-1)
+[2020-04-26T16:28:38+0800] [ALPM] upgraded linux419 (4.19.114-1 -&gt; 4.19.117-1)
+[2020-05-01T13:45:40+0800] [ALPM] upgraded linux-firmware (20200421.r1628.78c0348-1 -&gt; 20200424.r1632.b2cad6a-1)
+[2020-05-01T13:45:48+0800] [ALPM] upgraded linux419 (4.19.117-1 -&gt; 4.19.118-1)
+[2020-05-16T23:03:15+0800] [ALPM] upgraded linux419 (4.19.118-1 -&gt; 4.19.121-1)
+[2020-05-20T16:34:39+0800] [ALPM] upgraded linux419 (4.19.121-1 -&gt; 4.19.122-1)
+[2020-06-03T20:39:05+0800] [ALPM] upgraded linux-api-headers (5.4.17-1 -&gt; 5.6.11-1)
+[2020-06-03T20:39:45+0800] [ALPM] upgraded linux-firmware (20200424.r1632.b2cad6a-1 -&gt; 20200519.r1641.8ba6fa6-1)
+[2020-06-03T20:39:54+0800] [ALPM] upgraded linux419 (4.19.122-1 -&gt; 4.19.125-1)
+[2020-07-22T09:04:34+0800] [ALPM] upgraded linux419 (4.19.125-1 -&gt; 4.19.133-1)
+</pre>
+
+<p>
+可以看到，最后一次内核升级是从 4.19.125 升级到 4.19.133。
+</p></li>
+
+<li><p>
+执行降级安装
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">pacman -U /var/cache/pacman/pkg/linux419-4.19.125-1-x86_64.pkg.tar.xz
+</pre>
+</div></li>
+
+<li><p>
+重启
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">reboot
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org54fb04d" class="outline-3">
+<h3 id="org54fb04d">方案二：找深层次原因，对症下药</h3>
+<div class="outline-text-3" id="text-org54fb04d">
+<p>
+找深层次原因，确实是一件费时费力的活。
+找原因的过程我就略过不讲了，太琐碎了，就是各种google，各种尝试。
+最终确定了是因为pacman安装的内核版本和进入系统时加载的内核版本不同，
+这个描述可能并不正确，毕竟我也没理解透彻。
+</p>
+
+<p>
+其实是 <code>uname -r</code> 和 <code>pacman -Q linux</code> 两个命令显示的linux内核版本不同。
+</p>
+
+<pre class="example" id="org90249de">
+$ uname -r
+4.19.125-1-MANJARO
+
+$ pacman -Q linux
+linux419 4.19.133-1
+</pre>
+
+<p>
+至于为什么会出现这个现象，原理（理论知识）上我现在也讲不明白。
+但是跟系统的启动引导肯定有关系。
+查看 <code>/etc/fstab</code> 配置，发现 EFI系统分区 是挂载到 <code>/boot/efi</code> 目录的。
+因此又回想到，再往前一段时间，因为笔记本开机无法进入 <code>GRUB引导</code> 页面, 而是直接进入Win10系统，
+我通过 archlinux livecd U盘 修复过一次 grub 引导（修复过程找机会再写一遍文章记录一下）。
+当时我是把 EFI系统分区 直接挂载到了 <code>/boot</code> ，且在执行 <code>grub-install</code> 时， <code>--efi-directory</code> 参数指定的也是 <code>/boot</code> 目录。
+最后试验证明，问题确实在这，修复（即验证）步骤如下：
+</p>
+
+<ol class="org-ol">
+<li>通过方案一回滚内核版本后，正常进入系统</li>
+<li><p>
+确认EFI系统分区确实是挂载到了 <code>/boot/efi</code> 目录
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">mount | grep <span class="org-string">"boot"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">OR</span>
+findmnt /boot/efi
+</pre>
+</div></li>
+<li><p>
+重新执行 <code>grub-install</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">grub-install --recheck /dev/sda --efi-directory=/boot/efi
+update-grub
+</pre>
+</div></li>
+<li><p>
+再次升级内核
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">pacman -Syyuu
+</pre>
+</div></li>
+<li><p>
+重启
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">reboot
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+</section>
+
+<section id="outline-container-orgba4b853" class="outline-2">
+<h2 id="orgba4b853">命令汇总</h2>
+<div class="outline-text-2" id="text-orgba4b853">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#26597;&#30475;&#31995;&#32479;&#20449;&#24687;</span>
+uname -a
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#26597;&#30475;&#24050;&#23433;&#35013;&#30340;linux&#21253;</span>
+pacman -Q linux
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20998;&#26512;&#25152;&#26377;&#21487;&#29992;&#27169;&#22359;</span>
+depmod -an
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#26597;&#30475;&#30828;&#30424;&#20998;&#21306;&#34920;</span>
+fdisk -l
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#26597;&#30475;&#25152;&#26377;&#21487;&#29992;&#22359;&#35774;&#22791;&#30340;&#20449;&#24687;</span>
+lsblk -f
+<span class="org-comment-delimiter"># </span><span class="org-comment">fstab&#25991;&#20214;&#21487;&#29992;&#20110;&#23450;&#20041;&#30913;&#30424;&#20998;&#21306;&#12289;&#21508;&#31181;&#20854;&#20182;&#22359;&#35774;&#22791;&#25110;&#36828;&#31243;&#25991;&#20214;&#31995;&#32479;&#35813;&#22914;&#20309;&#35013;&#20837;&#25991;&#20214;&#31995;&#32479;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#27599;&#20010;&#25991;&#20214;&#31995;&#32479;&#22312;&#19968;&#20010;&#21333;&#29420;&#30340;&#34892;&#20013;&#25551;&#36848;&#12290;&#36825;&#20123;&#23450;&#20041;&#23558;&#22312;&#24341;&#23548;&#26102;&#21160;&#24577;&#22320;&#36716;&#25442;&#20026;&#31995;&#32479;&#25346;&#36733;&#21333;&#20803;&#65292;&#24182;&#22312;&#31995;&#32479;&#31649;&#29702;&#22120;&#30340;&#37197;&#32622;&#37325;&#26032;&#21152;&#36733;&#26102;&#36716;&#25442;&#12290;</span>
+cat /etc/fstab
+mount | grep <span class="org-string">"boot"</span>
+findmnt /boot
+systemctl status systemd-modules-load.service
+systemctl status boot-efi.mount
+grep <span class="org-string">"crypto_user"</span> -r /etc/modules-load.d /usr/lib/modules-load.d
+pacman -Qo /usr/lib/modules-load.d/bluez.conf
+pacman -Rsc bluez
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org84738d4" class="outline-2">
+<h2 id="org84738d4">参考</h2>
+<div class="outline-text-2" id="text-org84738d4">
+<ul class="org-ul">
+<li><a href="https://wiki.archlinux.org/index.php/Arch_boot_process">ArchLinux启动引导流程</a></li>
+<li><a href="https://wiki.archlinux.org/index.php/EFI_system_partition">EFI系统分区</a></li>
+<li><a href="https://wiki.archlinux.org/index.php/Unified_Extensible_Firmware_Interface">统一可扩展固件接口UEFI</a></li>
+</ul>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

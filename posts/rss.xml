@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+     xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+     xmlns:georss="http://www.georss.org/georss"
+     xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+     xmlns:media="http://search.yahoo.com/mrss/"><channel>
+  <title>珊瑚礁上的程序员</title>
+  <atom:link href="https://demokn.github.io/blog/posts/rss.xml" rel="self" type="application/rss+xml" />
+  <link>https://demokn.github.io/blog/posts/</link>
+  <description><![CDATA[]]></description>
+  <language>en</language>
+  <pubDate>Fri, 18 Apr 2025 16:29:27 +0000</pubDate>
+  <lastBuildDate>Fri, 18 Apr 2025 16:29:27 +0000</lastBuildDate>
+  <generator>Emacs 28.2 Org-mode 9.5.5</generator>
+  <webMaster>runner@fv-az2210-705 (nil)</webMaster>
+  <image>
+    <url>https://orgmode.org/img/org-mode-unicorn-logo.png</url>
+    <title>珊瑚礁上的程序员</title>
+    <link>https://demokn.github.io/blog/posts/</link>
+  </image>
+
+
+  <item>
+    <title>Orgmode 示例</title>
+    <link>https://demokn.github.io/blog/posts/emacs-orgmode-example/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/emacs-orgmode-example/index.html</guid>
+    <pubDate>Sun, 19 Jan 2025 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Maven 学习笔记</title>
+    <link>https://demokn.github.io/blog/posts/java-learn-maven/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/java-learn-maven/index.html</guid>
+    <pubDate>Sun, 12 Jan 2025 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>使用 Java 实现一个极简的静态资源 HTTP 服务器</title>
+    <link>https://demokn.github.io/blog/posts/java-simple-static-resources-http-server/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/java-simple-static-resources-http-server/index.html</guid>
+    <pubDate>Sun, 29 Dec 2024 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>SpringBoot 学习笔记</title>
+    <link>https://demokn.github.io/blog/posts/java-learn-springboot/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/java-learn-springboot/index.html</guid>
+    <pubDate>Sun, 22 Dec 2024 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Manjaro/Archlinux 使用PKGBUILD 安装指定版本的软件</title>
+    <link>https://demokn.github.io/blog/posts/archlinux-package-build-description-file-PKGBUILD/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/archlinux-package-build-description-file-PKGBUILD/index.html</guid>
+    <pubDate>Tue, 26 Mar 2024 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Manjaro滚挂了如何回滚</title>
+    <link>https://demokn.github.io/blog/posts/undo-an-update-in-manjaro/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/undo-an-update-in-manjaro/index.html</guid>
+    <pubDate>Tue, 12 Mar 2024 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>将大文件切割成多个小文件</title>
+    <link>https://demokn.github.io/blog/posts/split-large-file-into-pieces/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/split-large-file-into-pieces/index.html</guid>
+    <pubDate>Fri, 26 Jan 2024 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>如何查看当前正在运行的shell是bash zsh 还是 *sh</title>
+    <link>https://demokn.github.io/blog/posts/how-to-know-which-shell-you-are-running/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/how-to-know-which-shell-you-are-running/index.html</guid>
+    <pubDate>Sun, 07 Jan 2024 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>sed 小知识</title>
+    <link>https://demokn.github.io/blog/posts/learn-sed-the-hard-way/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/learn-sed-the-hard-way/index.html</guid>
+    <pubDate>Sat, 06 Jan 2024 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Shell 中输出彩色字体</title>
+    <link>https://demokn.github.io/blog/posts/shell-colorful-output/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/shell-colorful-output/index.html</guid>
+    <pubDate>Sat, 30 Dec 2023 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>VIM 编辑器实用技巧</title>
+    <link>https://demokn.github.io/blog/posts/vim-practical-skills/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/vim-practical-skills/index.html</guid>
+    <pubDate>Sat, 30 Dec 2023 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>在离线的电脑上如何使用pip安装python依赖包</title>
+    <link>https://demokn.github.io/blog/posts/python-pip-install-third-packages-in-offline-machine/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/python-pip-install-third-packages-in-offline-machine/index.html</guid>
+    <pubDate>Fri, 29 Dec 2023 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>在 =IDEA= 中查看 =JDK= 源码注释</title>
+    <link>https://demokn.github.io/blog/posts/view-java-jdk-src-comments-in-idea/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/view-java-jdk-src-comments-in-idea/index.html</guid>
+    <pubDate>Tue, 21 Nov 2023 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Java 碎片化知识点</title>
+    <link>https://demokn.github.io/blog/posts/java-fragment-knowledge/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/java-fragment-knowledge/index.html</guid>
+    <pubDate>Fri, 25 Aug 2023 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>shell中进行四则运算</title>
+    <link>https://demokn.github.io/blog/posts/shell-arithmetic/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/shell-arithmetic/index.html</guid>
+    <pubDate>Wed, 05 Jul 2023 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>AWK - 强大的文本处理工具</title>
+    <link>https://demokn.github.io/blog/posts/awk-usage/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/awk-usage/index.html</guid>
+    <pubDate>Mon, 19 Jun 2023 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>使用 mysqldump 备份数据库</title>
+    <link>https://demokn.github.io/blog/posts/mysqldump/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/mysqldump/index.html</guid>
+    <pubDate>Tue, 30 May 2023 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Shell 脚本实现ssh 密码登录</title>
+    <link>https://demokn.github.io/blog/posts/ssh-login-via-password-in-shell-script/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/ssh-login-via-password-in-shell-script/index.html</guid>
+    <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Shell 中大括号的用法</title>
+    <link>https://demokn.github.io/blog/posts/the-usage-of-braces-in-shell/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/the-usage-of-braces-in-shell/index.html</guid>
+    <pubDate>Fri, 19 May 2023 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>如何在 Chrome 浏览器的Dev Tools - Console 中设置cookie</title>
+    <link>https://demokn.github.io/blog/posts/set-cookies-in-google-chrome-dev-tools-console/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/set-cookies-in-google-chrome-dev-tools-console/index.html</guid>
+    <pubDate>Tue, 06 Dec 2022 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>一些不常使用但有趣的 Git 命令</title>
+    <link>https://demokn.github.io/blog/posts/infrequently-used-but-interesting-git-command/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/infrequently-used-but-interesting-git-command/index.html</guid>
+    <pubDate>Wed, 23 Nov 2022 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>使用 shadowsocks + frp 完全的访问内网资源</title>
+    <link>https://demokn.github.io/blog/posts/secure-access-to-intranet-resources-via-shadowsocks-and-frp/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/secure-access-to-intranet-resources-via-shadowsocks-and-frp/index.html</guid>
+    <pubDate>Thu, 27 Oct 2022 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>OpenSSH 格式的密钥转换为 PEM 格式</title>
+    <link>https://demokn.github.io/blog/posts/convert-openssh-private-key-to-rsa-pem-format/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/convert-openssh-private-key-to-rsa-pem-format/index.html</guid>
+    <pubDate>Wed, 29 Jun 2022 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>使用 gitcredentials 避免每次都要输入用户名密码</title>
+    <link>https://demokn.github.io/blog/posts/use-git-credentials-to-avoid-askpass-every-time/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/use-git-credentials-to-avoid-askpass-every-time/index.html</guid>
+    <pubDate>Wed, 29 Jun 2022 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Linux 下完全卸载 deepin wine 应用</title>
+    <link>https://demokn.github.io/blog/posts/uninstall-deepin-wine-application-completely/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/uninstall-deepin-wine-application-completely/index.html</guid>
+    <pubDate>Sun, 26 Jun 2022 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Manjaro 安装 CA 证书</title>
+    <link>https://demokn.github.io/blog/posts/adding-a-trusted-ca-certificate/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/adding-a-trusted-ca-certificate/index.html</guid>
+    <pubDate>Fri, 31 Dec 2021 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Linux 重新获取局域网IP 地址</title>
+    <link>https://demokn.github.io/blog/posts/renew-lan-ip-addr/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/renew-lan-ip-addr/index.html</guid>
+    <pubDate>Fri, 24 Dec 2021 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>EasySwoole 踩坑指南</title>
+    <link>https://demokn.github.io/blog/posts/use-easyswoole-the-right-way/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/use-easyswoole-the-right-way/index.html</guid>
+    <pubDate>Thu, 25 Nov 2021 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>尝试使用 Manjaro Linux 做为主力开发机</title>
+    <link>https://demokn.github.io/blog/posts/use-manjaro-as-my-primary-os/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/use-manjaro-as-my-primary-os/index.html</guid>
+    <pubDate>Sun, 07 Nov 2021 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Arch Linux 下调教笔记本的触控板</title>
+    <link>https://demokn.github.io/blog/posts/setup-touchpad-on-arch-linux/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/setup-touchpad-on-arch-linux/index.html</guid>
+    <pubDate>Tue, 25 May 2021 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Linux 配置 Apple Magic Keyboard</title>
+    <link>https://demokn.github.io/blog/posts/setup-apple-keyboard-on-arch-linux/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/setup-apple-keyboard-on-arch-linux/index.html</guid>
+    <pubDate>Sat, 06 Feb 2021 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Phabricator 安装过程</title>
+    <link>https://demokn.github.io/blog/posts/phabricator-installation-guide/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/phabricator-installation-guide/index.html</guid>
+    <pubDate>Fri, 22 Jan 2021 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Chrome 键盘快捷键</title>
+    <link>https://demokn.github.io/blog/posts/google-chrome-shortcuts/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/google-chrome-shortcuts/index.html</guid>
+    <pubDate>Sun, 17 Jan 2021 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Win10 使用 Laravel Homestead 碰到的一些问题</title>
+    <link>https://demokn.github.io/blog/posts/laravel-homestead-with-windows-10/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/laravel-homestead-with-windows-10/index.html</guid>
+    <pubDate>Wed, 28 Oct 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Manjaro(ArchLinux)加载内核模块失败</title>
+    <link>https://demokn.github.io/blog/posts/manjaro-failed-to-start-load-kernel-modules/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/manjaro-failed-to-start-load-kernel-modules/index.html</guid>
+    <pubDate>Tue, 28 Jul 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>SSH 端口转发应用实例</title>
+    <link>https://demokn.github.io/blog/posts/ssh-port-forwarding/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/ssh-port-forwarding/index.html</guid>
+    <pubDate>Mon, 08 Jun 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>使用 PHP 获取网站 SSL 证书信息</title>
+    <link>https://demokn.github.io/blog/posts/get-ssl-certificate-info-from-a-remote-server-with-php/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/get-ssl-certificate-info-from-a-remote-server-with-php/index.html</guid>
+    <pubDate>Mon, 25 May 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>使用 Syncthing 实现跨设备同步文件</title>
+    <link>https://demokn.github.io/blog/posts/sync-files-across-multiple-devices-with-syncthing/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/sync-files-across-multiple-devices-with-syncthing/index.html</guid>
+    <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>门店收银系统解决方案</title>
+    <link>https://demokn.github.io/blog/posts/pos-system-solution/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/pos-system-solution/index.html</guid>
+    <pubDate>Thu, 12 Mar 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Org Agenda 模式下常用快捷键</title>
+    <link>https://demokn.github.io/blog/posts/getting-start-with-org-agenda/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/getting-start-with-org-agenda/index.html</guid>
+    <pubDate>Tue, 10 Mar 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Xfce4 窗口管理器</title>
+    <link>https://demokn.github.io/blog/posts/xfce-xfwm4-window-manager/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/xfce-xfwm4-window-manager/index.html</guid>
+    <pubDate>Wed, 26 Feb 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Org-mode 执行 org-refile 报错 "Invalid function: ..."</title>
+    <link>https://demokn.github.io/blog/posts/emacs-orgmode-invalid-function-error-when-executing-org-refile/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/emacs-orgmode-invalid-function-error-when-executing-org-refile/index.html</guid>
+    <pubDate>Mon, 24 Feb 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Nginx + PHP-FPM: "Primary script unknown" 问题排查</title>
+    <link>https://demokn.github.io/blog/posts/nginx-1-fastcgi-sent-in-stderr-primary-script-unknown/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/nginx-1-fastcgi-sent-in-stderr-primary-script-unknown/index.html</guid>
+    <pubDate>Sun, 09 Feb 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>使用 Codeception 对 Yii2 进行 API 测试</title>
+    <link>https://demokn.github.io/blog/posts/codeception-for-yii2-app-advanced/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/codeception-for-yii2-app-advanced/index.html</guid>
+    <pubDate>Sun, 02 Feb 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>常用软件和工具集</title>
+    <link>https://demokn.github.io/blog/posts/awesome-software/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/awesome-software/index.html</guid>
+    <pubDate>Thu, 16 Jan 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Arch Linux 包管理工具 pacman 使用总结</title>
+    <link>https://demokn.github.io/blog/posts/arch-linux-package-manager-pacman-usage/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/arch-linux-package-manager-pacman-usage/index.html</guid>
+    <pubDate>Wed, 08 Jan 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Markdown Cheat Sheet</title>
+    <link>https://demokn.github.io/blog/posts/cheat-sheet-for-markdown/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/cheat-sheet-for-markdown/index.html</guid>
+    <pubDate>Mon, 06 Jan 2020 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>Composer 依赖包安装版本与已发布最新版不符且无法更新</title>
+    <link>https://demokn.github.io/blog/posts/troubleshooting-some-composer-packages-cant-update-from-aliyun-mirror/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/troubleshooting-some-composer-packages-cant-update-from-aliyun-mirror/index.html</guid>
+    <pubDate>Thu, 05 Dec 2019 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>微信生态开发-零散知识点</title>
+    <link>https://demokn.github.io/blog/posts/get-started-with-wechat-ecosystem-development/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/get-started-with-wechat-ecosystem-development/index.html</guid>
+    <pubDate>Mon, 18 Nov 2019 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>GIMP 日常应用</title>
+    <link>https://demokn.github.io/blog/posts/gimp-daily-usage/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/gimp-daily-usage/index.html</guid>
+    <pubDate>Fri, 15 Nov 2019 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>通过 Chrome Console 填写表单内容未生效</title>
+    <link>https://demokn.github.io/blog/posts/troubleshooting-fill-a-react-form-from-chrome-console/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/troubleshooting-fill-a-react-form-from-chrome-console/index.html</guid>
+    <pubDate>Fri, 15 Nov 2019 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>使用 Travis-CI 自动化部署 GitHub Pages</title>
+    <link>https://demokn.github.io/blog/posts/use-travis-ci-to-automate-publishing-to-github-pages/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/use-travis-ci-to-automate-publishing-to-github-pages/index.html</guid>
+    <pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <title>使用 git-hooks + phpcs + composer-scripts 践行PHP编码规范</title>
+    <link>https://demokn.github.io/blog/posts/use-git-hooks-and-phpcs-and-composer-scripts-to-practice-php-coding-startand/index.html</link>
+    <author>runner@fv-az2210-705 (nil)</author>
+    <guid isPermaLink="false">https://demokn.github.io/blog/posts/use-git-hooks-and-phpcs-and-composer-scripts-to-practice-php-coding-startand/index.html</guid>
+    <pubDate>Mon, 22 Jul 2019 00:00:00 +0000</pubDate>
+
+    <description><![CDATA[]]></description>
+  </item>
+</channel>
+</rss>

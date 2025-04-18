@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AWK - 强大的文本处理工具</title>
+<meta name="keywords" content="珊瑚礁上的程序员, awk, vim" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">AWK - 强大的文本处理工具</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2023-06-19</p>
+</header><p>
+<code>awk</code> 是一款强大的文本处理工具， <code>awk</code> 把文件逐行的读入，以空格为默认分隔符将每行切片，切开的部分再进行各种分析处理。
+</p>
+
+<section id="outline-container-orga5c5ec8" class="outline-2">
+<h2 id="orga5c5ec8"><code>AWK</code> 命令基本语法</h2>
+<div class="outline-text-2" id="text-orga5c5ec8">
+<p>
+AWK 命令的基本语法如下：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">awk <span class="org-string">'pattern {action}'</span> file
+</pre>
+</div>
+
+<p>
+其中， <code>pattern</code> 是模式，用于匹配文件中的文本行； <code>action</code> 是动作，用于对匹配到的文本行进行处理。
+<code>file</code> 是待处理的文件名，可以省略，此时 AWK 命令将从标准输入中读取数据。
+</p>
+
+<p>
+AWK 命令的执行流程如下：
+</p>
+
+<ol class="org-ol">
+<li>读取文件中的每一行文本；</li>
+<li>对每一行文本，依次检查所有的模式，如果有模式匹配成功，则执行对应的动作；</li>
+<li>处理完所有的文本行后，输出所有的结果。</li>
+</ol>
+
+<p>
+AWK 命令的模式可以是正则表达式，也可以是字符串，还可以是一个布尔表达式。
+动作可以是一条或多条命令，多条命令之间用分号隔开。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org9775b75" class="outline-2">
+<h2 id="org9775b75"><code>AWK</code> 命令内置变量</h2>
+<div class="outline-text-2" id="text-org9775b75">
+<p>
+AWK 命令有许多内置变量，可以用于处理文本数据。下面是一些常用的内置变量及其含义：
+</p>
+
+<ul class="org-ul">
+<li><code>NR</code> ：表示当前处理的行号；</li>
+<li><code>NF</code> ：表示当前行中的字段数；</li>
+<li><code>$0</code> ：表示当前行的所有内容；</li>
+<li><code>$1</code> 、 <code>$2</code> 、 <code>$3</code>  等：表示当前行中的第 1、2、3 个字段；</li>
+<li><code>FS</code> ：表示字段分隔符，默认为一个或多个空格；</li>
+<li><code>OFS</code> ：表示输出字段分隔符，默认为一个空格；</li>
+<li><code>RS</code> ：表示记录分隔符，默认为一个换行符；</li>
+<li><code>ORS</code> ：表示输出记录分隔符，默认为一个换行符；</li>
+<li><code>FILENAME</code> ：表示当前处理的文件名。</li>
+</ul>
+</div>
+</section>
+
+<section id="outline-container-org4dadcaa" class="outline-2">
+<h2 id="org4dadcaa"><code>AWK</code> 命令模式匹配</h2>
+<div class="outline-text-2" id="text-org4dadcaa">
+<p>
+AWK 命令的模式可以是正则表达式，也可以是字符串，还可以是一个布尔表达式。下面是一些常用的模式匹配方式：
+</p>
+
+<ul class="org-ul">
+<li><code>\/pattern\/</code> ：使用正则表达式匹配；</li>
+<li><code>$1 =</code> &ldquo;value&rdquo;= ：使用字符串匹配；</li>
+<li><code>NR &gt; 1</code> ：使用布尔表达式匹配。</li>
+</ul>
+</div>
+</section>
+
+<section id="outline-container-orgecb9380" class="outline-2">
+<h2 id="orgecb9380"><code>AWK</code> 命令动作</h2>
+<div class="outline-text-2" id="text-orgecb9380">
+<p>
+AWK 命令的动作可以是一条或多条命令，多条命令之间用分号隔开。下面是一些常用的动作：
+</p>
+
+<ul class="org-ul">
+<li><code>print</code> ：打印当前行或指定的字段；</li>
+<li><code>printf</code> ：格式化输出；</li>
+<li><code>getline</code> ：读取下一行文本；</li>
+<li><code>next</code> ：跳过当前行；</li>
+<li><code>if/else</code> ：条件语句；</li>
+<li><code>for/while</code> ：循环语句；</li>
+<li><code>split</code> ：将字符串分割成数组。</li>
+</ul>
+</div>
+</section>
+
+<section id="outline-container-org767752b" class="outline-2">
+<h2 id="org767752b"><code>AWK</code> 命令常用示例</h2>
+<div class="outline-text-2" id="text-org767752b">
+</div>
+<div id="outline-container-orgf6f90b4" class="outline-4">
+<h4 id="orgf6f90b4">统计文件中每个单词的出现次数</h4>
+<div class="outline-text-4" id="text-orgf6f90b4">
+<div class="org-src-container">
+<pre class="src src-shell">awk <span class="org-string">'{for(i=1;i&lt;=NF;i++) count[$i]++} END {for(j in count) print j, count[j]}'</span> file.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org832b545" class="outline-4">
+<h4 id="org832b545">计算文件中每一行的字符数</h4>
+<div class="outline-text-4" id="text-org832b545">
+<div class="org-src-container">
+<pre class="src src-shell">awk <span class="org-string">'{print length}'</span> file.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5dcf4a0" class="outline-4">
+<h4 id="org5dcf4a0">格式化输出文件中的数据</h4>
+<div class="outline-text-4" id="text-org5dcf4a0">
+<div class="org-src-container">
+<pre class="src src-shell">awk -F, <span class="org-string">'{printf "%-10s %-10s %5d\n", $1, $2, $3}'</span> file.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3078bec" class="outline-4">
+<h4 id="org3078bec">删除文件中的空行</h4>
+<div class="outline-text-4" id="text-org3078bec">
+<div class="org-src-container">
+<pre class="src src-shell">awk <span class="org-string">'NF &gt; 0'</span> file.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5202fad" class="outline-4">
+<h4 id="org5202fad">提取文件中的某一列数据</h4>
+<div class="outline-text-4" id="text-org5202fad">
+<div class="org-src-container">
+<pre class="src src-shell">awk <span class="org-string">'{print $2}'</span> file.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org48d287b" class="outline-4">
+<h4 id="org48d287b">替换文件中的某个字符串</h4>
+<div class="outline-text-4" id="text-org48d287b">
+<div class="org-src-container">
+<pre class="src src-shell">awk <span class="org-string">'{gsub(/old/, "new"); print}'</span> file.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf9b73d0" class="outline-4">
+<h4 id="orgf9b73d0">计算最长的行</h4>
+<div class="outline-text-4" id="text-orgf9b73d0">
+<div class="org-src-container">
+<pre class="src src-shell">awk <span class="org-string">'{ if (length &gt; max) { max = length; longest = $0 } } END { print longest }'</span> file.txt
+</pre>
+</div>
+
+<p>
+其中， <code>length</code> 是 <code>AWK</code> 内置变量，表示当前行的字符数；
+<code>max</code> 和 <code>longest</code> 是自定义变量，分别用于保存最大长度和最长的行。
+在每一行处理时，如果当前行的长度大于 <code>max</code> ，则更新 <code>max</code> 和 <code>longest</code> 的值。
+在处理完所有行后，输出 <code>longest</code> 即可。
+</p>
+
+<p>
+注意，如果文件中有多行长度相同且都是最长的行，则只会输出其中任意一行。
+如果需要输出所有最长的行，可以使用以下命令：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">awk <span class="org-string">'{ if (length &gt; max) { max = length; delete longest; longest[NR] = $0 } else if (length == max) { longest[NR] = $0 } } END { for (i in longest) print longest[i] }'</span> file.txt
+</pre>
+</div>
+
+<p>
+该命令使用了一个数组 <code>longest</code> ，用于保存所有最长的行。
+在每一行处理时，如果当前行的长度大于 <code>max</code> ，则清空 <code>longest</code> 并将当前行加入数组；
+如果当前行的长度等于 <code>max</code> ，则将当前行加入数组。
+在处理完所有行后，输出数组中的所有元素即可。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge82ef6c" class="outline-4">
+<h4 id="orge82ef6c">互换奇数行和偶数行</h4>
+<div class="outline-text-4" id="text-orge82ef6c">
+<div class="org-src-container">
+<pre class="src src-shell">awk <span class="org-string">'{a[NR]=$0} END{for(i=1;i&lt;=NR;i+=2){if(i==NR){print a[i]}else{print a[i+1];print a[i]}}}'</span> file.txt
+</pre>
+</div>
+
+<p>
+该命令的含义是，将文件中的每一行存储到数组 <code>a</code> 中，然后对数组进行处理，将奇数行和偶数行互换，并输出到标准输出流中。
+</p>
+
+<p>
+具体实现原理如下：
+</p>
+
+<ul class="org-ul">
+<li><code>a[NR]=$0</code> ：将当前行存储到数组 <code>a</code> 的第 <code>NR</code> 个元素中。</li>
+<li><code>END{}</code> ：在处理完文件后执行的操作。</li>
+<li><code>for(i=1;i&lt;=NR;i+=2)</code> ：遍历数组 <code>a</code> 中的所有元素，步长为 2。</li>
+<li><code>if(i==NR){print a[i]}</code> ：如果当前行是最后一行，则直接输出该行。</li>
+<li><code>else{print a[i+1];print a[i]}</code> ：否则，输出下一行和当前行，实现奇偶行的互换。</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="outline-container-orge07be09" class="outline-2">
+<h2 id="orge07be09">心有多大, 舞台就有多大</h2>
+<div class="outline-text-2" id="text-orge07be09">
+</div>
+<div id="outline-container-orgbb2db21" class="outline-4">
+<h4 id="orgbb2db21">将三方 API 文档中的字段描述转换为 <code>DTO</code> 类的属性</h4>
+<div class="outline-text-4" id="text-orgbb2db21">
+<p>
+三方 API 文档长这样:
+</p>
+
+
+<figure id="org661b39f">
+<img src="./三方API文档.png" alt="三方 API 文档" class="d-block mw-100 mx-auto" title="三方 API 文档">
+
+</figure>
+
+<p>
+转换成 DTO 后长这样:
+</p>
+
+
+<figure id="orge921502">
+<img src="./转换成DTO类的属性.png" alt="转换成 DTO 类的属性" class="d-block mw-100 mx-auto" title="转换成 DTO 类的属性">
+
+</figure>
+
+<p>
+处理的思路是这样色的：
+</p>
+<ol class="org-ol">
+<li>将三方 API 文档复制到 <code>vim</code> 编辑器</li>
+<li><p>
+将制表符 <code>\t</code> 替换为换行符 <code>\n</code>, 处理之后将会得到 字段名 和 描述 各占一行(字段名在上, 描述在下)
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">:%s/\t/\n/
+</pre>
+</div></li>
+<li>使用 <code>awk</code> 将奇数行和偶数行交换(为了让描述在上, 字段名在下)</li>
+<li><p>
+在完成第 3 步的同时, 可以拼接额外的字符串, 以满足不同编程语言的语法规则
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">:%!awk <span class="org-string">'{a[NR]=$0} END{for(i=1;i&lt;=NR;i+=2){if(i==NR){print a[i]}else{print "/**" RS " * " a[i+1] RS " */" ; print "private String " a[i] ";" RS}}}'</span>
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

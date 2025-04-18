@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Xfce4 窗口管理器</title>
+<meta name="keywords" content="珊瑚礁上的程序员, linux, window manager, window manager tweaks, xfce, xfwm, xfce4, xfwm4" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Xfce4 窗口管理器</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2020-02-26</p>
+</header>
+<section id="outline-container-org29d880f" class="outline-2">
+<h2 id="org29d880f">介绍</h2>
+<div class="outline-text-2" id="text-org29d880f">
+<p>
+Xfce4 窗口管理器是Xfce桌面环境的一部分。
+在前台运行它的命令是 <code>xfwm4</code> ; 在后台使用它 <code>xfwm4 –daemon</code> 。
+窗口管理器负责窗口在屏幕上的放置，提供窗口装饰，并允许它们移动，调整大小或关闭。
+</p>
+
+<p>
+xfwm4严格遵守 <a href="http://freedesktop.org/">freedesktop.org</a> 上定义的标准。
+因此，现在必须在应用程序中实现一些特殊功能，例如使窗口无边界或为应用程序提供图标。
+您将无法再使用窗口管理器来强制执行其他行为。
+xfwm4的一大特色是其主题性。可以在 <a href="http://xfce-look.org/">Xfce-Look</a> 上找到主题。
+可以使用窗口管理器主题来配置窗口装饰（边框，标题栏和窗口按钮）。
+</p>
+
+<p>
+xfwm4为多屏拼接和真正的多屏模式均提供了多传感头支持（<a href="https://wiki.archlinux.org/index.php/Multihead">Multihead</a>），这在您将多台显示器连接到电脑时非常有用。
+</p>
+
+<p>
+xfwm4可以独立运行，但是如果以这种方式使用，则需要 <a href="https://docs.xfce.org/xfce/xfce4-settings/start">Xfce Settings Manager</a> 作为GUI来进行配置更改。
+除管理窗口外，其他任务（例如设置背景图片或启动程序）需要由其他模块执行。
+</p>
+
+<p>
+xfwm4包括自己的合成管理器，该管理器利用了新 <code>X.org</code> 的服务器扩展。
+合成器本身就像一个仓库管理器。它管理着所有窗口的堆栈，监视各种X事件并做出相应的反应。
+将合成管理器嵌入到窗口管理器中还有助于使各种视觉效果与窗口事件保持同步。
+如果要使用合成器，则必须使用 <code>–enable-compositor</code> 选项来构建xfwm4。
+无论如何，您都可以使用 <code>–compositor=off</code> 参数在xfwm4启动时禁用该合成器。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org8769db7" class="outline-2">
+<h2 id="org8769db7">配置</h2>
+<div class="outline-text-2" id="text-org8769db7">
+</div>
+<div id="outline-container-org617806f" class="outline-3">
+<h3 id="org617806f">样式(Style)</h3>
+<div class="outline-text-3" id="text-org617806f">
+<p>
+<b>主题</b>:
+对话框左侧的列表显示所有可用的窗口装饰。
+xfwm 4模块可在少量主题之间进行选择，但xfwm4主题额外软件包中提供了更多补充主题。
+</p>
+
+<p>
+<b>标题字体</b>:
+<code>字体选择</code> 按钮显示当前用于窗口标题外观的系列字体。
+如果要更改它，请单击此按钮，然后将出现“字体选择”对话框。
+它的工作方式类似于外观设置的字体选择对话框。
+</p>
+
+<p>
+<b>标题对齐</b>:
+无论按钮的布局是什么，您都可以在标题栏中选择标题的对齐方式，
+然后选择以下简单选项之一：左对齐，居中对齐，右对齐。
+</p>
+
+<p>
+<b>按钮布局</b>:
+按钮布局配置使用简单的拖放工具。单击并拖动按钮以更改布局。
+在 <code>隐藏</code> 区域中放置一个按钮，以从标题栏中删除按钮。所有修改都会立即对标题栏按钮的位置产生影响。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org594ae7f" class="outline-3">
+<h3 id="org594ae7f">键盘(Keyboard)</h3>
+<div class="outline-text-3" id="text-org594ae7f">
+<p>
+<b>窗口操作快捷方式</b>:
+“操作”列显示Xfwm4管理的所有不同的快捷方式。
+您可以通过双击该行或按Enter来设置新的快捷方式。将出现一个对话框来设置新的组合键。
+</p>
+
+<p>
+<b>清除</b>:
+删除所选操作的组合键。
+</p>
+
+<p>
+<b>重置为默认</b>:
+将所有快捷方式重置为其默认值。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf02b842" class="outline-3">
+<h3 id="orgf02b842">焦点(Focus)</h3>
+<div class="outline-text-3" id="text-orgf02b842">
+<p>
+<b>焦点模型</b>:
+一个聚焦的窗口接收键盘和鼠标输入。您可以在两个焦点模型之间进行选择：
+</p>
+<ul class="org-ul">
+<li>点击聚焦: 窗口仅在单击其框架上的任何位置时才接收焦点</li>
+<li>焦点跟随鼠标: 窗口在鼠标指针悬停在其框架上时立即接收焦点</li>
+</ul>
+
+<p>
+<b>新窗口焦点</b>:
+选择此选项将自动将焦点移至新创建的窗口，而无需单击或移动鼠标指针。
+</p>
+
+<p>
+<b>聚焦抬高</b>:
+如果选择此选项，经过一段时间可以使用延迟滑块调整后，新聚焦窗口的框架将自动出现在所有其他框架上。
+</p>
+
+<p>
+<b>点击提高</b>:
+如果您希望在单击窗口框架上的任意位置时使一个窗口越过其他窗口，请选择此选项。
+如果未选择此选项，则必须单击其装饰的某处（标题栏，边框或角）以将其抬高。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge2ced14" class="outline-3">
+<h3 id="orge2ced14">高级设置(Advanced)</h3>
+<div class="outline-text-3" id="text-orge2ced14">
+<p>
+<b>Windows捕捉</b>:
+您可以选择移动其他窗口时要被其他窗口的边界或屏幕边缘吸引的窗口边界。
+可以使用&ldquo;距离&rdquo;滑块指定应用此效果的距离。
+</p>
+
+<p>
+<b>包装工作区</b>:
+如果要在鼠标指针到达屏幕边缘时切换到下一个工作区，请选择第一个选项。
+如果要在拖动窗口时具有相同的行为，请选择第二个。
+您可以使用相应的滑块指定屏幕边缘电阻。
+</p>
+
+<p>
+<b>不透明移动和调整大小</b>:
+有两个选项可让您选择是否显示窗口内容，移动或调整窗口大小（不显示内容会节省一些系统资源）。
+</p>
+
+<p>
+<b>双击动作</b>:
+双击窗口的标题栏时，选择窗口管理器的行为：遮挡窗口，隐藏窗口，最大化窗口或无响应。
+</p>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org3faa6dd" class="outline-2">
+<h2 id="org3faa6dd">窗口管理器微调</h2>
+<div class="outline-text-2" id="text-org3faa6dd">
+<p>
+可以通过 <code>Window Manager Tweaks</code> 对窗口行为和效果进行微调，
+包含窗口切换，焦点获取，辅助功能，工作区，窗口位置，合成器等功能。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org7af5402" class="outline-2">
+<h2 id="org7af5402">窗口操作快捷键</h2>
+<div class="outline-text-2" id="text-org7af5402">
+<div class="alert alert-warning info" id="org410b4af">
+<p>
+<b>注意：</b> 这里列出的快捷键是基于我本机的 <code>4.19.102-1-MANJARO xfwm-4.14.0</code> ，
+并且包含部分自定义的配置，并不都是 <code>xfwm4</code> 默认的快捷键。
+</p>
+
+</div>
+
+<table class="table table-sm table-hover">
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Action</th>
+<th scope="col" class="org-left">操作</th>
+<th scope="col" class="org-left">快捷键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Window operations menu</td>
+<td class="org-left">窗口操作菜单</td>
+<td class="org-left"><code>Alt+Space</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Cycle windows</td>
+<td class="org-left">切换窗口</td>
+<td class="org-left"><code>Alt+Tab</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Cycle windows (Reverse)</td>
+<td class="org-left">反向切换窗口</td>
+<td class="org-left"><code>Shift+Alt+tab</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Switch window for save application</td>
+<td class="org-left">在相同的应用间切换窗口</td>
+<td class="org-left"><code>Super+Tab</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Switch application</td>
+<td class="org-left">切换应用程序</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">Close window</td>
+<td class="org-left">关闭窗口</td>
+<td class="org-left"><code>Alt+F4</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Maximize window horizontally</td>
+<td class="org-left">水平最大化窗口</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">Maximize window vertically</td>
+<td class="org-left">垂直最大化窗口</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">Maximize window</td>
+<td class="org-left">最大化窗口</td>
+<td class="org-left"><code>Alt+F10</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Hide window</td>
+<td class="org-left">隐藏窗口</td>
+<td class="org-left"><code>Alt+F9</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Move window</td>
+<td class="org-left">移动窗口</td>
+<td class="org-left"><code>Alt+F7</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Resize window</td>
+<td class="org-left">改变窗口大小</td>
+<td class="org-left"><code>Alt+F8</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Shade window</td>
+<td class="org-left">遮挡窗口</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">Stick window</td>
+<td class="org-left">固定窗口</td>
+<td class="org-left"><code>Alt+F6</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Raise window</td>
+<td class="org-left">抬高窗口</td>
+<td class="org-left"><code>Shift+Alt+Page Up</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Lower window</td>
+<td class="org-left">降低窗口</td>
+<td class="org-left"><code>Shift+Alt+Page Down</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Raise or lower window</td>
+<td class="org-left">抬高或降低窗口</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">Fill window</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">Fill window horizontally</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">Fill window vertically</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">Toggle above</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left"><code>Alt+F12</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Toggle fullscreen</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left"><code>Alt+F11</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Move window to [upper&vert;bottom&vert;left&vert;right] workspace</td>
+<td class="org-left">移动窗口到[上&vert;下&vert;左&vert;右]工作区</td>
+<td class="org-left"><code>Shift+Ctrl+Alt+[Up/Down/Left/Right]</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Move window to [previous&vert;next] workspace</td>
+<td class="org-left">移动窗口到[前&vert;后]一个工作区</td>
+<td class="org-left"><code>Ctrl+Alt+[Home/End]</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Move window to workspace [1-9]</td>
+<td class="org-left">移动窗口到工作区[1-9]</td>
+<td class="org-left"><code>Ctrl+Alt+[1-9]</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Tile window to the [top&vert;bottom&vert;left&vert;right]</td>
+<td class="org-left">平铺窗口到[上&vert;下&vert;左&vert;右]半屏</td>
+<td class="org-left"><code>Supert+[Up/Down/Left/Right]</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Show desktop</td>
+<td class="org-left">显示桌面</td>
+<td class="org-left"><code>Ctrl+Alt+D</code></td>
+</tr>
+
+<tr>
+<td class="org-left">[Upper&vert;Bottom&vert;Left&vert;Right] workspace</td>
+<td class="org-left">切换到[上&vert;下&vert;左&vert;右]工作区</td>
+<td class="org-left"><code>Ctrl+Alt+[Up/Down/Left/Right]</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Workspace [1-12]</td>
+<td class="org-left">切换到工作区[1-12]</td>
+<td class="org-left"><code>Ctrl+[F1-F12]</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Add workspace</td>
+<td class="org-left">添加工作区</td>
+<td class="org-left"><code>Alt+Insert</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Add adjacent workspace</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">Delete last workspace</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left"><code>Alt+Delete</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Delete active workspace</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+<div class="alert alert-primary info" id="orgac78585">
+<p>
+<code>遮挡窗口</code>: 将其缩小为标题栏大小（收起窗体内容，仅显示标题栏）
+</p>
+
+<p>
+<code>固定窗口</code>: 固定当前窗口在所有工作区的相同位置可见
+</p>
+
+<p>
+<code>抬高窗口</code>: 使当前窗口出现在所有其他窗口的最上方(置顶显示)
+</p>
+
+<p>
+<code>降低窗口</code>: 使当前窗口出现在所有其他窗口的最下方(置底显示)
+</p>
+
+</div>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

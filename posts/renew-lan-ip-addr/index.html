@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Linux 重新获取局域网IP 地址</title>
+<meta name="keywords" content="珊瑚礁上的程序员, LAN, iproute2, dhcp" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Linux 重新获取局域网IP 地址</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2021-12-24</p>
+</header>
+<section id="outline-container-org7e11df3" class="outline-2">
+<h2 id="org7e11df3">背景</h2>
+<div class="outline-text-2" id="text-org7e11df3">
+<p>
+这两天压测一个项目, 结果 <code>Mysql</code> 报了一个很少见到的错误: <code>SQLSTATE[1129] too many connection errors from 172.16.36.41:34364</code> .
+关于这个 mysql 错误的成因和基于 mysql 层面怎么解决, 并不是本文要讨论的问题. 文末会附上一个关于这个问题讨论的链接.
+</p>
+
+<p>
+Mysql 是公司的服务器，由专门的运维同学管理，我手上的帐号权限不够，所以要想其他办法绕过这个问题。
+通过报错信息，结果自己本机的内网 IP, 能确定被封的是我本机的内网 IP, 那是不是我换一个内网 IP 就可以绕过问题。
+</p>
+</div>
+</section>
+
+<section id="outline-container-orgcf6f94e" class="outline-2">
+<h2 id="orgcf6f94e">实践</h2>
+<div class="outline-text-2" id="text-orgcf6f94e">
+</div>
+<div id="outline-container-org039b21a" class="outline-3">
+<h3 id="org039b21a">方案一: 切换另一个 <code>dhcp</code> 客户端</h3>
+<div class="outline-text-3" id="text-org039b21a">
+<p>
+我的电脑上装有两个 <code>dhcp</code> 客户端, <code>dhclient</code> 和 <code>dhcpcd</code>.
+默认使用的 <code>dhclient</code>, 这个时候只需要停用 <code>dhclient</code>, 转为使用 <code>dhcpcd</code>.
+即可以获取到一个新的 <code>IP</code> 地址.
+</p>
+
+<ol class="org-ol">
+<li>查看本机 <code>IP</code>
+<ul class="org-ul">
+<li><p>
+<code>ip addr show</code>
+</p>
+<pre class="example" id="org15a553f">
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: enp4s0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 00:1d:98:5a:d1:3a brd ff:ff:ff:ff:ff:ff
+    inet 172.16.36.139/24 brd 172.16.36.255 scope global dynamic noprefixroute enp4s0
+       valid_lft 336229sec preferred_lft 260629sec
+    inet6 fe80::75bc:a2b2:962e:5bd3/64 scope link
+       valid_lft forever preferred_lft forever
+</pre></li>
+</ul></li>
+
+<li>查看所有网络接口
+
+<ul class="org-ul">
+<li><p>
+<code>ip link show</code>
+</p>
+<pre class="example" id="orgaf8cd20">
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enp4s0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+link/ether 00:1d:98:5a:d1:3a brd ff:ff:ff:ff:ff:ff
+</pre></li>
+</ul></li>
+
+<li>清空 <code>enp4s0</code> 网卡配置
+
+<ul class="org-ul">
+<li><code>sudo ip addr flush enp4s0</code></li>
+</ul></li>
+
+<li>启用 <code>dhcpcd</code> 客户端
+
+<ul class="org-ul">
+<li><code>sudo systemctl start dhcpcd.service</code></li>
+</ul></li>
+
+<li>再次使用 <code>ip addr show</code> 查看 <code>IP</code> 地址, 确认已获取到新的地址</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgaac9939" class="outline-3">
+<h3 id="orgaac9939">方案二:  修改网卡 <code>MAC</code> 地址</h3>
+<div class="outline-text-3" id="text-orgaac9939">
+<ol class="org-ol">
+<li>查看所有网络接口和 <code>MAC</code> 地址
+<ul class="org-ul">
+<li><p>
+<code>ip link show</code>
+</p>
+<pre class="example" id="orgebd17fe">
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enp4s0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+link/ether 00:1d:98:5a:d1:3a brd ff:ff:ff:ff:ff:ff
+</pre></li>
+</ul></li>
+<li>禁用网卡
+<ul class="org-ul">
+<li><code>ip link set dev enp4s0 down</code></li>
+</ul></li>
+
+<li>修改 <code>MAC</code> 地址
+<ul class="org-ul">
+<li><code>ip link set dev enp4s0 address 00:1d:98:5a:d1:3b</code></li>
+</ul></li>
+
+<li>重新启用网卡
+<ul class="org-ul">
+<li><code>ip link set dev enp4s0 up</code></li>
+</ul></li>
+
+<li>使用 <code>dhclient</code> 重新获取 <code>IP</code>
+<ul class="org-ul">
+<li><code>sudo dhclient -v enp4s0</code></li>
+</ul></li>
+
+<li>使用 <code>ip addr show</code> 查看 <code>IP</code> 地址, 确认一切正常, 获取到了新的地址</li>
+</ol>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org7df2461" class="outline-2">
+<h2 id="org7df2461">参考</h2>
+<div class="outline-text-2" id="text-org7df2461">
+<ul class="org-ul">
+<li><a href="https://wiki.archlinux.org/title/MAC_address_spoofing">MAC 地址欺骗</a></li>
+<li><a href="http://focus-1.wiki/mysql/mysql-issue-max-connect-errors/">被我误解的max_connect_errors</a></li>
+<li><a href="https://linux.cn/article-4326-1.html">iproute2 对决 net-tools</a></li>
+</ul>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

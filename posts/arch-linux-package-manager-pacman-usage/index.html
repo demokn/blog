@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Arch Linux 包管理工具 pacman 使用总结</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Arch Linux, Pacman" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Arch Linux 包管理工具 pacman 使用总结</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2020-01-08</p>
+</header>
+<section id="outline-container-org1b40ce3" class="outline-2">
+<h2 id="org1b40ce3">善用帮助文档</h2>
+<div class="outline-text-2" id="text-org1b40ce3">
+<ul class="org-ul">
+<li><code>pacman -h</code> 简要帮助信息</li>
+
+<li><code>man pacman</code> 详细帮助文档</li>
+</ul>
+</div>
+</section>
+
+<section id="outline-container-org8a01253" class="outline-2">
+<h2 id="org8a01253">查看相关文件</h2>
+<div class="outline-text-2" id="text-org8a01253">
+<pre class="example" id="org7662f3c">
+$ pacman -v
+Root      : /
+Conf File : /etc/pacman.conf
+DB Path   : /var/lib/pacman/
+Cache Dirs: /var/cache/pacman/pkg/
+Hook Dirs : /usr/share/libalpm/hooks/  /etc/pacman.d/hooks/
+Lock File : /var/lib/pacman/db.lck
+Log File  : /var/log/pacman.log
+GPG Dir   : /etc/pacman.d/gnupg/
+Targets   : None
+</pre>
+</div>
+</section>
+
+<section id="outline-container-orge94399b" class="outline-2">
+<h2 id="orge94399b">操作选项(operation)</h2>
+<div class="outline-text-2" id="text-orge94399b">
+<p>
+pacman 在使用时通常是一个操作选项(大写字母)加上一些额外的参数(小写字母)。
+相同的小写字母跟在不同的大写字母后面表示的含义可能不同。
+那么多选项和组合只需要记住几个最常用的就可以， 其余的善用 <code>Tab 补全</code> 可以查看操作选项后可跟的额外参数和其简要作用描述。
+</p>
+
+<pre class="example" id="org5b5166f">
+$ pacman -h
+usage:  pacman &lt;operation&gt; [...]
+operations:
+    pacman {-h --help}                             查看pacman使用帮助
+    pacman {-V --version}                          查看pacman版本
+    pacman {-D --database} &lt;options&gt; &lt;package(s)&gt;  操作软件包数据库
+    pacman {-F --files}    [options] [package(s)]  查询文件数据库
+    pacman {-Q --query}    [options] [package(s)]  查询已安装包信息
+    pacman {-R --remove}   [options] &lt;package(s)&gt;  删除已安装包
+    pacman {-S --sync}     [options] [package(s)]  同步（安装）包
+    pacman {-T --deptest}  [options] [package(s)]  检查包依赖
+    pacman {-U --upgrade}  [options] &lt;file(s)&gt;     更新或安装包
+</pre>
+</div>
+</section>
+
+<section id="outline-container-orgcba07ec" class="outline-2">
+<h2 id="orgcba07ec">一些常用命令</h2>
+<div class="outline-text-2" id="text-orgcba07ec">
+<ul class="org-ul">
+<li>搜索
+<ul class="org-ul">
+<li><code>pacman -Ss curl</code> 搜索指定软件</li>
+</ul></li>
+
+<li>安装
+<ul class="org-ul">
+<li><code>pacman -S curl</code> 安装指定软件</li>
+<li><code>pacman -U \/var/cache/pacman/pkg/curl-x.x.x-x86_64.pkg.tar.zst</code> 安装(回滚)指定版本的软件</li>
+</ul></li>
+
+<li>更新
+<ul class="org-ul">
+<li><code>pacman -Syu</code> 更新所有包</li>
+</ul></li>
+
+<li>查看
+<ul class="org-ul">
+<li><code>pacman -Q</code> 查看所有已安装的包</li>
+<li><code>pacman -Qe</code> 查看所有被明确指定安装的包（而不是作为依赖项被安装）</li>
+<li><code>pacman -Qd</code> 查看所有仅作为依赖项而被安装的包</li>
+<li><code>pacman -Qi</code> 查看已安装包的详细信息</li>
+<li><code>pacman -Ql</code> 查看软件包中包含的文件列表</li>
+<li><code>pacman -Qdt</code> 查看孤立包(仅作为依赖被安装, 且当前没有被其他包依赖)</li>
+</ul></li>
+
+<li>删除
+<ul class="org-ul">
+<li><code>pacman -Rs curl</code> 删除指定软件，并删除所有不被其他软件依赖的依赖包</li>
+<li><code>pacman -Rsc curl</code> 删除指定软件，并删除所有不被其他软件依赖的依赖包, 并删除所有依赖该软件的包</li>
+</ul></li>
+
+<li>清理
+<ul class="org-ul">
+<li><code>pacman -Sc</code> 清理未安装软件包的缓存</li>
+<li><code>pacman -Scc</code> 清理所有软件包的缓存</li>
+</ul></li>
+</ul>
+</div>
+</section>
+
+<section id="outline-container-org091321d" class="outline-2">
+<h2 id="org091321d">一些复合命令</h2>
+<div class="outline-text-2" id="text-org091321d">
+<ul class="org-ul">
+<li><p>
+查看所有已安装的软件包及其描述, 每个软件包占一行
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">pacman -Q | cut -d <span class="org-string">' '</span> -f 1 | xargs pacman -Qi | awk <span class="org-string">'/^Name/ {printf $3 " "}; /^Description/ {print $0};'</span> | sed <span class="org-string">'s/Description[[:space:]]*: / /'</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">1.  pacman -Q  &#21629;&#20196;&#21015;&#20986;&#25152;&#26377;&#24050;&#23433;&#35013;&#30340;&#36719;&#20214;&#21253;&#21450;&#20854;&#29256;&#26412;&#21495;&#65307;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">2.  cut -d ' ' -f 1  &#21629;&#20196;&#23558;&#27599;&#34892;&#30340;&#31532;&#19968;&#20010;&#21333;&#35789;&#21363;&#36719;&#20214;&#21253;&#21517;&#31216;&#25552;&#21462;&#20986;&#26469;&#65307;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">3.  xargs pacman -Qi  &#21629;&#20196;&#23545;&#27599;&#20010;&#36719;&#20214;&#21253;&#21517;&#31216;&#25191;&#34892;  pacman -Qi  &#21629;&#20196;&#65292;&#33719;&#21462;&#36719;&#20214;&#21253;&#30340;&#35814;&#32454;&#20449;&#24687;&#65307;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">4.  awk '/^Name/ {printf $3 " "}; /^Description/ {print $0};'  &#21629;&#20196;&#23545;  pacman -Qi  &#21629;&#20196;&#30340;&#36755;&#20986;&#36827;&#34892;&#22788;&#29702;&#65292;&#23558;&#36719;&#20214;&#21253;&#21517;&#31216;&#21644;&#31616;&#35201;&#25551;&#36848;&#25552;&#21462;&#20986;&#26469;&#65292;&#24182;&#20197;&#31354;&#26684;&#20998;&#38548;&#65307;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">5.  sed 's/Description[[:space:]]*: / /'  &#21629;&#20196;&#23558;&#31616;&#35201;&#25551;&#36848;&#20013;&#30340; "Description: " &#23383;&#31526;&#20018;&#26367;&#25442;&#20026;&#31354;&#26684;&#12290;</span>
+</pre>
+</div></li>
+
+<li><p>
+接上, 如果还想让软件包名称和描述同时实现对齐
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">pacman -Q | cut -d <span class="org-string">' '</span> -f 1 | xargs pacman -Qi | awk <span class="org-string">'/^Name/ {printf "%-25s", $3}; /^Description/ {print $0};'</span> | sed <span class="org-string">'s/Description[[:space:]]*: / /'</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#19981;&#21516;&#20043;&#22788;&#22312;&#20110;&#22312; awk &#21629;&#20196;&#20013;&#20351;&#29992;&#20102; printf "%-25s" &#26684;&#24335;&#21270;&#36755;&#20986;&#65292;&#23558;&#36719;&#20214;&#21253;&#21517;&#31216;&#24038;&#23545;&#40784;&#24182;&#21344;&#29992; 25 &#20010;&#23383;&#31526;&#30340;&#23485;&#24230;</span>
+</pre>
+</div></li>
+
+<li><p>
+再接上, 如果要动态计算软件包的名称, 而不是使用固定的宽度
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-variable-name">max_len</span>=$(pacman -Q | awk <span class="org-string">'{if (length($1) &gt; max) max=length($1)}; END {print max}'</span>); pacman -Q | cut -d <span class="org-string">' '</span> -f 1 | xargs pacman -Qi | awk -v <span class="org-variable-name">w</span>=<span class="org-string">"$max_len"</span> <span class="org-string">'/^Name/ {printf "%-"w"s", $3}; /^Description/ {print $0}'</span> | sed <span class="org-string">'s/Description[[:space:]]*: / /'</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">awk '{if (length($1) &gt; max) max=length($1)}; END {print max}'  &#21629;&#20196;&#23545;  pacman -Q  &#21629;&#20196;&#30340;&#36755;&#20986;&#36827;&#34892;&#22788;&#29702;&#65292;&#35745;&#31639;&#20986;&#36719;&#20214;&#21253;&#21517;&#31216;&#30340;&#26368;&#22823;&#38271;&#24230;</span>
+</pre>
+</div></li>
+
+<li><p>
+列出所有主动安装的包及其大小，并按照包的大小倒序排列
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">pacman -Qe --info | awk <span class="org-string">'/^Name/{name=$3}/^Installed Size/{print name ": " $4 $5}'</span> | sort -h -r -k2
+<span class="org-comment-delimiter"># </span><span class="org-comment">1. pacman -Qe --info&#65306;&#21015;&#20986;&#25152;&#26377;&#20027;&#21160;&#23433;&#35013;&#30340;&#21253;&#21450;&#20854;&#35814;&#32454;&#20449;&#24687;&#12290;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">2. awk '/^Name/{name=$3}/^Installed Size/{print name ": " $4 $5}'&#65306;&#25552;&#21462;&#21253;&#21517;&#21644;&#23433;&#35013;&#22823;&#23567;&#12290;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">3. sort -h -r -k2&#65306;&#25353;&#22823;&#23567;&#20498;&#24207;&#65288;-r&#65289;&#25490;&#21015;&#65292;&#24182;&#26681;&#25454;&#20154;&#31867;&#21487;&#35835;&#26684;&#24335;&#65288;-h&#65289;&#36827;&#34892;&#25490;&#24207;&#12290;</span>
+</pre>
+</div>
+
+<p>
+输出示例:
+</p>
+<pre class="example" id="org7b8d3fc">
+archlinux-keyring       Arch Linux PGP keyring
+base                    Minimal package set to define a basic Arch Linux installation
+bash                    The GNU Bourne Again shell
+bzip2                   A high-quality data compression program
+ca-certificates         Common CA certificates (default providers)
+ca-certificates-mozilla Mozilla's set of trusted CA certificates
+ca-certificates-utils   Common CA certificates (utilities)
+coreutils               The basic file, shell and text manipulation utilities of the GNU operating s
+cryptsetup              Userspace setup tool for transparent encryption of block devices using dm-crypt
+curl                    command line tool and library for transferring data with URLs
+......
+</pre></li>
+
+<li>列出所有在 aur 中已经不存在的软件包</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-shell">yay -Qm | <span class="org-keyword">while </span><span class="org-builtin">read</span> pkg _; <span class="org-keyword">do</span> yay -Si <span class="org-string">"$pkg"</span> &gt;/dev/null || <span class="org-builtin">echo</span> <span class="org-string">"$pkg"</span>; <span class="org-keyword">done</span>
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org8b53d5c" class="outline-2">
+<h2 id="org8b53d5c">好玩的配置</h2>
+<div class="outline-text-2" id="text-org8b53d5c">
+<div class="org-src-container">
+<pre class="src src-sh"><span class="org-comment-delimiter"># </span><span class="org-comment">https://www.linux.com/news/10-truly-amusing-easter-eggs-linux</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">pacman&#36755;&#20986;&#20869;&#23481;&#21464;&#20026;&#24425;&#33394;</span>
+grep <span class="org-string">"^Color"</span> /etc/pacman.conf &gt;/dev/null || sudo sed -i <span class="org-string">"s/^#Color/Color/"</span> /etc/pacman.conf
+<span class="org-comment-delimiter"># </span><span class="org-comment">pacman&#36827;&#24230;&#26465;&#21507;&#31958;&#26524;&#21160;&#30011;</span>
+grep <span class="org-string">"ILoveCandy"</span> /etc/pacman.conf &gt;/dev/null || sudo sed -i <span class="org-string">"/#VerbosePkgLists/a ILoveCandy"</span> /etc/pacman.conf
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgd9f11ac" class="outline-3">
+<h3 id="orgd9f11ac">忽略某些软件包的更新</h3>
+<div class="outline-text-3" id="text-orgd9f11ac">
+<div class="org-src-container">
+<pre class="src src-conf"><span class="org-comment-delimiter"># </span><span class="org-comment">vim /etc/pacman.conf</span>
+<span class="org-variable-name">IgnorePkg</span> = package1 package2 package3
+</pre>
+</div>
+</div>
+</div>
+</section>
+
+<section id="outline-container-orgccb33e3" class="outline-2">
+<h2 id="orgccb33e3">常见问题</h2>
+<div class="outline-text-2" id="text-orgccb33e3">
+<ol class="org-ol">
+<li><p>
+<b>unable to lock database</b>
+</p>
+
+<p>
+执行 <code>sudo pacman -Syyu</code> 时报错，输出如下：
+</p>
+<pre class="example" id="org199d3c3">
+➜ sudo pacman -Syu
+:: Synchronizing package databases...
+error: failed to update core (unable to lock database)
+error: failed to update extra (unable to lock database)
+error: failed to update community (unable to lock database)
+error: failed to update multilib (unable to lock database)
+error: failed to synchronize all databases
+</pre>
+
+<div class="alert alert-info info" id="orgf65f7e2">
+<p>
+我碰到这个问题是因为在执行一次更新过程中电脑死机了, 强制关机重启后, 再次执行更新报了这个错。
+</p>
+
+<p>
+谢天谢地, 系统没挂。也是第一次碰到更新过程中死机的情况，还以为要重装系统了呢。
+</p>
+
+</div>
+
+<p>
+解决办法:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">sudo rm -rf /var/lib/pacman/db.lck
+</pre>
+</div>
+
+<p>
+参考:
+</p>
+<ul class="org-ul">
+<li><a href="https://www.ostechnix.com/how-to-fix-unable-to-lock-database-error-in-arch-linux/">How To Fix “unable to lock database” Error In Arch Linux</a></li>
+</ul></li>
+</ol>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

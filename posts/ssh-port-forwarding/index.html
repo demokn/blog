@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SSH 端口转发应用实例</title>
+<meta name="keywords" content="珊瑚礁上的程序员, ssh 端口转发, ssh port forwading" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">SSH 端口转发应用实例</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2020-06-08</p>
+</header>
+<section id="outline-container-orge6f8771" class="outline-2">
+<h2 id="orge6f8771">案例一：使用本地端口转发解决 Mysql 客户端不支持 Google 两步验证的问题</h2>
+<div class="outline-text-2" id="text-orge6f8771">
+<p>
+公司项目使用的阿里云服务，出于安全考虑，数据库服务器仅开放了内网访问权限。
+要想使用本地 Mysql 客户端 连接公司数据库的话，就需要使用 <a href="https://zh.wikipedia.org/wiki/%E9%9A%A7%E9%81%93%E5%8D%8F%E8%AE%AE#SSH">SSH隧道</a>。
+当然一般的 Mysql 客户端 都是支持基本的 SSH 隧道 连接的。
+但是，同样出于安全考虑，公司的云服务器登录又使用了 google 两步验证。
+而我使用的 Mysql 客户端 使用 SSH 隧道时，尚不支持 google 两步验证。
+这时候，使用 SSH 本地端口转发就可以很好的解决这个问题。
+</p>
+
+<p>
+本地端口转发的命令格式如下：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">ssh -L [&lt;&#26412;&#22320;&#20027;&#26426;&gt;:]&lt;&#26412;&#22320;&#20027;&#26426;&#31471;&#21475;&gt;:&lt;&#36828;&#31243;&#20027;&#26426;&gt;:&lt;&#36828;&#31243;&#20027;&#26426;&#31471;&#21475;&gt; &lt;SSH&#30331;&#24405;&#20027;&#26426;&gt;
+</pre>
+</div>
+
+<p>
+在本地电脑上执行如下命令：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">ssh -L 33060:RDS&#25968;&#25454;&#24211;&#26381;&#21153;&#22120;:3306 ECS&#20113;&#26381;&#21153;&#22120;
+</pre>
+</div>
+
+<p>
+然后使用本地 Mysql 客户端只需要访问本地的 33060 端口即可。
+</p>
+
+<p>
+实际的数据传输流程大致如下：
+</p>
+
+
+<figure id="org5bc7e49">
+<img src="./data-transfer.png" alt="data-transfer.png" class="d-block mw-100 mx-auto">
+
+</figure>
+
+<ol class="org-ol">
+<li>本机的 Mysql 客户端将数据发送到本机的 33060 端口上;</li>
+<li>本机的 SSH 客户端将 33060 端口收到的数据加密并转发到 ECS 云服务器的 SSH 服务端;</li>
+<li>ECS 云服务器的 SSH 服务端收到数据后解密并转发到 RDS 数据库服务器的 3306 端口;</li>
+<li>最后再将 RDS 数据库服务器返回的数据原路返回到本机的 Mysql 客户端。</li>
+</ol>
+</div>
+</section>
+
+<section id="outline-container-org047da5e" class="outline-2">
+<h2 id="org047da5e">案例二：使用本地端口转发将虚拟机中的服务提供给内网其他用户访问</h2>
+<div class="outline-text-2" id="text-org047da5e">
+<p>
+在项目开发过程中, 一般都是基于虚拟机, 比如我常使用的是 <code>vagrant</code> + <code>virtual box</code> 。
+有时出于临时调试目的，会让前端/客户端临时调用自己本地环境的接口, 这个时候就需要将虚拟机
+中的服务端口映射到宿主机的端口。这样才能让公司内其他同事访问到。
+</p>
+
+<p>
+在宿主机执行如下命令：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">ssh -L 0.0.0.0:80:192.168.10.10:9501 USER@192.168.10.10
+</pre>
+</div>
+
+<p>
+如此便可以将宿主机 80 端口的请求全部转发到虚拟机的 9501 端口。
+</p>
+</div>
+</section>
+
+<section id="outline-container-orgbb3443c" class="outline-2">
+<h2 id="orgbb3443c">To be continued&#x2026;</h2>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

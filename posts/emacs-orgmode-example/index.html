@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Orgmode 示例</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Emacs, Orgmode" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Orgmode 示例</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2025-01-19</p>
+</header>
+<section id="outline-container-org65d679e" class="outline-2">
+<h2 id="org65d679e">标题</h2>
+<div class="outline-text-2" id="text-org65d679e">
+<pre class="example" id="org2970980">
+* 一级标题
+** 二级标题
+*** 三级标题（以此类推）
+</pre>
+</div>
+</section>
+
+<section id="outline-container-org15bef69" class="outline-2">
+<h2 id="org15bef69">字体</h2>
+<div class="outline-text-2" id="text-org15bef69">
+<p>
+<b>粗体</b>
+</p>
+
+<p>
+<i>斜体</i>
+</p>
+
+<p>
+<del>删除线</del>
+</p>
+
+<p>
+<span class="underline">下划线</span>
+</p>
+
+<p>
+等宽字: <code>code(推荐)</code> 或 <code>code</code>
+</p>
+
+<p>
+下标: H_2 O
+</p>
+
+<p>
+上标: E=mc^2
+</p>
+
+<pre class="example" id="org872b40a">
+*粗体*
+/斜体/
++删除线+
+_下划线_
+等宽字: =code= 或 ~code~
+下标: H_2 O
+上标: E=mc^2
+</pre>
+</div>
+</section>
+
+<section id="outline-container-org4c6b101" class="outline-2">
+<h2 id="org4c6b101">列表</h2>
+<div class="outline-text-2" id="text-org4c6b101">
+<ul class="org-ul">
+<li>无序列表以 <code>-</code> 或 <code>+</code> 开头</li>
+<li>有序列表以 <code>1.</code> 或者 <code>1)</code> 开头</li>
+<li>描述列表用 <code>::</code></li>
+<li>列表层级用缩进体现</li>
+</ul>
+<p>
+&#x2014;
+</p>
+<ul class="org-ul">
+<li>无序列表 1
+<ul class="org-ul">
+<li>无序列表 1.1</li>
+<li>无序列表 1.2</li>
+</ul></li>
+<li>无序列表 2
+<ul class="org-ul">
+<li>无序列表 2.1</li>
+<li>&#x2026;</li>
+</ul></li>
+</ul>
+<p>
+&#x2014;
+</p>
+<ol class="org-ol">
+<li>有序列表 1
+<ol class="org-ol">
+<li>有序列表 1.1</li>
+<li>有序列表 1.2</li>
+</ol></li>
+<li>有序列表 2
+<ol class="org-ol">
+<li>有序列表 2.1</li>
+<li>有序列表 2.2</li>
+</ol></li>
+<li>指定序号其实是无效的, 导出 html 时会自动编号 20</li>
+<li value="20">如果确实想指定序号, 使用 <code>[@20]</code> 20</li>
+</ol>
+<hr>
+<p>
+描述列表（Definition List）是 Org-mode 中的一种列表类型，用于列出术语及其定义的场景，例如词汇表、概念说明、API 参数说明等。
+</p>
+<dl class="org-dl">
+<dt>Emacs</dt><dd>一款强大的文本编辑器</dd>
+<dt>Org-mode</dt><dd>Emacs 的标记语言，用于任务管理和笔记记录</dd>
+<dt>Markdown</dt><dd>一种轻量级的标记语言</dd>
+</dl>
+
+<pre class="example" id="orgbf3e559">
+- 无序列表 1
+  + 无序列表 1.1
+  + 无序列表 1.2
+- 无序列表 2
+  - 无序列表 2.1
+  + ...
+---
+1. 有序列表 1
+   1) 有序列表 1.1
+   1) 有序列表 1.2
+1. 有序列表 2
+   1. 有序列表 2.1
+   2) 有序列表 2.2
+20. 指定序号其实是无效的, 导出 html 时会自动编号 20
+20. [@20]如果确实想指定序号, 使用 =[@20]= 20
+--------
+描述列表（Definition List）是 Org-mode 中的一种列表类型，用于列出术语及其定义的场景，例如词汇表、概念说明、API 参数说明等。
+- Emacs :: 一款强大的文本编辑器
+- Org-mode :: Emacs 的标记语言，用于任务管理和笔记记录
+- Markdown :: 一种轻量级的标记语言
+</pre>
+</div>
+</section>
+
+<section id="outline-container-org8d47e35" class="outline-2">
+<h2 id="org8d47e35">表格</h2>
+<div class="outline-text-2" id="text-org8d47e35">
+<p>
+基础示例
+</p>
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-right">
+
+<col  class="org-right">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-right">Phone</th>
+<th scope="col" class="org-right">Age</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Peter</td>
+<td class="org-right">1234</td>
+<td class="org-right">17</td>
+</tr>
+
+<tr>
+<td class="org-left">Anna</td>
+<td class="org-right">4321</td>
+<td class="org-right">25</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+指定列宽（导出时无效）
+</p>
+<table>
+
+
+<colgroup>
+<col  class="org-right">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">one</td>
+<td class="org-left">some</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">two</td>
+<td class="org-left">boring</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">This is a long text</td>
+<td class="org-left">column</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+对齐方式（导出时有效）
+</p>
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-center">
+
+<col  class="org-right">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">左对齐</td>
+<td class="org-center">居中对齐</td>
+<td class="org-right">右对齐</td>
+</tr>
+
+<tr>
+<td class="org-left">this is long text to test align</td>
+<td class="org-center">this is long text to test align</td>
+<td class="org-right">this is long text to test align</td>
+</tr>
+</tbody>
+</table>
+
+<pre class="example" id="orgf92ea7d">
+基础示例
+| Name  | Phone | Age |
+|-------+-------+-----|
+| Peter |  1234 |  17 |
+| Anna  |  4321 |  25 |
+
+指定列宽（导出时无效）
+|---+---------------------+--------|
+|   | &lt;6&gt;                 |        |
+| 1 | one                 | some   |
+| 2 | two                 | boring |
+| 3 | This is a long text | column |
+|---+---------------------+--------|
+
+对齐方式（导出时有效）
+|---------------------------------+---------------------------------+---------------------------------|
+| &lt;l&gt;                             |               &lt;c&gt;               |                             &lt;r&gt; |
+| 左对齐                            |             居中对齐              |                            右对齐 |
+| this is long text to test align | this is long text to test align | this is long text to test align |
+|---------------------------------+---------------------------------+---------------------------------|
+</pre>
+</div>
+</section>
+
+<section id="outline-container-orge423a4f" class="outline-2">
+<h2 id="orge423a4f">脚注</h2>
+<div class="outline-text-2" id="text-orge423a4f">
+<ul class="org-ul">
+<li>这是第一个脚注<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup></li>
+<li>这是第二个脚注<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup></li>
+<li>这是第三个脚注<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup></li>
+<li>注意看, 声明脚注时的编号实际是作为脚注名字处理的<sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>, 导出时会自动从 1 进行编号, 所以不建议在文档中使用编号的脚注, 尽量取个合适的名字</li>
+<li>直接设置脚注内容, 忽略脚注名字, 这种叫作内联脚注<sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup></li>
+<li>也可以在加上脚注名称同时设置内容<sup><a id="fnr.6" class="footref" href="#fn.6" role="doc-backlink">6</a></sup></li>
+<li>脚注名字的另一个用法是可以重复引用, 而不用再次声明内容<sup><a id="fnr.6.100" class="footref" href="#fn.6" role="doc-backlink">6</a></sup></li>
+<li>如果名字一样, 但是声明的内容不一样<sup><a id="fnr.7" class="footref" href="#fn.7" role="doc-backlink">7</a></sup>, 最终以哪个为准在不同的版本中表现可能不一样<sup><a id="fnr.7.100" class="footref" href="#fn.7" role="doc-backlink">7</a></sup></li>
+</ul>
+
+<pre class="example" id="orgd974e0e">
+- 这是第一个脚注[fn:1]
+- 这是第二个脚注[fn:3]
+- 这是第三个脚注[fn:2]
+- 注意看, 声明脚注时的编号实际是作为脚注名字处理的[fn:name1], 导出时会自动从 1 进行编号, 所以不建议在文档中使用编号的脚注, 尽量取个合适的名字
+- 直接设置脚注内容, 忽略脚注名字, 这种叫作内联脚注[fn::可以直接设置脚注内容, 而不用写名字]
+- 也可以在加上脚注名称同时设置内容[fn:name2:加上脚注名称同时设置内容]
+- 脚注名字的另一个用法是可以重复引用, 而不用再次声明内容[fn:name2]
+- 如果名字一样, 但是声明的内容不一样[fn:name3:第一次声明], 最终以哪个为准在不同的版本中表现可能不一样[fn:name3:第二次声明]
+</pre>
+</div>
+</section>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+这是第一个脚注的内容
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+这是第三个脚注的内容
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+这是第二个脚注的内容, 注意查看
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+脚注根据名称对应, 会自动编号
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">可以直接设置脚注内容, 而不用写名字</p></div></div>
+
+<div class="footdef"><sup><a id="fn.6" class="footnum" href="#fnr.6" role="doc-backlink">6</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">加上脚注名称同时设置内容</p></div></div>
+
+<div class="footdef"><sup><a id="fn.7" class="footnum" href="#fnr.7" role="doc-backlink">7</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">第一次声明</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

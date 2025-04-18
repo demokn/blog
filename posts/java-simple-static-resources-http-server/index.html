@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>使用 Java 实现一个极简的静态资源 HTTP 服务器</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Java" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">使用 Java 实现一个极简的静态资源 HTTP 服务器</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2024-12-29</p>
+</header><p>
+有的时候需要在本机起一个简易的 <code>HTTP</code> 服务器，只需要简单的访问静态资源就可以。
+比如，自建一些镜像站点，如 <code>emacs</code> 插件镜像, <code>gradle wrapper</code> 镜像等。
+</p>
+
+<p>
+平时在自己的电脑上会用一些简单的方法，比如 PHP 内置的 HTTP 服务器。
+只需要一个简单的命令 <code>php -S 127.0.0.1:8080</code> 就可以在当前工作目录启动一个 <code>HTTP</code> 服务。
+</p>
+
+<p>
+最近在离线的电脑上也有这个诉求，电脑无法联网，没有安装 <code>nginx</code> 或 <code>php</code> ，但是有 <code>Java</code> 开发环境。
+于是考虑用 <code>Java</code> 起一个简易的 <code>HTTP</code> 服务，且尽量不引入外部依赖。
+</p>
+
+<section id="outline-container-orga406312" class="outline-2">
+<h2 id="orga406312">需求分析</h2>
+<div class="outline-text-2" id="text-orga406312">
+<p>
+目标是构建一个简单的 <code>HTTP</code> 服务器，它能够：
+</p>
+
+<ol class="org-ol">
+<li>监听指定端口（默认为 8080）</li>
+<li>提供从指定目录（默认为当前目录）读取的静态文件</li>
+<li>支持通过命令行参数动态指定端口和静态文件目录</li>
+<li>简单的访问日志记录</li>
+</ol>
+</div>
+</section>
+
+<section id="outline-container-org155c6b0" class="outline-2">
+<h2 id="org155c6b0">代码编写</h2>
+<div class="outline-text-2" id="text-org155c6b0">
+<div class="org-src-container">
+<pre class="src src-java"><span class="org-keyword">import</span> <span class="org-constant">com</span>.<span class="org-constant">sun</span>.<span class="org-constant">net</span>.<span class="org-constant">httpserver</span>.<span class="org-type">HttpServer</span>;
+<span class="org-keyword">import</span> <span class="org-constant">com</span>.<span class="org-constant">sun</span>.<span class="org-constant">net</span>.<span class="org-constant">httpserver</span>.<span class="org-type">HttpHandler</span>;
+<span class="org-keyword">import</span> <span class="org-constant">com</span>.<span class="org-constant">sun</span>.<span class="org-constant">net</span>.<span class="org-constant">httpserver</span>.<span class="org-type">HttpExchange</span>;
+
+<span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">io</span>.<span class="org-type">IOException</span>;
+<span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">io</span>.<span class="org-type">InputStream</span>;
+<span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">io</span>.<span class="org-type">OutputStream</span>;
+<span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">nio</span>.<span class="org-constant">file</span>.<span class="org-type">Files</span>;
+<span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">nio</span>.<span class="org-constant">file</span>.<span class="org-type">Path</span>;
+<span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">nio</span>.<span class="org-constant">file</span>.<span class="org-type">Paths</span>;
+<span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">util</span>.<span class="org-type">HashMap</span>;
+<span class="org-keyword">import</span> <span class="org-constant">java</span>.<span class="org-constant">util</span>.<span class="org-type">Map</span>;
+
+<span class="org-keyword">public</span> <span class="org-keyword">class</span> <span class="org-type">SimpleHttpServer</span> {
+
+    <span class="org-keyword">private</span> <span class="org-keyword">static</span> <span class="org-type">int</span> <span class="org-variable-name">port</span> = 8080; <span class="org-comment-delimiter">// </span><span class="org-comment">&#40664;&#35748;&#31471;&#21475;</span>
+    <span class="org-keyword">private</span> <span class="org-keyword">static</span> <span class="org-type">String</span> <span class="org-variable-name">root</span> = <span class="org-string">"."</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">&#40664;&#35748;&#38745;&#24577;&#36164;&#28304;&#30446;&#24405;</span>
+
+    <span class="org-keyword">public</span> <span class="org-keyword">static</span> <span class="org-type">void</span> <span class="org-function-name">main</span>(<span class="org-type">String</span>[] <span class="org-variable-name">args</span>) <span class="org-keyword">throws</span> <span class="org-type">IOException</span> {
+        <span class="org-comment-delimiter">// </span><span class="org-comment">&#35299;&#26512;&#21629;&#20196;&#34892;&#21442;&#25968;</span>
+        parseCommandLineArgs(args);
+
+        <span class="org-comment-delimiter">// </span><span class="org-comment">&#23558; root &#36716;&#25442;&#20026;&#32477;&#23545;&#36335;&#24452;&#24182;&#26816;&#26597;&#30446;&#24405;&#26159;&#21542;&#23384;&#22312;</span>
+        <span class="org-type">Path</span> <span class="org-variable-name">rootPath</span> = validateAndGetAbsolutePath(root);
+
+        <span class="org-comment-delimiter">// </span><span class="org-comment">&#21551;&#21160; HTTP &#26381;&#21153;&#22120;</span>
+        startServer(port, rootPath);
+    }
+
+    <span class="org-keyword">private</span> <span class="org-keyword">static</span> <span class="org-type">void</span> <span class="org-function-name">parseCommandLineArgs</span>(<span class="org-type">String</span>[] <span class="org-variable-name">args</span>) {
+        <span class="org-type">Map</span>&lt;<span class="org-type">String</span>, <span class="org-type">String</span>&gt; <span class="org-variable-name">argsMap</span> = <span class="org-keyword">new</span> <span class="org-type">HashMap</span>&lt;&gt;();
+        <span class="org-keyword">for</span> (<span class="org-type">String</span> <span class="org-variable-name">arg</span> : args) {
+            <span class="org-type">String</span>[] <span class="org-variable-name">splitArg</span> = arg.split(<span class="org-string">"="</span>);
+            <span class="org-keyword">if</span> (splitArg.length == 2) {
+                argsMap.put(splitArg[0], splitArg[1]);
+            }
+        }
+
+        <span class="org-comment-delimiter">// </span><span class="org-comment">&#25552;&#21462;&#31471;&#21475;&#21495;&#21644;&#38745;&#24577;&#30446;&#24405;</span>
+        <span class="org-keyword">if</span> (argsMap.containsKey(<span class="org-string">"--port"</span>)) {
+            <span class="org-keyword">try</span> {
+                port = Integer.parseInt(argsMap.get(<span class="org-string">"--port"</span>));
+            } <span class="org-keyword">catch</span> (<span class="org-type">NumberFormatException</span> <span class="org-variable-name">e</span>) {
+                System.out.println(<span class="org-string">"Invalid port number, using default port 8080"</span>);
+            }
+        }
+
+        <span class="org-keyword">if</span> (argsMap.containsKey(<span class="org-string">"--root"</span>)) {
+            root = argsMap.get(<span class="org-string">"--root"</span>);
+        }
+    }
+
+    <span class="org-keyword">private</span> <span class="org-keyword">static</span> <span class="org-type">Path</span> <span class="org-function-name">validateAndGetAbsolutePath</span>(<span class="org-type">String</span> <span class="org-variable-name">rootDir</span>) {
+        <span class="org-comment-delimiter">// </span><span class="org-comment">&#33719;&#21462;&#30456;&#23545;&#36335;&#24452;&#24182;&#36716;&#25442;&#20026;&#32477;&#23545;&#36335;&#24452;</span>
+        <span class="org-type">Path</span> <span class="org-variable-name">path</span> = Paths.get(rootDir).toAbsolutePath();
+
+        <span class="org-comment-delimiter">// </span><span class="org-comment">&#26816;&#26597;&#30446;&#24405;&#26159;&#21542;&#23384;&#22312;</span>
+        <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>Files.exists(path) || <span class="org-negation-char">!</span>Files.isDirectory(path)) {
+            System.out.println(<span class="org-string">"Error: The directory does not exist or is not a directory: "</span> + path);
+            System.exit(1); <span class="org-comment-delimiter">// </span><span class="org-comment">&#30446;&#24405;&#26080;&#25928;&#65292;&#36864;&#20986;&#31243;&#24207;</span>
+        }
+
+        <span class="org-keyword">return</span> path;
+    }
+
+    <span class="org-keyword">private</span> <span class="org-keyword">static</span> <span class="org-type">void</span> <span class="org-function-name">startServer</span>(<span class="org-type">int</span> <span class="org-variable-name">port</span>, <span class="org-type">Path</span> <span class="org-variable-name">rootPath</span>) <span class="org-keyword">throws</span> <span class="org-type">IOException</span> {
+        <span class="org-comment-delimiter">// </span><span class="org-comment">&#21019;&#24314; HTTP &#26381;&#21153;&#22120;&#65292;&#30417;&#21548;&#25351;&#23450;&#30340;&#31471;&#21475;</span>
+        <span class="org-type">HttpServer</span> <span class="org-variable-name">server</span> = HttpServer.create(<span class="org-keyword">new</span> <span class="org-constant">java</span>.<span class="org-constant">net</span>.<span class="org-type">InetSocketAddress</span>(port), 0);
+
+        <span class="org-comment-delimiter">// </span><span class="org-comment">&#35774;&#32622; handler&#65292;&#22788;&#29702;&#25152;&#26377;&#30340; HTTP &#35831;&#27714;</span>
+        server.createContext(<span class="org-string">"/"</span>, <span class="org-keyword">new</span> <span class="org-type">HttpHandler</span>() {
+                <span class="org-c-annotation">@Override</span>
+                <span class="org-keyword">public</span> <span class="org-type">void</span> <span class="org-function-name">handle</span>(<span class="org-type">HttpExchange</span> <span class="org-variable-name">exchange</span>) <span class="org-keyword">throws</span> <span class="org-type">IOException</span> {
+                    <span class="org-comment-delimiter">// </span><span class="org-comment">&#33719;&#21462;&#35831;&#27714;&#30340;&#25991;&#20214;&#36335;&#24452;</span>
+                    <span class="org-type">String</span> <span class="org-variable-name">requestedFile</span> = exchange.getRequestURI().getPath();
+                    <span class="org-keyword">if</span> (requestedFile.equals(<span class="org-string">"/"</span>)) {
+                        requestedFile = <span class="org-string">"/index.html"</span>;  <span class="org-comment-delimiter">// </span><span class="org-comment">&#40664;&#35748;&#36820;&#22238; index.html</span>
+                    }
+
+                    <span class="org-type">Path</span> <span class="org-variable-name">filePath</span> = Paths.get(rootPath.toString() + requestedFile);
+
+                    <span class="org-keyword">if</span> (Files.exists(filePath) &amp;&amp; <span class="org-negation-char">!</span>Files.isDirectory(filePath)) {
+                        <span class="org-comment-delimiter">// </span><span class="org-comment">&#25991;&#20214;&#23384;&#22312;&#21017;&#35835;&#21462;&#24182;&#36820;&#22238;</span>
+                        exchange.sendResponseHeaders(200, Files.size(filePath));
+
+                        <span class="org-keyword">try</span> (<span class="org-type">InputStream</span> <span class="org-variable-name">inputStream</span> = Files.newInputStream(filePath);
+                             <span class="org-type">OutputStream</span> <span class="org-variable-name">outputStream</span> = exchange.getResponseBody()) {
+                            Files.copy(filePath, outputStream);
+                        }
+
+                        System.out.println(<span class="org-string">"200 - File found and served: "</span> + filePath);
+                    } <span class="org-keyword">else</span> {
+                        <span class="org-comment-delimiter">// </span><span class="org-comment">&#25991;&#20214;&#19981;&#23384;&#22312;&#21017;&#36820;&#22238; 404&#65292;&#24182;&#25171;&#21360;&#26085;&#24535;</span>
+                        <span class="org-type">String</span> <span class="org-variable-name">response</span> = <span class="org-string">"404 Not Found"</span>;
+                        exchange.sendResponseHeaders(404, response.getBytes().length);
+                        exchange.getResponseBody().write(response.getBytes());
+
+                        System.out.println(<span class="org-string">"404 - File not found: "</span> + filePath);
+                    }
+                    exchange.getResponseBody().close();
+                }
+            });
+
+        <span class="org-comment-delimiter">// </span><span class="org-comment">&#21551;&#21160;&#26381;&#21153;&#22120;</span>
+        server.start();
+        System.out.println(<span class="org-string">"Server started at http://localhost:"</span> + port);
+        System.out.println(<span class="org-string">"Serving static files from: "</span> + rootPath);
+    }
+}
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-orga2c827b" class="outline-2">
+<h2 id="orga2c827b">编译</h2>
+<div class="outline-text-2" id="text-orga2c827b">
+<div class="org-src-container">
+<pre class="src src-shell">javac SimpleHttpServer.java
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org3d52122" class="outline-2">
+<h2 id="org3d52122">运行</h2>
+<div class="outline-text-2" id="text-org3d52122">
+<div class="org-src-container">
+<pre class="src src-shell">java SimpleHttpServer
+</pre>
+</div>
+
+<p>
+可以看到输出
+</p>
+<pre class="example" id="org59b53ca">
+Server started at http://localhost:8080
+Serving static files from: /tmp/simple-http-server/.
+</pre>
+
+<p>
+尝试浏览器访问正常，搞定。
+</p>
+
+<p>
+也可以启动时指定端口和服务根目录
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">java SimpleHttpServer --port=8090 --root=/tmp
+</pre>
+</div>
+
+<p>
+如果还想打成 <code>Jar</code> 包的话，还可以继续这么干&#x2026;
+</p>
+</div>
+</section>
+
+<section id="outline-container-org75ab43e" class="outline-2">
+<h2 id="org75ab43e">打包后运行</h2>
+<div class="outline-text-2" id="text-org75ab43e">
+<ol class="org-ol">
+<li><p>
+创建 <code>MANIFEST.MF</code> 文件，指定入口类 <code>Main-Class</code> 。
+</p>
+
+<p>
+<code>MANIFEST.MF</code> 文件内容：
+</p>
+<div class="org-src-container">
+<pre class="src src-java">Manifest-Version: 1.0
+Main-Class: SimpleHttpServer
+</pre>
+</div></li>
+
+<li><p>
+打包为 <code>JAR</code> 文件：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">jar cvfm SimpleHttpServer.jar MANIFEST.MF SimpleHttpServer*.class
+</pre>
+</div></li>
+
+<li><p>
+运行 <code>JAR</code> 文件：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">java -jar SimpleHttpServer.jar --port=8080 --root=/path/to/static
+</pre>
+</div></li>
+</ol>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

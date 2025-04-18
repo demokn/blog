@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>shell中进行四则运算</title>
+<meta name="keywords" content="shell, shell arithmetic, shell script" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">shell中进行四则运算</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2023-07-05</p>
+</header><p>
+在 shell 中进行四则运算的方法很很多，这里记录一些常见的方法。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#20351;&#29992; expr &#21629;&#20196;</span>
+<span class="org-variable-name">sum</span>=$(expr 2 + 3)
+<span class="org-builtin">echo</span> $<span class="org-variable-name">sum</span>
+<span class="org-builtin">unset</span> sum
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20351;&#29992; $((...)) &#32467;&#26500;</span>
+<span class="org-variable-name">sum</span>=$((2 + 3))
+<span class="org-builtin">echo</span> $<span class="org-variable-name">sum</span>
+<span class="org-builtin">unset</span> sum
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20351;&#29992; ((...)) &#32467;&#26500;</span>
+((sum = 2 + 3))
+<span class="org-builtin">echo</span> $<span class="org-variable-name">sum</span>
+<span class="org-builtin">unset</span> sum
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20351;&#29992; let &#21629;&#20196;</span>
+let <span class="org-variable-name">sum</span>=<span class="org-string">"2 + 3"</span>
+<span class="org-builtin">echo</span> $<span class="org-variable-name">sum</span>
+<span class="org-builtin">unset</span> sum
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20351;&#29992; bc &#21629;&#20196;</span>
+<span class="org-variable-name">sum</span>=$(<span class="org-builtin">echo</span> <span class="org-string">"2 + 3"</span> | bc)
+<span class="org-builtin">echo</span> $<span class="org-variable-name">sum</span>
+<span class="org-builtin">unset</span> sum
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20351;&#29992; awk &#21629;&#20196;</span>
+<span class="org-variable-name">sum</span>=$(awk <span class="org-string">'BEGIN{print 2+3}'</span>)
+<span class="org-builtin">echo</span> $<span class="org-variable-name">sum</span>
+<span class="org-builtin">unset</span> sum
+</pre>
+</div>
+
+<section id="outline-container-org8f05dda" class="outline-2">
+<h2 id="org8f05dda"><code>expr</code> 命令</h2>
+<div class="outline-text-2" id="text-org8f05dda">
+<p>
+expr 是一个用于进行表达式求值的 Shell 命令。
+它可以执行基本的算术运算、字符串操作和逻辑运算。
+下面是 expr 命令的一些常见用法和示例：
+</p>
+
+<ol class="org-ol">
+<li><p>
+算术运算
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">expr 2 + 3  <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 5</span>
+expr 5 - 2  <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 3</span>
+expr 2 <span class="org-string">\*</span> 3 <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 6</span>
+expr 5 / 2  <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 2</span>
+</pre>
+</div></li>
+
+<li><p>
+逻辑运算
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">expr 2 = 3    <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 0. &#22914;&#26524;2&#31561;&#20110;3&#65292;&#21017;&#36820;&#22238;1&#65292;&#21542;&#21017;&#36820;&#22238;0</span>
+expr 2 != 3   <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 1. &#22914;&#26524;2&#19981;&#31561;&#20110;3&#65292;&#21017;&#36820;&#22238;1&#65292;&#21542;&#21017;&#36820;&#22238;0</span>
+expr 2 <span class="org-string">\&gt;</span> 3   <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 0. &#22914;&#26524;2&#22823;&#20110;3&#65292;&#21017;&#36820;&#22238;1&#65292;&#21542;&#21017;&#36820;&#22238;0</span>
+expr 2 <span class="org-string">\&lt;</span> 3   <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 1. &#22914;&#26524;2&#23567;&#20110;3&#65292;&#21017;&#36820;&#22238;1&#65292;&#21542;&#21017;&#36820;&#22238;0</span>
+expr 2 <span class="org-string">\&gt;</span>= 3  <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 0. &#22914;&#26524;2&#22823;&#20110;&#31561;&#20110;3&#65292;&#21017;&#36820;&#22238;1&#65292;&#21542;&#21017;&#36820;&#22238;0</span>
+expr 2 <span class="org-string">\&lt;</span>= 3  <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 1. &#22914;&#26524;2&#23567;&#20110;&#31561;&#20110;3&#65292;&#21017;&#36820;&#22238;1&#65292;&#21542;&#21017;&#36820;&#22238;0</span>
+</pre>
+</div></li>
+
+<li><p>
+字符串操作
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 4. &#23383;&#31526;&#20018;&#21305;&#37197;, &#36820;&#22238;&#21305;&#37197;&#30340;&#23383;&#31526;&#20018;&#38271;&#24230;(&#25903;&#25345;&#27491;&#21017;&#21305;&#37197;)</span>
+expr <span class="org-string">"Hello"</span> : <span class="org-string">"e.*o"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 5. &#36820;&#22238;&#23383;&#31526;&#20018;&#38271;&#24230;</span>
+expr length <span class="org-string">"Hello"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: ell. &#23383;&#31526;&#20018;&#25130;&#21462;</span>
+expr substr <span class="org-string">"Hello"</span> 2 3
+</pre>
+</div></li>
+</ol>
+
+<p>
+注意事项：
+</p>
+<ul class="org-ul">
+<li><code>expr</code> 命令的参数和操作数之间需要用空格隔开。</li>
+<li>某些特殊字符（如 <code>*</code> ）需要进行转义，使用反斜杠 <code>\</code> 进行转义。</li>
+</ul>
+</div>
+</section>
+
+<section id="outline-container-orgc23f668" class="outline-2">
+<h2 id="orgc23f668"><code>$((...))</code> 结构</h2>
+<div class="outline-text-2" id="text-orgc23f668">
+<p>
+<code>$((...))</code> 结构提供了一种方便的方式来进行数学计算
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#31639;&#26415;&#36816;&#31639;</span>
+<span class="org-builtin">echo</span> $((2 + 3))           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 5. &#21152;&#27861;</span>
+<span class="org-builtin">echo</span> $((5 - 2))           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 3. &#20943;&#27861;</span>
+<span class="org-builtin">echo</span> $((2 * 3))           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 6. &#20056;&#27861;</span>
+<span class="org-builtin">echo</span> $((5 / 2))           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 2. &#38500;&#27861;</span>
+<span class="org-builtin">echo</span> $((5 % 3))           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 2. &#21462;&#20313;</span>
+<span class="org-builtin">echo</span> $((1 &lt;&lt; 2))          <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 4. &#24038;&#31227;</span>
+<span class="org-builtin">echo</span> $((10 &gt;&gt; 2))         <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 2. &#21491;&#31227;</span>
+<span class="org-builtin">echo</span> $((2 * (3+4)))       <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 14. &#20351;&#29992;&#25324;&#21495;&#25511;&#21046;&#20248;&#20808;&#32423;</span>
+<span class="org-variable-name">x</span>=2; <span class="org-variable-name">y</span>=3; <span class="org-builtin">echo</span> $((x + y)) <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 5. &#25903;&#25345;&#21464;&#37327;</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36923;&#36753;&#36816;&#31639;</span>
+<span class="org-builtin">echo</span> $((2 == 3)) <span class="org-comment-delimiter"># </span><span class="org-comment">0</span>
+<span class="org-builtin">echo</span> $((2 != 3)) <span class="org-comment-delimiter"># </span><span class="org-comment">1</span>
+<span class="org-builtin">echo</span> $((2 &gt; 3))  <span class="org-comment-delimiter"># </span><span class="org-comment">0</span>
+<span class="org-builtin">echo</span> $((2 &lt; 3))  <span class="org-comment-delimiter"># </span><span class="org-comment">1</span>
+<span class="org-builtin">echo</span> $((2 &gt;= 3)) <span class="org-comment-delimiter"># </span><span class="org-comment">0</span>
+<span class="org-builtin">echo</span> $((2 &lt;= 3)) <span class="org-comment-delimiter"># </span><span class="org-comment">1</span>
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org43bc287" class="outline-2">
+<h2 id="org43bc287"><code>((...))</code> 结构</h2>
+<div class="outline-text-2" id="text-org43bc287">
+<p>
+<code>((...))</code> 结构与带美元符号的 <code>$((...))</code> 类似。
+不同的是其结果必须直接赋值给变量, 且变量名要写在括号里面。
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#31639;&#26415;&#36816;&#31639;</span>
+((val = 2 + 3))           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 5. &#21152;&#27861;</span>
+((val = 5 - 2))           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 3. &#20943;&#27861;</span>
+((val = 2 * 3))           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 6. &#20056;&#27861;</span>
+((val = 5 / 2))           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 2. &#38500;&#27861;</span>
+((val = 5 % 3))           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 2. &#21462;&#20313;</span>
+((val = 1 &lt;&lt; 2))          <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 4. &#24038;&#31227;</span>
+((val = 10 &gt;&gt; 2))         <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 2. &#21491;&#31227;</span>
+((val = 2 * (3+4)))       <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 14. &#20351;&#29992;&#25324;&#21495;&#25511;&#21046;&#20248;&#20808;&#32423;</span>
+<span class="org-variable-name">x</span>=2; <span class="org-variable-name">y</span>=3; ((val = x + y)) <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 5. &#25903;&#25345;&#21464;&#37327;</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36923;&#36753;&#36816;&#31639;</span>
+((val = 2 == 3)) <span class="org-comment-delimiter"># </span><span class="org-comment">0</span>
+((val = 2 != 3)) <span class="org-comment-delimiter"># </span><span class="org-comment">1</span>
+((val = 2 &gt; 3))  <span class="org-comment-delimiter"># </span><span class="org-comment">0</span>
+((val = 2 &lt; 3))  <span class="org-comment-delimiter"># </span><span class="org-comment">1</span>
+((val = 2 &gt;= 3)) <span class="org-comment-delimiter"># </span><span class="org-comment">0</span>
+((val = 2 &lt;= 3)) <span class="org-comment-delimiter"># </span><span class="org-comment">1</span>
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org45b5a2a" class="outline-2">
+<h2 id="org45b5a2a"><code>let</code> 命令</h2>
+<div class="outline-text-2" id="text-org45b5a2a">
+<p>
+在 Shell 中， let 命令是用于进行算术运算的一种方式。
+它可以在 Shell 脚本中直接进行数学计算，并将结果赋值给变量。
+下面是 let 命令的一些常见用法和示例：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">let <span class="org-variable-name">val</span>=2+3; <span class="org-builtin">echo</span> $<span class="org-variable-name">val</span>           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 5</span>
+let <span class="org-variable-name">val</span>=5-2; <span class="org-builtin">echo</span> $<span class="org-variable-name">val</span>           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 3</span>
+let <span class="org-variable-name">val</span>=2<span class="org-string">\*</span>3; <span class="org-builtin">echo</span> $<span class="org-variable-name">val</span>          <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 6</span>
+let <span class="org-variable-name">val</span>=<span class="org-string">"2*3"</span>; <span class="org-builtin">echo</span> $<span class="org-variable-name">val</span>         <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 6</span>
+let <span class="org-variable-name">val</span>=5/2; <span class="org-builtin">echo</span> $<span class="org-variable-name">val</span>           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 2</span>
+let <span class="org-variable-name">val</span>=5%3; <span class="org-builtin">echo</span> $<span class="org-variable-name">val</span>           <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 2</span>
+<span class="org-variable-name">x</span>=2; <span class="org-variable-name">y</span>=3; let <span class="org-variable-name">val</span>=x+y; <span class="org-builtin">echo</span> $<span class="org-variable-name">val</span> <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 5</span>
+</pre>
+</div>
+
+<p>
+注意事项:
+</p>
+<ul class="org-ul">
+<li>等号两边不能有空格</li>
+<li>计算公式可以用双引号包裹</li>
+<li>乘号需要转义, 用双引号包裹时则无需转义</li>
+</ul>
+</div>
+</section>
+
+<section id="outline-container-orgfe1d689" class="outline-2">
+<h2 id="orgfe1d689"><code>bc</code> 命令</h2>
+<div class="outline-text-2" id="text-orgfe1d689">
+<p>
+<code>bc</code> 命令是一种用于进行任意精度计算的工具。
+它可以在 Shell 脚本中执行数学运算，包括整数和小数的加减乘除、取余、幂运算等。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">echo "&#34920;&#36798;&#24335;" | bc</span>
+<span class="org-builtin">echo</span> <span class="org-string">"2+3"</span> | bc          <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 5</span>
+<span class="org-builtin">echo</span> <span class="org-string">"5-2"</span> | bc          <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 3</span>
+<span class="org-builtin">echo</span> <span class="org-string">"2*3"</span> | bc          <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 6</span>
+<span class="org-builtin">echo</span> <span class="org-string">"5/2"</span> | bc          <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 2</span>
+<span class="org-builtin">echo</span> <span class="org-string">"5%3"</span> | bc          <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 2</span>
+<span class="org-builtin">echo</span> <span class="org-string">"scale=2; 5/3"</span> | bc <span class="org-comment-delimiter"># </span><span class="org-comment">&#32467;&#26524;: 1.66</span>
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org745cc81" class="outline-2">
+<h2 id="org745cc81"><code>awk</code> 命令</h2>
+<div class="outline-text-2" id="text-org745cc81">
+<p>
+<code>awk</code> 太过强大, 就不在这篇文章写了。
+</p>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>微信生态开发-零散知识点</title>
+<meta name="keywords" content="珊瑚礁上的程序员, 微信开发, 微信生态, 微信公众号开发, 微信小程序开发, 微信支付开发, 微信服务商, 小程序服务商, 支付服务商" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">微信生态开发-零散知识点</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2019-11-18</p>
+</header><p>
+目前只是零散的记录一些微信开发的相关知识点和Q&amp;A，侧重于服务商这块，持续更新，后面有时间了再统一梳理。
+</p>
+
+<ul class="org-ul">
+<li>基础概念
+<ul class="org-ul">
+<li>微信公众平台</li>
+<li>微信开放平台</li>
+<li>微信公众号</li>
+<li>微信小程序</li>
+<li>微信小游戏</li>
+<li>微信支付</li>
+<li>微信公众平台-第三方平台（公众号服务商, 小程序服务商）</li>
+<li>微信支付服务商</li>
+</ul></li>
+</ul>
+
+<div class="alert alert-primary info" id="orgf0da58d">
+<p class="verse">
+下文中出现的一些名词解释：<br>
+&#xa0;&#xa0;&#xa0;&#xa0;<code>服务商</code>: 未特别说明，均指微信公众平台-第三方平台，即公众号服务商或小程序服务商; 同时对外提供SaaS服务，如商城等;<br>
+&#xa0;&#xa0;&#xa0;&#xa0;<code>商户</code>: 使用服务商SaaS服务（商城）的客户;<br>
+&#xa0;&#xa0;&#xa0;&#xa0;<code>用户</code>: 访问商户在线商城的微信用户;<br>
+<br>
+文中提及的部分解决方案，仅作为参考，并非唯一的处理方式。 <code>请结合自身实际业务情况合理选用</code><br>
+</p>
+
+</div>
+
+<ul class="org-ul">
+<li><b>作为公众号服务商，用户访问商户的商城时应该怎么处理授权逻辑（即该用服务商的公众号还是商户的公众号）？</b>
+<ol class="org-ol">
+<li><i>微信授权获取用户头像/昵称时（用户有感知）, 使用服务商自己的公众号；</i> 并基于用户对服务商公众号的openid做登录/账号绑定;
+<ul class="org-ul">
+<li>商家以便没有公众号，也可以正常使用商城服务，用户可正常访问和下单;</li>
+<li>已授权拿到头像/昵称的微信用户，信息可以共享，即便访问不同商户的商城，也无需重新授权获取;</li>
+<li>用户对服务商的公众号来说是唯一的，基于此做登录/账号绑定，可以方便的支持商家更换公众号;</li>
+</ul></li>
+<li><i>给用户发送模板消息（如购买成功等）时，使用商家自己的公众号；</i> （只需采用静默授权，拿到用户对于商家公众号的openid即可）
+<ul class="org-ul">
+<li>对商家友好，利于品牌推广；</li>
+<li>对用户友好，明确购买的确实是该商户的产品或服务，需要关注的是商家的公众号，而非服务商的公众号；</li>
+<li>对服务商友好，规避风险；</li>
+</ul></li>
+</ol></li>
+</ul>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>将大文件切割成多个小文件</title>
+<meta name="keywords" content="珊瑚礁上的程序员, linux, split" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">将大文件切割成多个小文件</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2024-01-26</p>
+</header><p>
+这种场景还是挺常见的，比如：
+</p>
+
+<ol class="org-ol">
+<li>文本文件太大了，编辑器打开耗时太长，需要切割成小文件再打开</li>
+<li>某些工具传输单个文件有大小限制，如微信、公司邮箱等</li>
+</ol>
+
+<p>
+这种时候就可以借助 <code>split</code> 来切割文件了，传输/处理完后再使用 <code>cat</code> 命令来拼接成完整的文件。
+</p>
+
+<p>
+重点要提的一点是 <code>split</code> 不仅可以用来切割文本文件，也可以切割任何二进制文件。
+切割之后再使用 <code>cat</code> 命令拼接得到的依旧是原来的，完整的，有效的二进制文件。
+</p>
+
+<p>
+<code>split</code> 命令的用法其实很简单，参数和支持的选项都不多。
+</p>
+
+<section id="outline-container-org20a9222" class="outline-2">
+<h2 id="org20a9222">基本用法</h2>
+<div class="outline-text-2" id="text-org20a9222">
+<div class="org-src-container">
+<pre class="src src-shell">split [&#36873;&#39033;] [&#35201;&#20999;&#21106;&#30340;&#25991;&#20214; [&#20999;&#21106;&#21518;&#30340;&#23567;&#25991;&#20214;&#21517;&#31216;&#21069;&#32512;]]
+</pre>
+</div>
+
+<p>
+split 命令是支持管道操作符的，
+如果要切割的文件没传值或者传值为 <code>-</code> ，则表示从标准输入读取数据。
+例如：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-builtin">echo</span> <span class="org-string">"hello world"</span> | split -b 5 - test_
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-orgcb89f23" class="outline-2">
+<h2 id="orgcb89f23">切割文本文件(按行数切割)</h2>
+<div class="outline-text-2" id="text-orgcb89f23">
+<div class="org-src-container">
+<pre class="src src-shell">split -l 100 input_file.txt output_prefix
+</pre>
+</div>
+
+<p>
+这将把 <code>input_file.txt</code> 分割成每个包含 100 行的小文件，以 <code>output_prefix</code> 为小文件名前缀。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org8bbd369" class="outline-2">
+<h2 id="org8bbd369">切割二进制文件(按大小切割)</h2>
+<div class="outline-text-2" id="text-org8bbd369">
+<div class="org-src-container">
+<pre class="src src-shell">split -b 20M large_file.exe output_prefix
+</pre>
+</div>
+
+<p>
+这将把 <code>large_file.exe</code> 分割成每个文件大小为 <code>20M</code> 的部分，以 <code>output_prefix</code> 为小文件名前缀。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org8292198" class="outline-2">
+<h2 id="org8292198">合并为完整的文件</h2>
+<div class="outline-text-2" id="text-org8292198">
+<div class="org-src-container">
+<pre class="src src-shell">cat output_prefix* &gt; new_large_file.exe
+</pre>
+</div>
+
+<p>
+这样就可以把切割后的多个小文件拼接成一个大文件，
+可以和原始的大文件对比一下 <code>md5</code>, 它们是一样的，说明文件并没有被损坏。
+</p>
+
+<p>
+也就是说，如果原文件是图片，合并后还能正常打开查看；
+原文件是 windows 安装包，合并后还能双击安装[手动狗头]。
+</p>
+</div>
+</section>
+
+<section id="outline-container-orgf5f5dba" class="outline-2">
+<h2 id="orgf5f5dba">其他选项的用法示例</h2>
+<div class="outline-text-2" id="text-orgf5f5dba">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-builtin">echo</span> <span class="org-string">"hello world"</span> | split -b5 -a4 -d --additional-suffix=.txt - test_
+</pre>
+</div>
+
+<ul class="org-ul">
+<li><code>-a4</code> : 指定文件后缀长度为 4 位</li>
+<li><code>-d</code> : 指定使用数字作为文件序号，而不是字母</li>
+<li><code>--additional-suffix=.txt</code> : 指定为所有文件再添加额外的后缀为 <code>.txt</code></li>
+</ul>
+
+<p>
+如上命令将得到三个文件，分别是
+</p>
+<pre class="example" id="orgb3aa4e0">
+test_0000.txt
+test_0001.txt
+test_0002.txt
+</pre>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

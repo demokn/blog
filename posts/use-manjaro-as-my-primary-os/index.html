@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>尝试使用 Manjaro Linux 做为主力开发机</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Manjaro Linux, 主力机" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">尝试使用 Manjaro Linux 做为主力开发机</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2021-11-07</p>
+</header><p>
+一直想尝试，从未敢实践。
+</p>
+
+<p>
+公司给配的是联想的本子，性能倒是还可以，但就是在 Windows 下开发总会碰到一些这样或那样的问题。
+</p>
+
+<p>
+最近让我比较难以忍受的是:
+</p>
+
+<ol class="org-ol">
+<li>电脑偶尔蓝屏，看报错大概是因为虚拟机的问题吧，平均一周蓝 1-2 次；</li>
+<li>公司项目太大，git 相关操作在 windows 下表现太慢；</li>
+</ol>
+
+<p>
+刚巧发现竟然有同事在用 <code>Arch</code> 做主力机，在佩服之余，也决定把我的台式机抱去公司尝试一下用 <code>Linux</code> 做主力机到底可不可行。
+</p>
+
+<section id="outline-container-org1d6d01b" class="outline-2">
+<h2 id="org1d6d01b">发行版的选择</h2>
+<div class="outline-text-2" id="text-org1d6d01b">
+<p>
+我目前选择的方案是 <code>Manjaro KDE</code> + <code>DWM</code> 。
+至于选这个方案的原因嘛，也没必要太纠结，纯看个人喜好了。
+我的笔记本一直在用的就是 <code>Manjaro XFCE</code> + <code>DWM</code> 。
+选 <code>Manjaro</code> 是因为喜欢 <code>Arch</code> ， 没用裸 Arch 是因为毕竟做为主力机， <code>Manjaro</code> 还是更保守一点，万一在公司滚挂就不好看了。
+又装了个 <code>DWM</code> 是因为个人还是比较喜欢平铺式桌面的。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org28b1377" class="outline-2">
+<h2 id="org28b1377">系统安装</h2>
+<div class="outline-text-2" id="text-org28b1377">
+<p>
+<code>Manjaro</code> 可以说是一键安装了，比较简单。这里主要记录一下硬盘分区信息。
+</p>
+
+<table class="table table-sm table-hover">
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">挂载点</th>
+<th scope="col" class="org-left">文件系统格式</th>
+<th scope="col" class="org-left">分区大小</th>
+<th scope="col" class="org-left">Flags</th>
+<th scope="col" class="org-left">是否加密</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">/boot/efi</td>
+<td class="org-left">fat32</td>
+<td class="org-left">512M</td>
+<td class="org-left">boot</td>
+<td class="org-left">-</td>
+</tr>
+
+<tr>
+<td class="org-left">/</td>
+<td class="org-left">ext4</td>
+<td class="org-left">150G</td>
+<td class="org-left">root</td>
+<td class="org-left">🔒</td>
+</tr>
+
+<tr>
+<td class="org-left">/home</td>
+<td class="org-left">ext4</td>
+<td class="org-left">300G</td>
+<td class="org-left">-</td>
+<td class="org-left">🔒</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

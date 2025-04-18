@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nginx + PHP-FPM: "Primary script unknown" 问题排查</title>
+<meta name="keywords" content="珊瑚礁上的程序员, nginx, php, php-fpm, fastcgi, primary script unknown" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Nginx + PHP-FPM: &ldquo;Primary script unknown&rdquo; 问题排查</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2020-02-09</p>
+</header><p>
+前几天在笔记本上开发PHP项目的时候，想调试接口，浏览器上却无情的出现了 &ldquo;File not found&rdquo; 的空白页面。
+笔记本上的开发环境是早就配置好了的，而且一直都是正常在用的，当时又是急着调试，却出现这种情况，顿时脑瓜子嗡嗡的。
+简单排查了一下 <code>访问url是否正确</code>, <code>hosts文件是否正常</code>, <code>nginx root路径是否正确</code> ，并没有找到原因。
+因为急着调试，这个问题就暂时放在一边了，先使用php内置的Web服务新起一个Server(<code>php -S 127.0.0.1:8001 -t /PATH/PROJECT/public</code>)继续调试。
+今天抽时间把这个问题解决并记录一下。
+</p>
+
+<section id="outline-container-orgb775592" class="outline-2">
+<h2 id="orgb775592">先说现象</h2>
+<div class="outline-text-2" id="text-orgb775592">
+<p>
+浏览器访问页面时，页面&ldquo;报错&rdquo; <code>File not found</code> 。
+</p>
+
+<p>
+查看 nginx 日志， 访问日志(access_log)如下：
+</p>
+
+<pre class="example" id="org53f9bd7">
+127.0.0.1 - - [09/Feb/2020:22:20:48 +0800] "GET /api HTTP/1.1" 404 27 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36"
+</pre>
+
+<p>
+错误日志(error_log)如下：
+</p>
+
+<pre class="example" id="org4f74c5c">
+2020/02/09 22:20:48 [error] 12451#12451: *1 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 127.0.0.1, server: dl.dev.com, request: "GET /api HTTP/1.1", upstream: "fastcgi://unix:/run/php-fpm/php-fpm.sock:", host: "dl.dev.com"
+</pre>
+</div>
+</section>
+
+<section id="outline-container-org0b2a88a" class="outline-2">
+<h2 id="org0b2a88a">开发环境</h2>
+<div class="outline-text-2" id="text-org0b2a88a">
+<pre class="example" id="org6e38913">
+OS: 4.19.102-1-MANJARO(Arch Linux)
+PHP Version: 7.4.2
+Nginx Version: 1.16.1
+Service Manager: Systemd 242
+</pre>
+</div>
+</section>
+
+<section id="outline-container-orgf2f47da" class="outline-2">
+<h2 id="orgf2f47da">常见原因</h2>
+<div class="outline-text-2" id="text-orgf2f47da">
+<p>
+出现这个错误的原因一般有两个，一个是nginx或php-fpm确实找不到php文件，一个是php-fpm没有权限读取和执行php文件。
+</p>
+</div>
+
+<div id="outline-container-orgf9e2a16" class="outline-3">
+<h3 id="orgf9e2a16">1. 找不到文件问题</h3>
+<div class="outline-text-3" id="text-orgf9e2a16">
+</div>
+<div id="outline-container-org531fc13" class="outline-4">
+<h4 id="org531fc13">1) 排查 nginx 是否访问到正确的文件路径</h4>
+<div class="outline-text-4" id="text-org531fc13">
+<p>
+可以通过 nginx 访问日志查看文件路径是否正确。
+</p>
+
+<p>
+打开 nginx 主配置文件（我的是 <code>/etc/nginx/nginx.conf</code> ）,在http代码块中增加：
+</p>
+<div class="org-src-container">
+<pre class="src src-conf"><span class="org-comment-delimiter"># </span><span class="org-comment">$document_root$fastcgi_script_name &#20854;&#23454;&#23601;&#26159; server &#20195;&#30721;&#22359;&#20013;&#30340; fastcgi_param SCRIPT_NAME &#30340;&#20540;</span>
+log_format scripts <span class="org-string">'$document_root$fastcgi_script_name &gt; $request'</span>;
+</pre>
+</div>
+
+<p>
+继续打开 nginx server 配置文件（我的是 <code>/etc/nginx/sites-enabled/dl.dev.com.conf</code> ）,在server代码块增加：
+</p>
+<div class="org-src-container">
+<pre class="src src-conf">access_log /var/log/nginx/scripts.log scripts;
+</pre>
+</div>
+
+<p>
+重启nginx服务（ <code>systemctl restart nginx.service</code> ），再次访问接口，可以在日志文件中看到：
+</p>
+<pre class="example" id="org145f5b4">
+/home/demo/Code/coco/dl/frontend/web/index.php &gt; GET /api HTTP/1.1
+</pre>
+
+<p>
+再次确认日志文件中的文件路径，确实没错。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org2f97fbd" class="outline-4">
+<h4 id="org2f97fbd">2) 排查 php-fpm 是否访问到正确的文件</h4>
+<div class="outline-text-4" id="text-org2f97fbd">
+<p>
+同样是通过 php-fpm 的访问日志排查。
+</p>
+
+<p>
+编辑 php-fpm 配置文件（我的是 <code>/etc/php/php-fpm.d/www.conf</code> ）：
+</p>
+<div class="org-src-container">
+<pre class="src src-conf"><span class="org-variable-name">access.log</span> = /var/log/php-fpm/$pool.access.log
+</pre>
+</div>
+
+<p>
+重启php-fpm（ <code>systemctl restart php-fpm.service</code> ），再次访问接口，可以在日志文件中看到：
+</p>
+<pre class="example" id="org0b24e89">
+- -  09/Feb/2020:17:19:50 +0800 "GET /index.php" 404
+</pre>
+
+<p>
+可以看到 nginx 传递给 php-fpm 的文件确实是 <code>index.php</code>, 但 php-fpm 响应的是 404, 说明是 php-fpm 无法(无权限)访问到文件。
+</p>
+<div class="alert alert-primary info" id="orgbee519c">
+<p>
+如果日志显示 <code>GET /</code> 或 <code>GET /api</code> 则说明 nginx 传递给 php-fpm 的文件名是错误的。
+</p>
+
+<p>
+如果一切正常，日志显示应该是 <code>"GET /index.php" 200</code> 。
+</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga0e2cdc" class="outline-3">
+<h3 id="orga0e2cdc">2. 权限问题</h3>
+<div class="outline-text-3" id="text-orga0e2cdc">
+</div>
+<div id="outline-container-org222a88b" class="outline-4">
+<h4 id="org222a88b">1) 进程用户</h4>
+<div class="outline-text-4" id="text-org222a88b">
+<p>
+nginx 进程 和 php-fpm 进程要是同一个用户。
+</p>
+
+<p>
+查看 nginx 和 php-fpm 进程信息:
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">ps -ef | grep nginx
+ps -ef | grep php-fpm
+</pre>
+</div>
+
+<pre class="example" id="orged8baa7">
+➜ ps -ef | grep nginx
+root     13038     1  0 12:05 ?        00:00:00 nginx: master process /usr/bin/nginx -g pid /run/nginx.pid; error_log stderr;
+demo     13039 13038  0 12:05 ?        00:00:00 nginx: worker process
+demo     13040 13038  0 12:05 ?        00:00:00 nginx: worker process
+</pre>
+
+<pre class="example" id="org58428c3">
+➜ ps -ef | grep php-fpm
+root     13022     1  0 12:05 ?        00:00:00 php-fpm: master process (/etc/php/php-fpm.conf)
+demo     13041 13022  0 12:05 ?        00:00:00 php-fpm: pool www
+demo     13042 13022  0 12:05 ?        00:00:00 php-fpm: pool www
+</pre>
+
+<p>
+可以看到 nginx 和 php-fpm 进程所属用户都是 <code>demo</code>, 说明配置没有问题。
+</p>
+
+<p>
+如果两个进程所属用户不同，需要修改如下配置文件：
+</p>
+
+<p>
+<code>nginx.conf</code> :
+</p>
+<div class="org-src-container">
+<pre class="src src-conf">user demo;
+</pre>
+</div>
+
+<p>
+<code>php-fpm.d/www.conf</code> :
+</p>
+<div class="org-src-container">
+<pre class="src src-conf">; Unix user/group of processes
+; Note: The user is mandatory. If the group is not set, the default user<span class="org-string">'s group</span>
+<span class="org-string">;       will be used.</span>
+<span class="org-string">user = demo</span>
+<span class="org-string">group = demo</span>
+
+<span class="org-string">; Set permissions for unix socket, if one is used. In Linux, read/write</span>
+<span class="org-string">; permissions must be set in order to allow connections from a web server. Many</span>
+<span class="org-string">; BSD-derived systems allow connections regardless of permissions.</span>
+<span class="org-string">; Default Values: user and group are set as the running user</span>
+<span class="org-string">;                 mode is set to 0660</span>
+<span class="org-string">listen.owner = demo</span>
+<span class="org-string">listen.group = demo</span>
+<span class="org-string">;listen.mode = 0660</span>
+</pre>
+</div>
+
+<div class="alert alert-primary info" id="org0c5b4de">
+<p>
+在开发环境下，建议进程用户配置为当前登录用户即可，可以避免处理一些目录和文件权限问题，省心。
+</p>
+
+</div>
+
+<p>
+记得配置修改后，需要重启服务才能生效。
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">systemctl restart nginx.service php-fpm.service
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1b15919" class="outline-4">
+<h4 id="org1b15919">2) 目录和文件权限</h4>
+<div class="outline-text-4" id="text-org1b15919">
+<p>
+nginx 和 php-fpm 进程运行用户对 php 入口文件必须要有 <code>可读(r)</code> 权限，对入口文件所在目录（逐级目录）必须要有 <code>可执行(x)</code> 权限。
+</p>
+
+<div class="alert alert-primary info" id="org127657a">
+<p>
+通常，目录无可执行权限，页面报错为 <code>File not found.</code>
+</p>
+
+<p>
+文件无可读权限，页面报错为 <code>Access denied.</code>
+</p>
+
+</div>
+
+<p>
+逐级检查目录和文件权限，我的结果如下：
+</p>
+<pre class="example" id="org20a7d44">
+drwxr-xr-x  3 root root 4.0K  1月 20  2019 /home
+drwx------ 58 demo demo 4.0K  2月 13 14:33 /home/demo
+drwxr-xr-x  6 demo demo 4.0K  2月  9 16:37 /home/demo/Code
+drwxr-xr-x 10 demo demo 4.0K 11月 11 21:39 /home/demo/Code/coco
+drwxr-xr-x 11 demo demo 4.0K  2月 12 22:19 /home/demo/Code/coco/dl
+drwxr-xr-x 11 demo demo 4.0K  2月  3 11:00 /home/demo/Code/coco/dl/frontend
+drwxr-xr-x  4 demo demo 4.0K  2月 12 22:18 /home/demo/Code/coco/dl/frontend/web
+-rw-r--r--  1 demo demo 611   8月 14  2019 /home/demo/Code/coco/dl/frontend/web/index.php
+</pre>
+
+<p>
+从结果来看，目录和文件的权限都是正常的。如果你发现自己的目录或文件权限异常，可使用 <code>chown</code> 和 <code>chmod</code> 修改。
+</p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org1de689e" class="outline-2">
+<h2 id="org1de689e">继续排查</h2>
+<div class="outline-text-2" id="text-org1de689e">
+<p>
+以上列出的常见问题全部排查过了，没有发现什么异常，这却难住我了。
+</p>
+
+<p>
+回想一下，这套开发环境早就部署好了，而且一直都是正常在使用的，为什么会突然出现这个问题呢。
+上一次正常使用到现在突然出现问题这段时间，我干了什么&ldquo;坏事&rdquo;吗？
+记不清了，如果有的话，那可能就是升级了系统和软件。
+莫不是因为php版本或nginx版本升级的问题。
+反正暂时也没其他思路了，软件降级试试吧。
+</p>
+
+<p>
+先从php入手，因为生产版本使用的是 <code>php 7.2</code> ，那就再安装个 php 7.2 吧。
+</p>
+<div class="org-src-container">
+<pre class="src src-sh">yay -S php72 php72-fpm php72-gd php72-intl --removemake --nodiffmenu --noconfirm
+</pre>
+</div>
+
+<div class="alert alert-primary info" id="orga5edb36">
+<p>
+不同的操作系统安装方式不尽相同，我这里只是给自己做下记录，请结合自己的系统自行安装。
+</p>
+
+<p>
+具体配置就不再赘述了，记得配置好 php72-fpm 后把 nginx server 代码块中的 <code>fastcgi_pass</code> 指向 php72-fpm，然后重启服务。
+</p>
+
+</div>
+
+<p>
+服务重启后，神奇的事情发生了，问题解决了。
+</p>
+
+<p>
+diff 一下两个版本下的 <code>php-fpm.conf</code> 和 <code>php-fpm.d/www.conf</code> 配置文件，除了新增的几个配置项外，并没有发现什么特别的差异。
+难不成是 php 7.4 的锅？ 不幸的是还真的搜到了一个类似的还处于open状态的bug提交记录 <a href="https://bugs.php.net/bug.php?id=79014">Bug #79014 PHP-FPM &amp; Primary script unknown | no more PHP Render</a> 。
+难道就这样放弃吗，等着这个 ISSUE 更新？可又不甘心啊，如果真的是php 7.4.2 的bug，那应该早就被重视并解决了啊。Google 上也没找到更多关于 php-fpm 7.4 的类似bug报告。
+那就继续再找找问题吧。
+</p>
+
+<p>
+现在可以确定的是问题确实和php版本有关，去看源码找bug是不可能的了，这辈子都不可能[手动狗头]。
+那就还是只能试着找找本机上两个版本配置上的差异。
+</p>
+
+<p>
+使用 <code>systemctl status</code> 查看一下 php-fpm 和 php72-fpm 两个进程的状态：
+</p>
+<pre class="example" id="org7385d4d">
+➜ systemctl status php-fpm.service
+● php-fpm.service - The PHP FastCGI Process Manager
+   Loaded: loaded (/usr/lib/systemd/system/php-fpm.service; disabled; vendor preset: disabled)
+   Active: active (running) since Thu 2020-02-13 12:05:44 CST; 3h 12min ago
+ Main PID: 13022 (php-fpm)
+   Status: "Processes active: 0, idle: 2, Requests: 95, slow: 0, Traffic: 0req/sec"
+    Tasks: 3 (limit: 4915)
+   Memory: 36.3M
+   CGroup: /system.slice/php-fpm.service
+           ├─13022 php-fpm: master process (/etc/php/php-fpm.conf)
+           ├─13041 php-fpm: pool www
+           └─13042 php-fpm: pool www
+
+2月 13 12:05:43 Macy systemd[1]: Starting The PHP FastCGI Process Manager...
+2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] fpm is running, pid 13022
+2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] ready to handle connections
+2月 13 12:05:44 Macy php-fpm[13022]: [NOTICE] systemd monitor interval set to 10000ms
+2月 13 12:05:44 Macy systemd[1]: Started The PHP FastCGI Process Manager.
+</pre>
+
+<pre class="example" id="org71aa56d">
+➜ systemctl status php72-fpm.service
+● php72-fpm.service - The PHP FastCGI Process Manager
+   Loaded: loaded (/usr/lib/systemd/system/php72-fpm.service; disabled; vendor preset: disabled)
+   Active: active (running) since Thu 2020-02-13 12:05:43 CST; 3h 13min ago
+ Main PID: 13024 (php-fpm72)
+   Status: "Processes active: 0, idle: 2, Requests: 0, slow: 0, Traffic: 0req/sec"
+    Tasks: 3 (limit: 4915)
+   Memory: 13.9M
+   CGroup: /system.slice/php72-fpm.service
+           ├─13024 php-fpm: master process (/etc/php72/php-fpm.conf)
+           ├─13027 php-fpm: pool www
+           └─13028 php-fpm: pool www
+
+2月 13 12:05:43 Macy systemd[1]: Starting The PHP FastCGI Process Manager...
+2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] fpm is running, pid 13024
+2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] ready to handle connections
+2月 13 12:05:43 Macy php-fpm[13024]: [NOTICE] systemd monitor interval set to 10000ms
+2月 13 12:05:43 Macy systemd[1]: Started The PHP FastCGI Process Manager.
+</pre>
+
+<p>
+进程状态都是正常的，但是我好像又发现了两个可以对比的配置文件，。
+<code>/usr/lib/systemd/system/php-fpm.service</code> 和 <code>/usr/lib/systemd/system/php72-fpm.service</code> 。
+虽然没抱多大希望，但也没其他思路，就当随便看看吧。
+然而，猜猜我发现了什么，此处必须加“握操”。
+php 7.4.2 的 systemd service 配置文件中多出了这么几个配置项，注释也是清晰明了：
+</p>
+<div class="org-src-container">
+<pre class="src src-conf"><span class="org-comment-delimiter"># </span><span class="org-comment">Set up a new file system namespace and mounts private /tmp and /var/tmp directories</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">so this service cannot access the global directories and other processes cannot</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">access this service's directories.</span>
+<span class="org-variable-name">PrivateTmp</span>=true
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">The directories /home, /root and /run/user are made inaccessible and empty for processes</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">invoked by this unit.</span>
+<span class="org-variable-name">ProtectHome</span>=true
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Mounts the /usr, /boot, and /etc directories read-only for processes invoked by this unit.</span>
+<span class="org-variable-name">ProtectSystem</span>=full
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Sets up a new /dev namespace for the executed processes and only adds API pseudo devices</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">such as /dev/null, /dev/zero or /dev/random (as well as the pseudo TTY subsystem) to it,</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">but no physical devices such as /dev/sda.</span>
+<span class="org-variable-name">PrivateDevices</span>=true
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Explicit module loading will be denied. This allows to turn off module load and unload</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">operations on modular kernels. It is recommended to turn this on for most services that</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">do not need special file systems or extra kernel modules to work.</span>
+<span class="org-variable-name">ProtectKernelModules</span>=true
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Kernel variables accessible through /proc/sys, /sys, /proc/sysrq-trigger, /proc/latency_stats,</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">/proc/acpi, /proc/timer_stats, /proc/fs and /proc/irq will be made read-only to all processes</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">of the unit. Usually, tunable kernel variables should only be written at boot-time, with the</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">sysctl.d(5) mechanism. Almost no services need to write to these at runtime; it is hence</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">recommended to turn this on for most services.</span>
+<span class="org-variable-name">ProtectKernelTunables</span>=true
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">The Linux Control Groups (cgroups(7)) hierarchies accessible through /sys/fs/cgroup will be</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">made read-only to all processes of the unit. Except for container managers no services should</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">require write access to the control groups hierarchies; it is hence recommended to turn this on</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">for most services</span>
+<span class="org-variable-name">ProtectControlGroups</span>=true
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Any attempts to enable realtime scheduling in a process of the unit are refused.</span>
+<span class="org-variable-name">RestrictRealtime</span>=true
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Restricts the set of socket address families accessible to the processes of this unit.</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Protects against vulnerabilities such as CVE-2016-8655</span>
+<span class="org-variable-name">RestrictAddressFamilies</span>=AF_INET AF_INET6 AF_NETLINK AF_UNIX
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Takes away the ability to create or manage any kind of namespace</span>
+<span class="org-variable-name">RestrictNamespaces</span>=true
+</pre>
+</div>
+
+<p>
+对我来说最值得注意的是 <code>ProtectHome=true</code> ，因为我的代码是放在了 <code>$HOME</code> 目录下。
+真相就要浮出水面了，抓紧改成 false，重启一下 php-fpm 试试。“握草”，好了。
+</p>
+
+<p>
+我也不知道说什么好了，只是给大家提供一个思路。
+如果你碰到了和我一样的情况，基本情况都排查完了，问题还是没解决，可以再查看一下 <code>php-fpm.service</code> 配置里是不是把代码所在目录设为保护了。
+这个真的是没曾想到过的问题，也是因为对 <code>systemd service manager</code> 的不熟悉吧，只是知道使用 <code>systemctl [start|stop|restart]</code> 。
+</p>
+
+<p>
+当然，这个原因总结下来，还是因为 php-fpm 进程找不到文件，而找不到文件的原因并不是文件不存在，而是文件被服务管理器 <code>systemd</code> 保护起来了。
+</p>
+
+<p>
+再强行结个尾，不要轻言放弃。
+</p>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

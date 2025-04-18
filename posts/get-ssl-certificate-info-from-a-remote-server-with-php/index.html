@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>使用 PHP 获取网站 SSL 证书信息</title>
+<meta name="keywords" content="珊瑚礁上的程序员, php, ssl certificate" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">使用 PHP 获取网站 SSL 证书信息</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2020-05-25</p>
+</header><p>
+前两天，有用户反馈网站突然打不开了，看了一下用户给的截图，应该是网站的证书过期了。
+赶紧爬起来更新了一下证书。为了避免再次发生这种尴尬的事情，想着写一个简单的脚本，
+监控网站的证书到期时间，以便提醒自己及时更新证书。
+</p>
+
+<p>
+因为自己平时还是和 <code>php</code> 打交道比较多，也有现成的短信、邮件、企业微信等通知方式可用，
+所以还是决定用 <code>php</code> 来实现。
+关于如何使用PHP获取网站的SSL证书，经过简单的搜索和尝试，还是比较简单的，直接附上代码：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">url</span> <span class="org-php-assignment-op">=</span> <span class="org-php-string">'https://www.httpbin.org/'</span>;
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">host</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">parse_url</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">url</span>, <span class="org-php-constant">PHP_URL_HOST</span>);
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">streamContext</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">stream_context_create</span>([<span class="org-php-string">'ssl'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> [<span class="org-php-string">'capture_peer_cert'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-constant">true</span>]]);
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">socket</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">stream_socket_client</span>(
+    <span class="org-php-string">'ssl://'</span>.<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">host</span>.<span class="org-php-string">':443'</span>,
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">errorNo</span>,
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">errorMessage</span>,
+    30,
+    <span class="org-php-constant">STREAM_CLIENT_CONNECT</span>,
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">streamContext</span>
+);
+<span class="org-php-keyword">if</span> (<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">socket</span> <span class="org-php-comparison-op">===</span> <span class="org-php-constant">false</span>) {
+    <span class="org-php-keyword">echo</span> <span class="org-php-string">"[ERROR] Failed to open socket connection: </span><span class="org-php-variable-name">{$errorNo}</span><span class="org-php-string"> - </span><span class="org-php-variable-name">{$errorMessage}</span><span class="org-php-string">"</span>.<span class="org-php-constant">PHP_EOL</span>;
+    <span class="org-php-keyword">exit</span>(1);
+}
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">parameters</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">stream_context_get_params</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">socket</span>);
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">certificate</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">openssl_x509_parse</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">parameters</span>[<span class="org-php-string">'options'</span>][<span class="org-php-string">'ssl'</span>][<span class="org-php-string">'peer_certificate'</span>]);
+<span class="org-php-function-call-traditional">print_r</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">certificate</span>);
+</pre>
+</div>
+
+<p>
+解析后的证书信息如下：
+</p>
+
+<pre class="example" style="max-height:360px;" id="orga304d42">
+[
+    'name' =&gt; '/CN=httpbin.org',
+    'subject' =&gt; [
+        'CN' =&gt; 'httpbin.org',
+    ],
+    'hash' =&gt; '5a356b71',
+    'issuer' =&gt; [
+        'C' =&gt; 'US',
+        'O' =&gt; 'Amazon',
+        'OU' =&gt; 'Server CA 1B',
+        'CN' =&gt; 'Amazon',
+    ],
+    'version' =&gt; 2,
+    'serialNumber' =&gt; '15511154429359216763915851913648262204',
+    'serialNumberHex' =&gt; '0BAB56F52FC9F721C8C35BFC58E9CC3C',
+    'validFrom' =&gt; '200118000000Z',
+    'validTo' =&gt; '210218120000Z',
+    'validFrom_time_t' =&gt; 1579305600,
+    'validTo_time_t' =&gt; 1613649600,
+    'signatureTypeSN' =&gt; 'RSA-SHA256',
+    'signatureTypeLN' =&gt; 'sha256WithRSAEncryption',
+    'signatureTypeNID' =&gt; 668,
+    'purposes' =&gt; [
+        1 =&gt; [
+            true,
+            false,
+            'sslclient',
+        ],
+        2 =&gt; [
+            true,
+            false,
+            'sslserver',
+        ],
+        3 =&gt; [
+            true,
+            false,
+            'nssslserver',
+        ],
+        4 =&gt; [
+            false,
+            false,
+            'smimesign',
+        ],
+        5 =&gt; [
+            false,
+            false,
+            'smimeencrypt',
+        ],
+        6 =&gt; [
+            false,
+            false,
+            'crlsign',
+        ],
+        7 =&gt; [
+            true,
+            true,
+            'any',
+        ],
+        8 =&gt; [
+            true,
+            false,
+            'ocsphelper',
+        ],
+        9 =&gt; [
+            false,
+            false,
+            'timestampsign',
+        ],
+    ],
+    'extensions' =&gt; [
+        'authorityKeyIdentifier' =&gt; "keyid:59:A4:66:06:52:A0:7B:95:92:3C:A3:94:07:27:96:74:5B:F9:3D:D0\n",
+        'subjectKeyIdentifier' =&gt; '4D:47:D7:1B:DA:3A:E5:FB:D0:31:40:CA:CE:35:D6:54:B9:C8:EF:A5',
+        'subjectAltName' =&gt; 'DNS:httpbin.org, DNS:*.httpbin.org',
+        'keyUsage' =&gt; 'Digital Signature, Key Encipherment',
+        'extendedKeyUsage' =&gt; 'TLS Web Server Authentication, TLS Web Client Authentication',
+        'crlDistributionPoints' =&gt; "
+         \n
+         Full Name:\n
+           URI:http://crl.sca1b.amazontrust.com/sca1b.crl\n
+         ",
+        'certificatePolicies' =&gt; "
+         Policy: 2.16.840.1.114412.1.2\n
+         Policy: 2.23.140.1.2.1\n
+         ",
+        'authorityInfoAccess' =&gt; "
+         OCSP - URI:http://ocsp.sca1b.amazontrust.com\n
+         CA Issuers - URI:http://crt.sca1b.amazontrust.com/sca1b.crt\n
+         ",
+        'basicConstraints' =&gt; 'CA:FALSE',
+        'ct_precert_scts' =&gt; "
+         Signed Certificate Timestamp:\n
+             Version   : v1 (0x0)\n
+             Log ID    : EE:4B:BD:B7:75:CE:60:BA:E1:42:69:1F:AB:E1:9E:66:\n
+                         A3:0F:7E:5F:B0:72:D8:83:00:C4:7B:89:7A:A8:FD:CB\n
+             Timestamp : Jan 18 01:26:21.019 2020 GMT\n
+             Extensions: none\n
+             Signature : ecdsa-with-SHA256\n
+                         30:45:02:21:00:81:00:82:78:B4:00:81:AD:D1:F0:07:\n
+                         86:67:18:81:93:CB:7F:FD:17:1B:99:F4:62:28:1E:07:\n
+                         D7:E5:18:DE:7D:02:20:79:76:3E:C7:BA:16:42:62:12:\n
+                         85:70:AB:05:27:6A:79:36:17:AE:CC:50:71:61:3A:66:\n
+                         90:32:43:17:2C:75:45\n
+         Signed Certificate Timestamp:\n
+             Version   : v1 (0x0)\n
+             Log ID    : 87:75:BF:E7:59:7C:F8:8C:43:99:5F:BD:F3:6E:FF:56:\n
+                         8D:47:56:36:FF:4A:B5:60:C1:B4:EA:FF:5E:A0:83:0F\n
+             Timestamp : Jan 18 01:26:21.098 2020 GMT\n
+             Extensions: none\n
+             Signature : ecdsa-with-SHA256\n
+                         30:45:02:20:10:CC:62:29:B6:B0:5F:1E:1E:95:B5:67:\n
+                         BF:F2:43:59:62:4F:06:BC:21:14:A3:89:D0:5D:F5:95:\n
+                         48:C1:EE:A6:02:21:00:EC:33:CE:4D:A4:60:73:F7:07:\n
+                         DC:EC:C8:19:2B:BA:74:B6:9E:7B:91:7F:61:19:26:0B:\n
+                         D4:E2:91:68:96:4C:2F
+         ",
+    ],
+]
+</pre>
+
+<p>
+可以看到证书信息中的 <code>validTo_time_t</code> 就是证书到期时间。简单的配合 <code>CRONTAB</code> 每天检查一遍，就可以提前通知自己“证书即将到期，请及时更新”。
+</p>
+
+<section id="outline-container-orgd56bbfe" class="outline-2">
+<h2 id="orgd56bbfe">参考</h2>
+<div class="outline-text-2" id="text-orgd56bbfe">
+<ul class="org-ul">
+<li><a href="https://stackoverflow.com/questions/3081042/how-to-get-ssl-certificate-info-with-curl-in-php">How to get SSL certificate info with CURL in PHP?</a></li>
+<li><a href="https://www.php.net/manual/zh/context.ssl.php#context.ssl.capture-peer-cert">PHP SSL 上下文选项</a></li>
+</ul>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

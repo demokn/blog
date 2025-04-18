@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>使用 mysqldump 备份数据库</title>
+<meta name="keywords" content="珊瑚礁上的程序, mysql, mysqldump" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">使用 mysqldump 备份数据库</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2023-05-30</p>
+</header><p>
+mysqldump 是 MySQL 提供的备份工具，在备份 MySQL 数据库时，可以使用多个选项来指定备份结果的格式和内容。
+</p>
+
+<section id="outline-container-orge448d94" class="outline-2">
+<h2 id="orge448d94"><code>mysqldump</code> 常用选项</h2>
+<div class="outline-text-2" id="text-orge448d94">
+<ol class="org-ol">
+<li><code>-u</code> 或 <code>--user</code> : 指定连接 MySQL 服务器使用的用户名。</li>
+<li><code>-p</code> 或 <code>--password</code> : 指定连接 MySQL 服务器使用的密码。如果不指定该选项，则会在命令中提示输入密码。</li>
+<li><code>-h</code> 或 <code>--host</code> : 指定连接 MySQL 服务器使用的主机名。</li>
+<li><code>--port</code> : 指定连接 MySQL 服务器使用的端口号，默认为 3306。</li>
+<li><code>--single-transaction</code> : 在备份过程中使用事务来保证备份结果的一致性。</li>
+<li><code>--master-data</code> : 在备份过程中添加 CHANGE MASTER TO 语句，方便在主从复制环境下恢复备份。</li>
+<li><code>--databases</code> : 指定要备份的数据库名，多个数据库名之间用空格分隔。</li>
+<li><code>--tables</code> : 指定要备份的表名，多个表名之间用逗号分隔。</li>
+<li><code>--ignore-table</code> : 忽略指定表, 要忽略多个表可以多次指定该参数。</li>
+<li><code>-r</code> 或 <code>--result-file</code> : 指定备份结果存储的文件路径。</li>
+<li><code>--no-data</code> : 只备份建表语句, 不备份数据。</li>
+<li><code>--no-create-info</code> : 只备份表中的数据，不包括建表的 SQL 语句。</li>
+<li><code>-F</code> 或 <code>--force</code> : 强制备份即使备份结果可能不完整或不一致。</li>
+<li><code>-c</code> 或 <code>--complete-insert</code> : 在备份结果中使用完整的 INSERT 语句，包括列名和值。</li>
+<li><code>-e</code> 或  <code>--extended-insert</code> : 在备份结果中使用扩展的 INSERT 语句，可以将多个值一起插入。</li>
+<li><code>--hex-blob</code> : 在备份结果中使用十六进制表示 BLOB 类型的列。</li>
+<li><code>--compact</code> : 备份结果使用紧凑格式，可以减小备份文件的大小。</li>
+<li><code>--compress</code> : 压缩备份结果，可以减小备份文件的大小。</li>
+<li><code>--events</code> : 备份事件（即 MySQL 中的定时任务）。</li>
+<li><code>--routines</code> : 备份存储函数和存储过程。</li>
+<li><code>--lock-tables</code> : 备份表时加锁，确保备份结果的一致性。</li>
+<li><code>--skip-lock-tables</code> : 不备份表时加锁。</li>
+<li><code>--add-drop-table</code> : 在备份结果中添加 DROP TABLE 语句，方便恢复备份时删除原有表。</li>
+<li><code>--skip-add-drop-table</code> : 不在备份结果中添加 DROP TABLE 语句。</li>
+<li><code>--add-locks</code> : 备份每个表时添加锁。</li>
+<li><code>--skip-add-locks</code> : 备份每个表时不加锁。</li>
+<li><code>--triggers</code> : 备份触发器。</li>
+<li><code>--skip-triggers</code> : 不备份触发器。</li>
+<li><code>--dump-date</code> : 在备份结果中添加日期和时间信息。</li>
+<li><code>--skip-dump-date</code> : 不在备份结果中添加日期和时间信息。</li>
+<li><code>--comments</code> : 在备份数据的过程中添加注释信息，如备份时间、Mysql 版本等，方便用户在后续操作中进行识别和管理。</li>
+<li><code>--skip-comments</code> : 不在备份结果中添加注释。</li>
+</ol>
+</div>
+</section>
+
+<section id="outline-container-org24c5089" class="outline-2">
+<h2 id="org24c5089">常用示例</h2>
+<div class="outline-text-2" id="text-org24c5089">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#22791;&#20221;&#25972;&#20010;&#25968;&#25454;&#24211;</span>
+mysqldump -h<span class="org-string">'&#22320;&#22336;'</span> --port=&#31471;&#21475;&#21495; -u<span class="org-string">'&#29992;&#25143;&#21517;'</span> -p<span class="org-string">'&#23494;&#30721;'</span> [&#25968;&#25454;&#24211;&#21517;&#31216;] &gt; [&#22791;&#20221;&#25991;&#20214;&#21517;.sql]
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#22791;&#20221;&#25351;&#23450;&#34920;</span>
+mysqldump -h<span class="org-string">'&#22320;&#22336;'</span> --port=&#31471;&#21475;&#21495; -u<span class="org-string">'&#29992;&#25143;&#21517;'</span> -p<span class="org-string">'&#23494;&#30721;'</span> [&#25968;&#25454;&#24211;&#21517;&#31216;] [&#34920;&#21517;1] [&#34920;&#21517;2] &gt; [&#22791;&#20221;&#25991;&#20214;&#21517;.sql]
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#24674;&#22797;&#22791;&#20221;&#25968;&#25454;</span>
+mysql -h<span class="org-string">'&#22320;&#22336;'</span> --port=&#31471;&#21475;&#21495; -u<span class="org-string">'&#29992;&#25143;&#21517;'</span> -p<span class="org-string">'&#23494;&#30721;'</span> [&#25968;&#25454;&#24211;&#21517;&#31216;] &lt; [&#22791;&#20221;&#25991;&#20214;&#21517;.sql]
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20165;&#23548;&#20986;&#34920;&#32467;&#26500;(&#19981;&#21547;&#25968;&#25454;)</span>
+mysqldump -u<span class="org-string">'&#29992;&#25143;&#21517;'</span> --host=<span class="org-string">'&#22320;&#22336;'</span> --port=<span class="org-string">'&#31471;&#21475;'</span> -p<span class="org-string">'&#23494;&#30721;'</span> --column-statistics=0 --set-gtid-purged=OFF --skip-lock-tables --skip-add-drop-table --no-data [&#24211;&#21517;] [&#34920;&#21517;] &gt; [&#25991;&#20214;&#21517;.sql]
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20165;&#23548;&#20986;&#25968;&#25454;(&#19981;&#21547;&#34920;&#32467;&#26500;)</span>
+mysqldump -u<span class="org-string">'&#29992;&#25143;&#21517;'</span> --host=<span class="org-string">'&#22320;&#22336;'</span> --port=<span class="org-string">'&#31471;&#21475;'</span> -p<span class="org-string">'&#23494;&#30721;'</span> --column-statistics=0 --set-gtid-purged=OFF --skip-lock-tables --skip-add-drop-table --skip-triggers --no-create-info [&#24211;&#21517;] [&#34920;&#21517;] &gt; [&#25991;&#20214;&#21517;.sql]
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#21516;&#26102;&#23548;&#20986;&#34920;&#32467;&#26500;&#21644;&#25968;&#25454;</span>
+mysqldump -u<span class="org-string">'&#29992;&#25143;&#21517;'</span> --host=<span class="org-string">'&#22320;&#22336;'</span> --port=<span class="org-string">'&#31471;&#21475;'</span> -p<span class="org-string">'&#23494;&#30721;'</span> --column-statistics=0 --set-gtid-purged=OFF --skip-lock-tables --skip-add-drop-table --skip-triggers [&#24211;&#21517;] [&#34920;&#21517;] &gt; [&#25991;&#20214;&#21517;.sql]
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org2ac781c" class="outline-2">
+<h2 id="org2ac781c">常见问题</h2>
+<div class="outline-text-2" id="text-org2ac781c">
+<ol class="org-ol">
+<li><p>
+报错 <code>Unknown table 'column_statistics' in information_schema (1109)</code>
+</p>
+
+<p>
+这个错误通常是使用高版本的 mysqldump 备份低版本的 MySQL 引起的。
+由于低版本不支持 <code>column_statistics</code> 表，但是 <code>mysqldump</code> 在备份时默认会包括 <code>column_statistics</code> 表，因此在备份时会出现该错误。
+解决该问题的方法有两种：
+</p>
+<ol class="org-ol">
+<li>升级 MySQL 数据库版本到高版本（单纯为了这个备份的话，完全没必要）；</li>
+<li>在使用 <code>mysqldump</code> 命令时，增加 <code>--column-statistics=0</code> 参数，该参数可以禁止备份 <code>column_statistics</code> 表，从而避免出现错误。</li>
+</ol></li>
+
+<li>若非确实需要，建议加上 <code>--skip-add-locks</code> 选项，以避免备份过程中产生长时间的表锁，影响线上业务</li>
+</ol>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

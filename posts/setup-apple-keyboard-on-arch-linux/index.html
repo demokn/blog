@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Linux 配置 Apple Magic Keyboard</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Arch Linux, Apple Magic Keyboard, 蓝牙键盘" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Linux 配置 Apple Magic Keyboard</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2021-02-06</p>
+</header><p>
+因为疫情原因，最近都是在家办公。在家用的一直都是自己的笔记本（荣耀 MagicBook），
+笔记本用的时间也蛮久了，感觉 Ctrl 键按着有点不太对劲，为防本子上的键盘真的坏掉，
+吓的我赶紧拿出闲置很久的苹果蓝牙键盘给它接上。
+</p>
+
+<p>
+我用的 <code>Manjaro</code> 系统，桌面环境 <code>Xfce</code> ，蓝牙 GUI 管理器 <code>Blueman</code> 。
+</p>
+
+<section id="outline-container-org0948d5d" class="outline-2">
+<h2 id="org0948d5d">配对和连接</h2>
+<div class="outline-text-2" id="text-org0948d5d">
+<p>
+因为都是图形界面操作，蓝牙设备的配对和连接倒没什么好说的。
+提一点就是，一定要先配对(<code>pair</code>)，再连接(<code>connect</code>)。
+我一开始就是没有配对，直接连接了，而且还连接成功了。
+出现的问题就是，键盘时而工作，时而不工作，甚至会把系统卡住完全无响应。反正就是一团浆糊。
+</p>
+
+<p>
+当然如果你想，也可以在终端使用 <code>bluetoothctl</code> 进行配对和连接的操作。
+具体命令参考 <a href="https://wiki.archlinux.org/index.php/Bluetooth">Arch Wiki</a> 即可。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org532ec06" class="outline-2">
+<h2 id="org532ec06">设置开机自启</h2>
+<div class="outline-text-2" id="text-org532ec06">
+<p>
+只需要修改蓝牙的配置文件 <code>/etc/bluetooth/main.conf</code> ，在 <code>[Policy]</code> 部分找到或添加 <code>AutoEnable=true</code> 即可.
+</p>
+</div>
+</section>
+
+<section id="outline-container-org5cc48e9" class="outline-2">
+<h2 id="org5cc48e9">修改键位</h2>
+<div class="outline-text-2" id="text-org5cc48e9">
+<p>
+重要的来了，苹果键盘的键位和我本子上键盘的键位布局是有一点差异的。
+主要是 <code>Ctrl, Fn, Win(Command), Alt</code> 四个键位。
+苹果键盘的键位顺序是 <code>Fn, Ctrl, Alt, Command</code> 。
+键位不改的话，在两个键盘上切换的时候，因为肌肉记忆，特别容易按错。
+</p>
+
+<p>
+要调整苹果键盘跟本子上的键盘键位一致，要做的就是将 <code>Fn</code> 和 <code>Ctrl</code> 键位互换, <code>Alt</code> 和 <code>Command</code> 键位互换。
+</p>
+
+<p>
+根据 <a href="https://wiki.archlinux.org/index.php/Apple_Keyboard">Arch Wiki</a> 描述，要实现这种键位互换，可以使用 <code>hid_apple</code> 模块配置选项。
+但是官方的 hid_apple 模块仅支持 Alt 和 Command 互换，为了实现 Fn 和 Ctrl 的互换，还需要重新安装 <a href="https://github.com/free5lot/hid-apple-patched">hid-apple-patched</a> 补丁包。
+根据该补丁包文档描述，我直接使用的 Arch 三方包 <a href="https://aur.archlinux.org/packages/hid-apple-patched-git-dkms/">hid-apple-patched-git-dkms</a> 。
+不过该包目前已经没人维护了，该包原作者 <b>2021-01-10</b> 说自己已经不在 Macbook Pro 上使用 archlinux 了。
+有同学介意的话，也可以自己编译安装。
+要注意的就是，hid_apple 属于内核模块，自己编译安装之后，需要重新创建内核镜像。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">sudo mkinitcpio -P
+</pre>
+</div>
+
+<p>
+安装好 hid-apple 补丁包之后，将配置文件 <code>/usr/lib/modprobe.d/hid_apple.conf</code> 复制到 <code>/etc/modprobe.d/hid_apple.conf</code> 。
+然后按需修改配置项：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-conf"><span class="org-comment-delimiter"># </span><span class="org-comment">Enable PC-like layout by default.</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">To override, copy this file to /etc/modprobe.d/hid_apple.conf and make</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">desired changes. Note that /etc/modprobe.d/hid_apple.conf will completely</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">replace this file, and the content is NOT merged.</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Option reference: https://github.com/free5lot/hid-apple-patched#configuration</span>
+<span class="org-variable-name">options hid_apple fnmode</span>=1
+<span class="org-variable-name">options hid_apple swap_fn_leftctrl</span>=1
+<span class="org-variable-name">options hid_apple swap_opt_cmd</span>=1
+<span class="org-variable-name">options hid_apple rightalt_as_rightctrl</span>=1
+<span class="org-variable-name">options hid_apple ejectcd_as_delete</span>=1
+</pre>
+</div>
+
+<p>
+配置文件修改之后也要重新创建内核镜像。
+然后重新加载 <code>hid_apple</code> 模块。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">sudo modprobe -r hid_apple
+sudo modprobe hid_apple
+</pre>
+</div>
+
+<p>
+至此，苹果键盘改键完成。
+再也不用担心切换键盘时犯错了。
+</p>
+</div>
+</section>
+
+<section id="outline-container-orgb74cd2e" class="outline-2">
+<h2 id="orgb74cd2e">参考</h2>
+<div class="outline-text-2" id="text-orgb74cd2e">
+<ul class="org-ul">
+<li><a href="https://wiki.archlinux.org/index.php/Bluetooth">Arch 蓝牙管理</a></li>
+<li><a href="https://wiki.archlinux.org/index.php/Bluetooth_keyboard">Arch 蓝牙键盘</a></li>
+<li><a href="https://wiki.archlinux.org/index.php/Apple_Keyboard">Arch 苹果键盘</a></li>
+<li><a href="https://github.com/free5lot/hid-apple-patched">hid-apple 补丁包</a></li>
+</ul>
+
+<p>
+更多:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://wiki.archlinux.org/index.php/Kernel_module">Arch Kernel Module</a></li>
+<li><a href="https://wiki.archlinux.org/index.php/Mkinitcpio">Arch Mkinitcpio</a></li>
+</ul>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

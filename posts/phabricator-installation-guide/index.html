@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phabricator 安装过程</title>
+<meta name="keywords" content="珊瑚礁上的程序员, phabricator" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Phabricator 安装过程</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2021-01-22</p>
+</header><div class="alert alert-warning info" id="org1893ab7">
+<p>
+更新于 2021-11-06
+<code>Phabricator</code> 发布公告称<a href="https://admin.phacility.com/phame/post/view/11/phacility_is_winding_down_operations/">不再维护</a>, 已经切换到 <a href="https://gitea.io/">gitea</a>.
+</p>
+
+</div>
+
+<section id="outline-container-org1fcfe64" class="outline-2">
+<h2 id="org1fcfe64">基础的 LNMP 环境搭建</h2>
+<div class="outline-text-2" id="text-org1fcfe64">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#23433;&#35013;&#22522;&#30784;&#36719;&#20214;</span>
+apt update
+apt install -y curl wget htop git vim
+apt install -y software-properties-common
+
+add-apt-repository -y ppa:ondrej/php
+add-apt-repository -y ppa:nginx/stable
+
+apt update
+<span class="org-comment-delimiter"># </span><span class="org-comment">PHP</span>
+apt install -y php7.4 php7.4-common php7.4-fpm php7.4-curl php7.4-gd php7.4-intl php7.4-json php7.4-mbstring php7.4-mysql php7.4-readline php7.4-redis php7.4-xml php7.4-yaml php7.4-zip
+<span class="org-comment-delimiter"># </span><span class="org-comment">nginx</span>
+apt install -y nginx
+<span class="org-comment-delimiter"># </span><span class="org-comment">mysql</span>
+apt install -y mysql-common mysql-client mysql-server
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org5f013ed" class="outline-2">
+<h2 id="org5f013ed">CLONE 项目源码</h2>
+<div class="outline-text-2" id="text-org5f013ed">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">cd __wwwroot__</span>
+git clone https://github.com/phacility/libphutil.git
+git clone https://github.com/phacility/arcanist.git
+git clone https://github.com/phacility/phabricator.git
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org4e3638e" class="outline-2">
+<h2 id="org4e3638e">基础配置</h2>
+<div class="outline-text-2" id="text-org4e3638e">
+</div>
+<div id="outline-container-org93b9929" class="outline-3">
+<h3 id="org93b9929">nginx 配置</h3>
+<div class="outline-text-3" id="text-org93b9929">
+<div class="org-src-container">
+<pre class="src src-nginx">server {
+    listen 80;
+    server_name phabricator.example.com;
+
+    root  /data/www/wwwroot/phabricator.example.com/phabricator/webroot;
+    index index.html index.htm index.php;
+
+    access_log /var/log/nginx/phabricator.example.com-access.log;
+    error_log  /var/log/nginx/phabricator.example.com-error.log error;
+
+    location / {
+	index index.php;
+	rewrite ^/(.*)$ /index.php?__path__=/$1 last;
+    }
+
+    location /index.php {
+	include snippets/fastcgi-php.conf;
+
+	# With php-fpm (or other unix sockets):
+	fastcgi_pass unix:/run/php/php7.4-fpm.sock;
+	# With php-cgi (or other tcp sockets):
+	#fastcgi_pass 127.0.0.1:9000;
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgec9b9a5" class="outline-3">
+<h3 id="orgec9b9a5">phabricator 数据库配置</h3>
+<div class="outline-text-3" id="text-orgec9b9a5">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">cd phabricator</span>
+./bin/config set mysql.host __host__
+./bin/config set mysql.user __user__
+./bin/config set mysql.pass __pass__
+./bin/config set mysql.port __port__
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org081fb9f" class="outline-3">
+<h3 id="org081fb9f">执行数据库迁移(创建库和表)</h3>
+<div class="outline-text-3" id="text-org081fb9f">
+<div class="org-src-container">
+<pre class="src src-shell">./bin/storage upgrade
+</pre>
+</div>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org8cdfd8b" class="outline-2">
+<h2 id="org8cdfd8b">打开浏览器尝试访问项目, 继续配置</h2>
+<div class="outline-text-2" id="text-org8cdfd8b">
+<ol class="org-ol">
+<li>首次访问会直接让创建一个管理员账户并登录.</li>
+
+<li><p>
+登入后的第一件事就是配置 <code>Auth</code> 模块.
+</p>
+
+<p>
+添加一个 Login and Registration Provider,
+因为自用, 我就选了 <code>Username/Password</code> 方式, 且禁用了注册功能;
+</p></li>
+
+<li><p>
+为当前管理员账号设置的密码, 创建管理员账号时并没有让填写密码, 所以要主动设置一下密码.
+</p>
+
+<p>
+点击头像 &gt; <code>Settings</code> &gt; <code>Password</code>: 发送重置密码邮件.
+因为还没有配置邮件相关, 可以在命令行查看邮件内容, 拿到邮件中的重置密码链接直接访问即可.
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#26597;&#30475;&#21457;&#36865;&#30340;&#37038;&#20214;&#21015;&#34920;</span>
+./bin/phabricator mail list-outbound
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#25214;&#21040;&#37325;&#32622;&#23494;&#30721;&#30340;&#37038;&#20214;ID, &#26597;&#30475;&#20869;&#23481;</span>
+./bin/phabricator mail show-outbound --id 1
+</pre>
+</div></li>
+
+<li><p>
+查看 <code>Config</code> &gt; <code>Setup Issues</code>, 可以看到还需要配置或处理的其他事项.
+</p>
+
+
+<figure id="orgd715d91">
+<img src="./unresolved-setup-issues.png" alt="unresolved-setup-issues.png" class="d-block mw-100 mx-auto">
+
+</figure>
+
+<p>
+点进去都有具体的问题描述以及解决方法(赞).
+当然并不是所有列出的问题都需要解决, 具体还是看自己的需求.
+</p></li>
+</ol>
+</div>
+</section>
+
+<section id="outline-container-org667cc25" class="outline-2">
+<h2 id="org667cc25">需求一: 配置 GIT 仓库</h2>
+<div class="outline-text-2" id="text-org667cc25">
+<p>
+我的首要目标是搭建一个 GIT 仓库, 给公司自用.
+要求使用 SSH 协议.
+</p>
+</div>
+
+<div id="outline-container-org5a9734c" class="outline-3">
+<h3 id="org5a9734c">配置</h3>
+<div class="outline-text-3" id="text-org5a9734c">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">cd phabricator</span>
+./bin/config set phabricator.base-uri http://phabricator.example.com/
+./bin/config set storage.local-dist.path /data/pha/storage
+./bin/config set repository.default-local-path /data/pha/repo
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#35774;&#32622; daemon-user</span>
+./bin/config set phd.user pha
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#35774;&#32622; vcs-user</span>
+./bin/config set diffusion.ssh-user git
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#28155;&#21152; daemon-user</span>
+useradd -d /data/www -s /bin/bash -U pha
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#28155;&#21152; vcs-user, &#38656;&#35201;&#35774;&#32622;&#20026; NO PASSWORD</span>
+useradd -d /home/git -s /bin/bash -U git -p NP
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#21019;&#24314;&#29992;&#20110;&#23384;&#20648;&#19978;&#20256;&#25991;&#20214;&#30340;&#30446;&#24405;</span>
+mkdir -p /data/pha/storage
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#21019;&#24314;&#29992;&#20110;&#23384;&#20648;&#20195;&#30721;&#24211;&#30340;&#30446;&#24405;</span>
+mkdir -p /data/pha/repo
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#21019;&#24314; vcs-user &#30340; HOME &#30446;&#24405;</span>
+mkdir -p /home/git
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20551;&#35774; nginx &#29992;&#25143;&#20026;&#36816;&#34892; webserver &#30340;&#29992;&#25143;(&#25991;&#26723;&#37324;&#30340; www-user)</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20462;&#25913;&#30446;&#24405;&#26435;&#38480;</span>
+chown pha:pha -R /data/pha/repo
+chown nginx:nginx -R /data/pha/storage
+chown git:git -R /home/git
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#21551;&#21160; phd &#21518;&#21488;&#36827;&#31243;</span>
+./bin/phd start
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">www-user &#21644; vcs-user &#38656;&#35201;&#33021;&#22815;&#20197; deamon-user &#30340;&#36523;&#20221;&#25191;&#34892; sudo, &#20197;&#20415;&#23427;&#20204;&#33021;&#19982;&#20195;&#30721;&#23384;&#20648;&#24211;&#36827;&#34892;&#20132;&#20114;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#37197;&#32622; sudo &#26435;&#38480;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">vim /etc/sudoers</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36825;&#37324;&#20026;&#20102;&#26041;&#20415;, &#30452;&#25509;&#32473;&#20102;&#20840;&#37096;COMMNAD&#30340;&#26435;&#38480;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">nginx ALL=(pha) NOPASSWD: ALL</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">git ALL=(pha) NOPASSWD: ALL</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#38656;&#35201;&#26032;&#36215;&#19968;&#20010; sshd &#36827;&#31243;&#32473; phabricator &#20351;&#29992;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20986;&#20110;&#23433;&#20840;&#21644;&#26041;&#20415;&#30340;&#32771;&#34385;, &#25226;&#21407; ssh &#30331;&#24405;&#30340;&#31471;&#21475;&#25913;&#25104;&#38750; 22 &#31471;&#21475;, &#40664;&#35748;&#30340; 22 &#31471;&#21475;&#30041;&#32473; phabricator &#29992;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#37197;&#32622; SSHD</span>
+cp resources/sshd/phabricator-ssh-hook.sh /usr/libexec/
+cp resources/sshd/sshd_config.phabricator.example /etc/ssh/sshd_config.phabricator
+<span class="org-comment-delimiter"># </span><span class="org-comment">vim /etc/ssh/sshd_config.phabricator</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20462;&#25913; AuthorizedKeysCommand, AuthorizedKeysCommandUser, AllowUsers</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">vim /usr/libexec/phabricator-ssh-hook.sh</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#20462;&#25913; VCSUSER, ROOT</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#21551;&#21160; SSHD</span>
+sshd -f /etc/ssh/sshd_config.phabricator
+</pre>
+</div>
+
+<p>
+至此应该大功告成了.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfd7d1db" class="outline-3">
+<h3 id="orgfd7d1db">测试</h3>
+<div class="outline-text-3" id="text-orgfd7d1db">
+<p>
+继续回到浏览器, 登入后上传一下自己本机的 SSH 公钥.
+点击头像 &gt; <code>Settings</code> &gt; <code>SSH Public Keys</code>.
+在本机终端测试:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-builtin">echo</span> {} | ssh git@phabricator.example.com conduit conduit.ping
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#19968;&#20999;&#27491;&#24120;&#30340;&#35805;, &#24212;&#35813;&#21487;&#20197;&#30475;&#21040;</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">{"result":"__hostname__","error_code":null,"error_info":null}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga63c68c" class="outline-3">
+<h3 id="orga63c68c">参考</h3>
+<div class="outline-text-3" id="text-orga63c68c">
+<p>
+官方文档是最好的教程.
+</p>
+
+<ul class="org-ul">
+<li><a href="https://secure.phabricator.com/book/phabricator/article/diffusion/">Diffusion User Guide</a></li>
+<li><a href="https://secure.phabricator.com/book/phabricator/article/diffusion_hosting/">Diffusion User Guide: Repository Hosting</a></li>
+<li><a href="https://secure.phabricator.com/book/phabricator/article/managing_daemons/">Managing Daemons with phd</a></li>
+</ul>
+</div>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

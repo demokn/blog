@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shell 脚本实现ssh 密码登录</title>
+<meta name="keywords" content="珊瑚礁上的程序员, shell, ssh, expect" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Shell 脚本实现ssh 密码登录</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2023-05-26</p>
+</header><p>
+首先明确一下，ssh 是支持免密登录的。只需要把公钥放到目标机器的 <code>~/.ssh/authorized_keys</code> 文件中即可。
+但这不是本文的重点，本次要介绍的是使用 <code>expect</code> 脚本实现密码认证的自动登录。
+</p>
+
+<section id="outline-container-org1787468" class="outline-2">
+<h2 id="org1787468"><code>expect</code> 脚本自动输入密码</h2>
+<div class="outline-text-2" id="text-org1787468">
+<p>
+先上代码：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter">#</span><span class="org-comment">!/usr/bin/</span><span class="org-keyword">expect</span><span class="org-comment"> -f</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#35774;&#32622;SSH&#36830;&#25509;&#21442;&#25968;</span>
+<span class="org-builtin">set</span> user <span class="org-string">"YOUR_USERNAME"</span>
+<span class="org-builtin">set</span> host <span class="org-string">"YOUR_REMOTE_HOST"</span>
+<span class="org-builtin">set</span> pass <span class="org-string">"YOUR_PASSWORD"</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#21551;&#21160;SSH&#36830;&#25509;</span>
+spawn ssh $<span class="org-variable-name">user</span>@$<span class="org-variable-name">host</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#31561;&#24453;&#30331;&#24405;&#25552;&#31034;&#31526;</span>
+expect <span class="org-string">"*: "</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36755;&#20837;&#23494;&#30721;</span>
+send <span class="org-string">"$pass\r"</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#31561;&#24453;&#30331;&#24405;&#25104;&#21151;&#25552;&#31034;&#31526;</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">expect "$user@"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#25191;&#34892; pwd &#21629;&#20196;</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">send "pwd\r"</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#36827;&#20837;&#20132;&#20114;&#24335;&#27169;&#24335;</span>
+interact
+</pre>
+</div>
+
+<p>
+在这个例子中， <code>expect</code> 命令将读取脚本文件中的所有命令，直到遇到 <code>interact</code> 命令。
+在这之前，脚本会通过 <code>spawn</code> 命令启动一个新的进程，打开一个 <code>SSH</code> 连接并等待登录提示符。
+一旦登录提示符出现， <code>expect</code> 命令会等待用户输入，然后通过 <code>send</code> 命令将密码发送到 <code>SSH</code> 连接。
+最后，停留在在交互式模式下，用户将能够与远程主机进行交互。
+</p>
+</div>
+</section>
+
+<section id="outline-container-orge2b8ceb" class="outline-2">
+<h2 id="orge2b8ceb"><code>expect</code> 脚本是什么</h2>
+<div class="outline-text-2" id="text-orge2b8ceb">
+<p>
+<code>expect</code> 脚本是一种用于自动化交互式命令行的工具，类似于一个脚本化的终端。
+</p>
+
+<p>
+下面是一些 <code>expect</code> 脚本的基本语法和命令解释：
+</p>
+
+<ol class="org-ol">
+<li><p>
+<code>set</code> 命令：定义变量，变量的值可以是字符串或数值类型。例如：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-builtin">set</span> username <span class="org-string">"myusername"</span>
+<span class="org-builtin">set</span> password <span class="org-string">"mypassword"</span>
+</pre>
+</div></li>
+
+<li><p>
+<code>spawn</code> 命令：启动一个新的进程，通常是启动一个交互式的命令行工具。例如：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">spawn ssh username@hostname
+</pre>
+</div></li>
+
+<li><p>
+<code>expect</code> 命令：等待指定的输出，通常是等待命令提示符或其他特定的输出。例如：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">expect <span class="org-string">"Password:"</span>
+expect <span class="org-string">"$ "</span>
+</pre>
+</div></li>
+
+<li><p>
+<code>send</code> 命令：向进程发送一个字符串，通常是输入命令或密码。例如：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">send <span class="org-string">"password\n"</span>
+send <span class="org-string">"ls -l\n"</span>
+</pre>
+</div></li>
+
+<li><code>interact</code> 命令：将控制权交给用户，允许用户直接与进程进行交互。</li>
+
+<li><code>break</code> 命令：停止执行脚本。</li>
+
+<li><p>
+<code>sleep</code> 命令：将脚本挂起指定的时间（单位为秒）。例如：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">sleep 2
+</pre>
+</div></li>
+</ol>
+</div>
+</section>
+
+<section id="outline-container-org9213753" class="outline-2">
+<h2 id="org9213753">其他方案</h2>
+<div class="outline-text-2" id="text-org9213753">
+</div>
+<div id="outline-container-orgad8c982" class="outline-3">
+<h3 id="orgad8c982"><code>sshpass</code> 工具</h3>
+<div class="outline-text-3" id="text-orgad8c982">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#27880;: sshpass &#38656;&#35201;&#21333;&#29420;&#23433;&#35013;</span>
+sshpass -p <span class="org-string">'mypassword'</span> ssh user@host
+</pre>
+</div>
+</div>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

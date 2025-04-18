@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EasySwoole 踩坑指南</title>
+<meta name="keywords" content="珊瑚礁上的程序员, PHP, EasySwoole, Swoole" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">EasySwoole 踩坑指南</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2021-11-25</p>
+</header>
+<section id="outline-container-orgc64f719" class="outline-2">
+<h2 id="orgc64f719">版本说明</h2>
+<div class="outline-text-2" id="text-orgc64f719">
+<pre class="example" id="orge62f573">
+php version: 8.0.12
+swoole version: 4.8.1
+easyswoole version: 3.4.6
+</pre>
+</div>
+</section>
+
+<section id="outline-container-org6af8f6f" class="outline-2">
+<h2 id="org6af8f6f">踩坑实践</h2>
+<div class="outline-text-2" id="text-org6af8f6f">
+</div>
+<div id="outline-container-org72f363c" class="outline-3">
+<h3 id="org72f363c">1. <code>TEMP_DIR</code> 配置必须使用绝对路径</h3>
+<div class="outline-text-3" id="text-org72f363c">
+<p>
+临时文件存放的目录, 默认为框架根目录的 <code>Temp</code> 目录, 如需自定义, 务必要使用绝对路径, 否则会造成守护模式运行无法退出.
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">php easyswoole server stop
+pid :4177803 not exist
+</pre>
+</div>
+
+<p>
+错误用法：
+</p>
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-php-string">'TEMP_DIR'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-string">'./storage/temp'</span>,
+</pre>
+</div>
+
+<p>
+正确用法：
+</p>
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-php-string">'TEMP_DIR'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-constant">EASYSWOOLE_ROOT</span> . <span class="org-php-string">'/storage/temp'</span>,
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6227fbc" class="outline-3">
+<h3 id="org6227fbc">2. <code>ORM</code> 联表查询时, 要指定 <code>field()</code></h3>
+<div class="outline-text-3" id="text-org6227fbc">
+<p>
+在 orm 中使用联表查询时, 务必要指定查询的字段, 一般就是 <code>YourTable.*</code>.
+否则会造成不同表的同名字段值被覆盖的情况。
+</p>
+
+<p>
+一些成熟框架的 <code>ORM</code> 其实都会对这种联表查询的情况自动处理, 例如 <code>Yii2</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-comment-delimiter">// </span><span class="org-comment">\yii\db\ActiveQuery::prepare()</span>
+<span class="org-php-keyword">if</span> (<span class="org-php-keyword">empty</span>(<span class="org-php-this-sigil">$</span><span class="org-php-this">this</span><span class="org-php-object-op">-&gt;</span><span class="org-php-property-name">select</span>) <span class="org-php-logical-op">&amp;&amp;</span> <span class="org-php-logical-op">!</span><span class="org-php-keyword">empty</span>(<span class="org-php-this-sigil">$</span><span class="org-php-this">this</span><span class="org-php-object-op">-&gt;</span><span class="org-php-property-name">join</span>)) {
+    <span class="org-php-keyword">list</span>(, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">alias</span>) <span class="org-php-assignment-op">=</span> <span class="org-php-this-sigil">$</span><span class="org-php-this">this</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getTableNameAndAlias</span>();
+    <span class="org-php-this-sigil">$</span><span class="org-php-this">this</span><span class="org-php-object-op">-&gt;</span><span class="org-php-property-name">select</span> <span class="org-php-assignment-op">=</span> [<span class="org-php-string">"</span><span class="org-php-variable-name">$alias</span><span class="org-php-string">.*"</span>];
+}
+</pre>
+</div>
+<p>
+但 <code>EasySwoole</code> 目前的版本确实还是需要自己手动指定查询字段.
+</p>
+
+<p>
+错误用法：
+</p>
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">articles</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Article</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">create</span>()
+    <span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">join</span>(<span class="org-php-string">'author'</span>, <span class="org-php-string">'author.id=article.author'</span>, <span class="org-php-string">'INNER'</span>)
+    <span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">all</span>();
+<span class="org-comment-delimiter">// </span><span class="org-comment">author &#34920;&#20013;&#30340; id &#20250;&#35206;&#30422; article &#34920;&#20013;&#30340; id</span>
+</pre>
+</div>
+
+<p>
+正确用法：
+</p>
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">articles</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Article</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">create</span>()
+    <span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">with</span>([<span class="org-php-string">'author'</span>])
+    <span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">field</span>(<span class="org-php-string">'article.*'</span>)
+    <span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">join</span>(<span class="org-php-string">'author'</span>, <span class="org-php-string">'author.id=article.author'</span>, <span class="org-php-string">'INNER'</span>)
+    <span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">all</span>();
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orge666e8d" class="outline-3">
+<h3 id="orge666e8d">3. 不要使用 <code>ORM</code> 和 <code>QueryBuilder</code> 的 <code>withTotalCount()</code> 方法</h3>
+<div class="outline-text-3" id="text-orge666e8d">
+<p>
+<code>withTotalCount</code> 查询总条数的方式是通过 <code>SQL_CALC_FOUND_ROWS</code> 查询选项 + <code>select FOUND_ROWS()</code> 实现的,
+并非我们平常使用的 <code>select count(*)</code> 方式.
+<code>SQL_CALC_FOUND_ROWS</code> 查询选项在 mysql 8.0 版本已经被 <a href="https://dev.mysql.com/doc/refman/8.0/en/information-functions.html#function_found-rows">标记为废弃</a> 了，所以不建议使用.
+而且, 在实际使用过程中, 确实出现了无法预知的结果。(阿里云 RDS + 读写分离)
+</p>
+
+<p>
+错误用法：
+</p>
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">query</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Article</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">create</span>()
+    <span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">withTotalCount</span>()
+    <span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">limit</span>(10, 5);
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">articles</span> <span class="org-php-assignment-op">=</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">query</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">all</span>();
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">totalCount</span> <span class="org-php-assignment-op">=</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">query</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">lastQueryResult</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getTotalCount</span>();
+</pre>
+</div>
+
+<p>
+正确用法：
+</p>
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">query</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Article</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">create</span>();
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">totalCount</span> <span class="org-php-assignment-op">=</span> (<span class="org-php-keyword">clone</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">query</span>)<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">count</span>();
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">articles</span> <span class="org-php-assignment-op">=</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">query</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">limit</span>(10, 5)<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">all</span>();
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8731a1e" class="outline-3">
+<h3 id="org8731a1e">4. 慎用 <code>max_request</code> 选项</h3>
+<div class="outline-text-3" id="text-org8731a1e">
+<p>
+参考 <a href="https://wiki.swoole.com/#/server/setting?id=max_request">Swoole 官方文档</a> ：
+</p>
+<blockquote>
+<p>
+这个参数的主要作用是解决由于程序编码不规范导致的 PHP 进程内存泄露问题。
+PHP 应用程序有缓慢的内存泄漏，但无法定位到具体原因、无法解决，可以通过设置 max_request 临时解决，
+需要找到内存泄漏的代码并修复，而不是通过此方案，可以使用 Swoole Tracker 发现泄漏的代码。
+</p>
+</blockquote>
+
+<p>
+但是，在 <code>EasySwoole</code> 的实现中，当收到 <a href="https://wiki.swoole.com/#/server/events?id=onworkerexit">onWorkerExit</a> 和 <a href="https://wiki.swoole.com/#/server/events?id=onworkerstop">onWrokerStop</a> 事件时，
+直接调用了 <a href="https://wiki.swoole.com/#/event?id=exit">\Swoole\Event::exit()</a> 方法退出了整个事件循环。
+这会造成当前 worker 可能尚未执行结束就被强行终止了。
+从而导致本次请求假死（得不到响应）。
+</p>
+
+<p>
+再直白一点描述，当第 max_request 个请求被投递到 <code>worker</code> 后，因为到达了 <code>max_request</code> 的阈值限制，
+<code>manager</code> 进程会向 <code>worker</code> 发出 <code>onWorkerExit</code> 的事件信号。
+因为 <code>worker</code> 中还有协程还在处理， <code>manager</code> 不会直接强杀 <code>worker</code> ，需要等到 <code>max_wait_time</code> 后才会强杀。
+但由于在 <code>onWorkerExit</code> 回调中，执行了  <code>\Swoole\Event::exit()</code> ，会直接退出当前协程。
+也就是 <code>manager</code> 进程只是尝试通知 <code>worker</code> 干完手上的事你就可以下班了，
+但 <code>worker</code> 收到通知后，就啥也没管，放下手上未完成的工作（有协程还在执行）就跑路了。
+</p>
+
+<p>
+这个问题在社区反馈过，得到的答复是 “不要使用 <code>max_request</code> ”。
+截至到当前最新版本 <a href="https://github.com/easy-swoole/easyswoole/blob/24910e08c380c43a3f3e469b4c3349d5a68ae274/src/Core.php#L330">3.6.1</a> 该问题依据存在。
+</p>
+
+<p>
+好在 EasySwoole 提供了机制可以完全接管 <code>Swoole</code> 的全部事件。
+只需要把框架中原有事件注册方法复制出来，简单改一下即可。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-php-php-tag">&lt;?php</span>
+
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\Component\Di</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\Component\Process\Manager</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\EasySwoole\AbstractInterface\Event</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\EasySwoole\Config</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\EasySwoole\Http\Dispatcher</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\EasySwoole\ServerManager</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\EasySwoole\Swoole\EventHelper</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\EasySwoole\Swoole\EventRegister</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\EasySwoole\SysConst</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\EasySwoole\Trigger</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\Http\Message\Status</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\Http\Request</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">EasySwoole\Http\Response</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">Swoole\Http\Request</span> <span class="org-php-keyword">as</span> <span class="org-type">SwooleRequest</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">Swoole\Http\Response</span> <span class="org-php-keyword">as</span> <span class="org-type">SwooleResponse</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">Swoole\Server</span>;
+<span class="org-php-import-declaration">use</span> <span class="org-type">Swoole\Timer</span>;
+
+<span class="org-php-class-declaration">class</span> <span class="org-type">EasySwooleEvent</span> <span class="org-php-class-declaration-spec">implements</span> <span class="org-type">Event</span> {
+    <span class="org-php-keyword">public</span> <span class="org-php-keyword">static</span> <span class="org-php-keyword">function</span> <span class="org-php-function-name">initialize</span>()
+    {
+    <span class="org-comment-delimiter">// </span><span class="org-comment">TODO: Implement initialize() method.</span>
+    }
+
+    <span class="org-php-keyword">public</span> <span class="org-php-keyword">static</span> <span class="org-php-keyword">function</span> <span class="org-php-function-name">mainServerCreate</span>(<span class="org-type">\EasySwoole\EasySwoole\Swoole\EventRegister</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">register</span>)
+    {
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">server</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">ServerManager</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getSwooleServer</span>();
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serverType</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Config</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getConf</span>(<span class="org-php-string">'MAIN_SERVER.SERVER_TYPE'</span>);
+    <span class="org-php-keyword">self</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">overrideEasySwooleDefaultCallBack</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">server</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serverType</span>);
+
+    <span class="org-php-keyword">return</span> <span class="org-php-constant">false</span>; <span class="org-comment-delimiter">//</span><span class="org-comment">&#36820;&#22238;false, &#34920;&#31034;&#24076;&#26395;&#25509;&#31649;&#20840;&#37096;&#20107;&#20214;</span>
+    }
+
+    <span class="org-php-keyword">private</span> <span class="org-php-keyword">static</span> <span class="org-php-keyword">function</span> <span class="org-php-function-name">overrideEasySwooleDefaultCallBack</span>(<span class="org-type">Server</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">server</span>, <span class="org-type">int</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serverType</span>)
+    {
+    <span class="org-comment-delimiter">/*</span>
+<span class="org-comment">     * &#27880;&#20876;&#40664;&#35748;&#22238;&#35843;</span>
+<span class="org-comment-delimiter">     */</span>
+    <span class="org-php-keyword">if</span> (<span class="org-php-function-call-traditional">in_array</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serverType</span>, [<span class="org-php-constant">EASYSWOOLE_WEB_SERVER</span>, <span class="org-php-constant">EASYSWOOLE_WEB_SOCKET_SERVER</span>], <span class="org-php-constant">true</span>)) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">namespace</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Di</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">get</span>(<span class="org-php-constant">SysConst</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">HTTP_CONTROLLER_NAMESPACE</span>);
+        <span class="org-php-keyword">if</span> (<span class="org-php-keyword">empty</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">namespace</span>)) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">namespace</span> <span class="org-php-assignment-op">=</span> <span class="org-php-string">'App\\HttpController\\'</span>;
+        }
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">depth</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">intval</span>(<span class="org-php-constant">Di</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">get</span>(<span class="org-php-constant">SysConst</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">HTTP_CONTROLLER_MAX_DEPTH</span>));
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">depth</span> <span class="org-php-assignment-op">=</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">depth</span> <span class="org-php-comparison-op">&gt;</span> 5 ? <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">depth</span> : 5;
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">max</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">intval</span>(<span class="org-php-constant">Di</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">get</span>(<span class="org-php-constant">SysConst</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">HTTP_CONTROLLER_POOL_MAX_NUM</span>));
+        <span class="org-php-keyword">if</span> (<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">max</span> <span class="org-php-comparison-op">==</span> 0) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">max</span> <span class="org-php-assignment-op">=</span> 500;
+        }
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">waitTime</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">intval</span>(<span class="org-php-constant">Di</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">get</span>(<span class="org-php-constant">SysConst</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">HTTP_CONTROLLER_POOL_WAIT_TIME</span>));
+        <span class="org-php-keyword">if</span> (<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">waitTime</span> <span class="org-php-comparison-op">==</span> 0) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">waitTime</span> <span class="org-php-assignment-op">=</span> 5;
+        }
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">dispatcher</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Dispatcher</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">setNamespacePrefix</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">namespace</span>)<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">setMaxDepth</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">depth</span>)<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">setControllerMaxPoolNum</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">max</span>)<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">setControllerPoolWaitTime</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">waitTime</span>);
+        ;
+        <span class="org-comment-delimiter">//</span><span class="org-comment">&#34917;&#20805;HTTP_EXCEPTION_HANDLER&#40664;&#35748;&#22238;&#35843;</span>
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">httpExceptionHandler</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Di</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">get</span>(<span class="org-php-constant">SysConst</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">HTTP_EXCEPTION_HANDLER</span>);
+        <span class="org-php-keyword">if</span> (<span class="org-php-logical-op">!</span><span class="org-php-function-call-traditional">is_callable</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">httpExceptionHandler</span>)) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">httpExceptionHandler</span> <span class="org-php-assignment-op">=</span> <span class="org-php-keyword">function</span> (<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">throwable</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">request</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response</span>) {
+            <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">withStatus</span>(<span class="org-php-constant">Status</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">CODE_INTERNAL_SERVER_ERROR</span>);
+            <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">write</span>(<span class="org-php-function-call-traditional">nl2br</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">throwable</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getMessage</span>() . <span class="org-php-string">"\n"</span> . <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">throwable</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getTraceAsString</span>()));
+            <span class="org-php-constant">Trigger</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">throwable</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">throwable</span>);
+        };
+        <span class="org-php-constant">Di</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">set</span>(<span class="org-php-constant">SysConst</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">HTTP_EXCEPTION_HANDLER</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">httpExceptionHandler</span>);
+        }
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">dispatcher</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">setHttpExceptionHandler</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">httpExceptionHandler</span>);
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">requestHook</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Di</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">get</span>(<span class="org-php-constant">SysConst</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">HTTP_GLOBAL_ON_REQUEST</span>);
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">afterRequestHook</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Di</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">get</span>(<span class="org-php-constant">SysConst</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">HTTP_GLOBAL_AFTER_REQUEST</span>);
+        <span class="org-php-constant">EventHelper</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">on</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">server</span>, <span class="org-php-constant">EventRegister</span><span class="org-php-paamayim-nekudotayim">::</span>onRequest, <span class="org-php-keyword">function</span> (<span class="org-type">SwooleRequest</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">request</span>, <span class="org-type">SwooleResponse</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response</span>) <span class="org-php-import-declaration">use</span> (<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">dispatcher</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">requestHook</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">afterRequestHook</span>) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">request_psr</span> <span class="org-php-assignment-op">=</span> <span class="org-php-keyword">new</span> <span class="org-type">Request</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">request</span>);
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response_psr</span> <span class="org-php-assignment-op">=</span> <span class="org-php-keyword">new</span> <span class="org-type">Response</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response</span>);
+        <span class="org-php-keyword">try</span> {
+            <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">ret</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">null</span>;
+            <span class="org-php-keyword">if</span> (<span class="org-php-function-call-traditional">is_callable</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">requestHook</span>)) {
+            <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">ret</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">call_user_func</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">requestHook</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">request_psr</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response_psr</span>);
+            }
+            <span class="org-php-keyword">if</span> (<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">ret</span> <span class="org-php-comparison-op">!==</span> <span class="org-php-constant">false</span>) {
+            <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">dispatcher</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">dispatch</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">request_psr</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response_psr</span>);
+            }
+        } <span class="org-php-keyword">catch</span> (<span class="org-type">\Throwable</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">throwable</span>) {
+            <span class="org-php-function-call-traditional">call_user_func</span>(<span class="org-php-constant">Di</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">get</span>(<span class="org-php-constant">SysConst</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">HTTP_EXCEPTION_HANDLER</span>), <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">throwable</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">request_psr</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response_psr</span>);
+        } <span class="org-php-keyword">finally</span> {
+            <span class="org-php-keyword">try</span> {
+            <span class="org-php-keyword">if</span> (<span class="org-php-function-call-traditional">is_callable</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">afterRequestHook</span>)) {
+                <span class="org-php-function-call-traditional">call_user_func</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">afterRequestHook</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">request_psr</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response_psr</span>);
+            }
+            } <span class="org-php-keyword">catch</span> (<span class="org-type">\Throwable</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">throwable</span>) {
+            <span class="org-php-function-call-traditional">call_user_func</span>(<span class="org-php-constant">Di</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">get</span>(<span class="org-php-constant">SysConst</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-constant">HTTP_EXCEPTION_HANDLER</span>), <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">throwable</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">request_psr</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response_psr</span>);
+            }
+        }
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response_psr</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">__response</span>();
+        });
+    }
+
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">register</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">ServerManager</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getEventRegister</span>();
+    <span class="org-comment-delimiter">//</span><span class="org-comment">&#27880;&#20876;&#40664;&#35748;&#30340;worker start</span>
+    <span class="org-php-constant">EventHelper</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">registerWithAdd</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">register</span>, <span class="org-php-constant">EventRegister</span><span class="org-php-paamayim-nekudotayim">::</span>onWorkerStart, <span class="org-php-keyword">function</span> (<span class="org-type">Server</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">server</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">workerId</span>) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serverName</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Config</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getConf</span>(<span class="org-php-string">'SERVER_NAME'</span>);
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">type</span> <span class="org-php-assignment-op">=</span> <span class="org-php-string">'Unknown'</span>;
+        <span class="org-php-keyword">if</span> ((<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">workerId</span> <span class="org-php-comparison-op">&lt;</span> <span class="org-php-constant">Config</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getConf</span>(<span class="org-php-string">'MAIN_SERVER.SETTING.worker_num'</span>)) <span class="org-php-logical-op">&amp;&amp;</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">workerId</span> <span class="org-php-comparison-op">&gt;=</span> 0) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">type</span> <span class="org-php-assignment-op">=</span> <span class="org-php-string">'Worker'</span>;
+        }
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">processName</span> <span class="org-php-assignment-op">=</span> <span class="org-php-string">"</span><span class="org-php-variable-name">{$serverName}</span><span class="org-php-string">.</span><span class="org-php-variable-name">{$type}</span><span class="org-php-string">.</span><span class="org-php-variable-name">{$workerId}</span><span class="org-php-string">"</span>;
+        <span class="org-php-function-call-traditional">set_process_name</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">processName</span>);
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">table</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Manager</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getProcessTable</span>();
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">getmypid</span>();
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">table</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">set</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span>, [
+        <span class="org-php-string">'pid'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span>,
+        <span class="org-php-string">'name'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">processName</span>,
+        <span class="org-php-string">'group'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-string">"</span><span class="org-php-variable-name">{$serverName}</span><span class="org-php-string">.</span><span class="org-php-variable-name">{$type}</span><span class="org-php-string">"</span>,
+        <span class="org-php-string">'startUpTime'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-function-call-traditional">time</span>(),
+        ]);
+        <span class="org-php-constant">Timer</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">tick</span>(1 <span class="org-php-arithmetic-op">*</span> 1000, <span class="org-php-keyword">function</span> () <span class="org-php-import-declaration">use</span> (<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">table</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span>) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">table</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">set</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span>, [
+            <span class="org-php-string">'memoryUsage'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-function-call-traditional">memory_get_usage</span>(),
+            <span class="org-php-string">'memoryPeakUsage'</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-function-call-traditional">memory_get_peak_usage</span>(<span class="org-php-constant">true</span>),
+        ]);
+        });
+        <span class="org-php-function-call-traditional">register_shutdown_function</span>(<span class="org-php-keyword">function</span> () <span class="org-php-import-declaration">use</span> (<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span>) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">table</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Manager</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getProcessTable</span>();
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">table</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">del</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span>);
+        });
+    });
+    <span class="org-comment-delimiter">//</span><span class="org-comment">onWorkerStop,onWorkerExit,register_shutdown_function&#20887;&#20313;&#28165;&#29702;</span>
+    <span class="org-php-constant">EventHelper</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">registerWithAdd</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">register</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">register</span><span class="org-php-paamayim-nekudotayim">::</span>onWorkerStop, <span class="org-php-keyword">function</span> (<span class="org-type">Server</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">server</span>, <span class="org-type">int</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">workerId</span>) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">table</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Manager</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getProcessTable</span>();
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">getmypid</span>();
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">table</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">del</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span>);
+        <span class="org-php-constant">Timer</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">clearAll</span>();
+        <span class="org-comment-delimiter">//</span><span class="org-comment">SwooleEvent::exit(); //&#23601;&#26159;&#36825;&#37324;, &#27880;&#37322;&#25481;&#21363;&#21487;</span>
+    });
+
+    <span class="org-comment-delimiter">/*</span>
+<span class="org-comment">     * &#24320;&#21551;reload async&#30340;&#26102;&#20505;&#65292;&#28165;&#29702;&#20107;&#20214;</span>
+<span class="org-comment-delimiter">     */</span>
+    <span class="org-php-constant">EventHelper</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">registerWithAdd</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">register</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">register</span><span class="org-php-paamayim-nekudotayim">::</span>onWorkerExit, <span class="org-php-keyword">function</span> (<span class="org-type">Server</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">server</span>, <span class="org-type">int</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">workerId</span>) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">table</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Manager</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getProcessTable</span>();
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">getmypid</span>();
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">table</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">del</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span>);
+        <span class="org-php-constant">Timer</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">clearAll</span>();
+        <span class="org-comment-delimiter">//</span><span class="org-comment">SwooleEvent::exit(); //&#36824;&#26377;&#36825;&#37324;, &#27880;&#37322;&#25481;&#21363;&#21487;</span>
+    });
+
+    <span class="org-php-constant">EventHelper</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">registerWithAdd</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">register</span>, <span class="org-php-constant">EventRegister</span><span class="org-php-paamayim-nekudotayim">::</span>onManagerStart, <span class="org-php-keyword">function</span> (<span class="org-type">Server</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">server</span>) {
+        <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serverName</span> <span class="org-php-assignment-op">=</span> <span class="org-php-constant">Config</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">getInstance</span>()<span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">getConf</span>(<span class="org-php-string">'SERVER_NAME'</span>);
+        <span class="org-php-function-call-traditional">set_process_name</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serverName</span> . <span class="org-php-string">'.Manager'</span>);
+    });
+    }
+}
+</pre>
+</div>
+
+<p>
+基于 <code>Swoole</code> 的最小复现代码如下：
+</p>
+<div class="org-src-container">
+<pre class="src src-php"><span class="org-php-php-tag">&lt;?php</span>
+
+<span class="org-php-keyword">function</span> <span class="org-php-function-name">setProcessName</span>(<span class="org-type">string</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">processName</span> <span class="org-php-assignment-op">=</span> <span class="org-php-string">''</span>): <span class="org-type">void</span>
+{
+    <span class="org-php-keyword">if</span> (<span class="org-php-keyword">empty</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">processName</span>) <span class="org-php-logical-op">||</span> <span class="org-php-function-call-traditional">in_array</span>(<span class="org-php-constant">PHP_OS</span>, [<span class="org-php-string">'Darwin'</span>, <span class="org-php-string">'CYGWIN'</span>, <span class="org-php-string">'WINNT'</span>])) {
+    <span class="org-php-keyword">return</span>;
+    }
+
+    <span class="org-php-keyword">if</span> (<span class="org-php-function-call-traditional">function_exists</span>(<span class="org-php-string">'cli_set_process_title'</span>)) {
+    <span class="org-php-function-call-traditional">cli_set_process_title</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">processName</span>);
+    } <span class="org-php-keyword">elseif</span> (<span class="org-php-function-call-traditional">function_exists</span>(<span class="org-php-string">'swoole_set_process_name'</span>)) {
+    <span class="org-php-function-call-traditional">swoole_set_process_name</span>(<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">processName</span>);
+    }
+}
+
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span> <span class="org-php-assignment-op">=</span> <span class="org-php-keyword">new</span> <span class="org-type">Swoole\Http\Server</span>(<span class="org-php-string">'0.0.0.0'</span>, 9502, <span class="org-php-constant">SWOOLE_PROCESS</span>, <span class="org-php-constant">SWOOLE_TCP</span>);
+
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">set</span>(
+    [
+    <span class="org-php-string">"worker_num"</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> 1,
+    <span class="org-php-string">"reload_async"</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-constant">true</span>,
+    <span class="org-php-string">"max_wait_time"</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> 30,
+    <span class="org-php-string">"max_request"</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> 3,
+    <span class="org-php-string">"package_max_length"</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> 104857600,
+    <span class="org-php-string">"pid_file"</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-string">"/easyswoole/storage/temp/pid.pid"</span>,
+    <span class="org-php-string">"log_file"</span> <span class="org-php-assignment-op">=</span><span class="org-php-comparison-op">&gt;</span> <span class="org-php-string">"/easyswoole/storage/logs/swoole.log"</span>,
+    ]
+);
+
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">on</span>(<span class="org-php-string">'Request'</span>, <span class="org-php-keyword">function</span> (<span class="org-type">\Swoole\Http\Request</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">request</span>, <span class="org-type">\Swoole\Http\Response</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response</span>) {
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">header</span>(<span class="org-php-string">'Content-Type'</span>, <span class="org-php-string">'text/html; charset=utf-8'</span>);
+    <span class="org-php-constant">Co</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">sleep</span>(5); <span class="org-comment-delimiter">//</span><span class="org-comment">&#36825;&#37324;&#26159;&#20026;&#20102;&#27169;&#25311;&#19994;&#21153;&#20195;&#30721;&#30340;&#25191;&#34892;&#26102;&#38388;</span>
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">response</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">write</span>(<span class="org-php-string">'&lt;h1&gt;Hello Swoole. #'</span> . <span class="org-php-function-call-traditional">rand</span>(1000, 9999) . <span class="org-php-string">'&lt;/h1&gt;'</span> . <span class="org-php-constant">PHP_EOL</span>);
+});
+
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">on</span>(<span class="org-php-string">'ManagerStart'</span>, <span class="org-php-keyword">function</span> (<span class="org-type">\Swoole\Server</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span>) {
+    <span class="org-php-function-call-traditional">setProcessName</span>(<span class="org-php-string">'my.Manager'</span>);
+});
+
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">on</span>(<span class="org-php-string">'WorkerStart'</span>, <span class="org-php-keyword">function</span> (<span class="org-type">\Swoole\Server</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">workerId</span>) {
+    <span class="org-php-function-call-traditional">setProcessName</span>(<span class="org-php-string">'my.Worker.'</span> . <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">workerId</span>);
+});
+
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">on</span>(<span class="org-php-string">'WorkerExit'</span>, <span class="org-php-keyword">function</span> (<span class="org-type">\Swoole\Server</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">workerId</span>) {
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">ms</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">microtime</span>(<span class="org-php-constant">true</span>);
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">getmypid</span>();
+    <span class="org-php-function-call-traditional">var_dump</span>(<span class="org-php-string">"WorkerExit, worker_id#</span><span class="org-php-variable-name">{$workerId}</span><span class="org-php-string">, pid#</span><span class="org-php-variable-name">{$pid}</span><span class="org-php-string">, ms#</span><span class="org-php-variable-name">{$ms}</span><span class="org-php-string">"</span>);
+    <span class="org-php-constant">\Swoole\Timer</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">clearAll</span>();
+    <span class="org-php-constant">\Swoole\Event</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">exit</span>();
+});
+
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">on</span>(<span class="org-php-string">'WorkerStop'</span>, <span class="org-php-keyword">function</span> (<span class="org-type">\Swoole\Server</span> <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span>, <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">workerId</span>) {
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">ms</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">microtime</span>(<span class="org-php-constant">true</span>);
+    <span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">pid</span> <span class="org-php-assignment-op">=</span> <span class="org-php-function-call-traditional">getmypid</span>();
+    <span class="org-php-function-call-traditional">var_dump</span>(<span class="org-php-string">"WorkerStop, worker_id#</span><span class="org-php-variable-name">{$workerId}</span><span class="org-php-string">, pid#</span><span class="org-php-variable-name">{$pid}</span><span class="org-php-string">, ms#</span><span class="org-php-variable-name">{$ms}</span><span class="org-php-string">"</span>);
+    <span class="org-php-constant">\Swoole\Timer</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">clearAll</span>();
+    <span class="org-php-constant">\Swoole\Event</span><span class="org-php-paamayim-nekudotayim">::</span><span class="org-php-static-method-call-traditional">exit</span>();
+});
+
+<span class="org-php-variable-sigil">$</span><span class="org-php-variable-name">serv</span><span class="org-php-object-op">-&gt;</span><span class="org-php-method-call-traditional">start</span>();
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgab53d7e" class="outline-3">
+<h3 id="orgab53d7e">5. 使用 <code>Redis</code> 连接池时不要执行 <code>select db</code> 的操作</h3>
+<div class="outline-text-3" id="text-orgab53d7e">
+<p>
+这只是一个建议。
+</p>
+
+<p>
+当执行了 <code>select db</code> 操作后，如果忘记 select 回去默认的 db，那么当这个连接被重新放回到连接池，又被其他协程取走使用的话，
+就会出现一些意外情况。
+</p>
+
+<p>
+如果确实有用多个 db 的需要，最好是将不同的 db 分别注册到不同的连接池。
+这样可以方便的从不同的连接池直接取出对应 db 的连接，而不需要通过 <code>select db</code> 来切换db。
+</p>
+</div>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

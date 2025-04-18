@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>使用 Syncthing 实现跨设备同步文件</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Syncthing, file synchronization, 跨设备同步文件" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">使用 Syncthing 实现跨设备同步文件</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2020-03-14</p>
+</header>
+<section id="outline-container-org9b4d04d" class="outline-2">
+<h2 id="org9b4d04d">前言</h2>
+<div class="outline-text-2" id="text-org9b4d04d">
+<p>
+笔记本上装的 <a href="https://manjaro.org/">Manjaro</a> 系统，微信客户端用的是 <a href="https://github.com/kooritea/electronic-wechat">electronic-wechat</a> 。
+一直存在的一个问题是每当发送屏幕截屏时，图片分辨率都好低。
+因为工作的原因，又经常需要通过微信发送屏幕截屏，所以今天特地想找找原因。
+原本以为是截屏工具的问题，今天才发现竟然是 <a href="https://web.wechat.com/">网页版微信</a> 自身的问题，图片会被自动压缩。
+要想发送“原图”，可以把图片打包后作为非图片文件发送，但这对接收者来说太不友好了。
+无奈，只好找一个“曲线救国”的方案：先把屏幕截屏保存在电脑上，再同步到手机上，然后用手机端微信发送图片。
+乍一看这也太曲线，太麻烦了吧。
+但是再转念一想，我不是一直都想找一个电脑和手机互传文件的方案吗。
+现在需要互传时，基本上都是通过微信发送给自己的小号或者文件传输助手，然后再到另一台设备上下载下来。
+但其实早就想摆脱这种方案了，毕竟有些文件实在不想经过第三方服务器中转（当然也不想上传到云盘了）。
+一番简单的Google之后，最终选择了使用 <a href="https://syncthing.net/">Syncthing</a> 。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org101ab4e" class="outline-2">
+<h2 id="org101ab4e">简介</h2>
+<div class="outline-text-2" id="text-org101ab4e">
+<p>
+<code>Syncthing</code> 是一个开源的跨平台的文件夹/文件持续同步程序，支持 <code>Android</code>, <code>Linux</code>, <code>Windows,</code> <code>Mac OS X</code> 等平台。
+数据安全方面， <code>Syncthing</code> 不需要将数据上传到云，而是当自己的多台设备同时联机时仅在这些受信任的设备之间交换数据。
+官方对它的介绍是：
+</p>
+<blockquote>
+<p>
+Syncthing is a <b>continuous file synchronization</b> program.
+It synchronizes files between two or more computers in real time, safely protected from prying eyes.
+Your data is your data alone and you deserve to choose where it is stored, whether it is shared with some third party,
+and how it&rsquo;s transmitted over the internet.
+</p>
+</blockquote>
+
+<div class="alert alert-info info" id="orge4abfd0">
+<p>
+<code>Syncthing</code> 并没有官方支持的 iOS 客户端，官方给出的解释参见 <a href="https://docs.syncthing.net/users/faq.html#why-is-there-no-ios-client">这里</a> 。
+不过好像说是有一个第三方的实现，叫 <code>fsync</code> 。有需要的自己搜一下试试。
+</p>
+
+</div>
+</div>
+</section>
+
+<section id="outline-container-org52b25f7" class="outline-2">
+<h2 id="org52b25f7">安装</h2>
+<div class="outline-text-2" id="text-org52b25f7">
+<p>
+安装其实没什么好说的，到 <a href="https://syncthing.net/downloads/">官网</a> 去选择合适的版本下载就是了。
+我目前在两台设备上装了 <code>Syncthing</code> ，安卓手机直接到 <a href="https://play.google.com/store/apps/details?id=com.nutomic.syncthingandroid">Google Play</a> 商店安装；
+笔记本电脑是通过软件包管理工具装的：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">sudo pacman -S syncthing
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org0d7ca6d" class="outline-2">
+<h2 id="org0d7ca6d">基本使用</h2>
+<div class="outline-text-2" id="text-org0d7ca6d">
+<p>
+在我的笔记本上启动 <code>Syncthing</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">syncthing
+</pre>
+</div>
+
+<div class="alert alert-info info" id="org1f89cf8">
+<p>
+如果需要，可以自行配置后台常驻运行和开机自启动等。
+</p>
+
+</div>
+
+<p>
+<code>Syncthing</code> 启动后会自动在浏览器中打开 <a href="http://127.0.0.1:8384">管理页面</a> 。
+</p>
+
+
+<figure id="org36ad3b8">
+<img src="./syncthing-admin-gui-index.png" alt="syncthing-admin-gui-index.png" class="d-block mw-100 mx-auto">
+
+</figure>
+
+<p>
+左侧是“文件夹”列表或要同步的目录，右侧是设备列表。
+你可以根据需要来添加任意数量的目录和任意数量的设备。
+<i>该图中右下方的远程设备列表里显示我已经成功连接了我的手机。</i>
+</p>
+
+<p>
+Web GUI 已经自带了中文翻译，自己都点一点，看一下都有些什么功能。
+这里只做一下简单说明，就不一步步放图讲解了。
+</p>
+
+<p>
+为了使 <code>Syncthing</code> 能够与另一台设备同步文件，必须告知该设备。这可以通过交换 <b>设备ID</b> 来实现。
+设备ID是唯一的加密安全标识符，该标识符在首次启动 <code>Syncthing</code> 时作为密钥的一部分生成的。
+可以通过 <code>操作</code> &rArr; <code>显示 ID</code> 查看设备ID。
+只有两个设备都配置有彼此的设备ID，它们才会相互连接。
+也就是说配置必须是相互的，需要双方都同意，因此不需要刻意将设备ID保密。它们本质上是公钥的一部分。
+</p>
+
+<p>
+接下来自己操作试试吧，有问题记得看 <a href="https://docs.syncthing.net/users/index.html">文档</a>，同时借用文档中的一句话：
+<b>Good luck and have fun!</b>
+</p>
+</div>
+</section>
+
+<section id="outline-container-orgbddaa7f" class="outline-2">
+<h2 id="orgbddaa7f">常见问题</h2>
+<div class="outline-text-2" id="text-orgbddaa7f">
+<ol class="org-ol">
+<li><p>
+手机端使用 <b>垃圾清理</b> 时会把 <code>Syncthing</code> 自动创建的<a href="https://docs.syncthing.net/users/faq.html#how-do-i-serve-a-folder-from-a-read-only-filesystem">文件夹标记(默认为 <code>.stfolder</code> )</a>删除，导致无法同步
+</p>
+<hr>
+<p>
+首先明确， <code>.stfolder</code> 之所以会被 <b>垃圾清理</b> “误删”是因为它是一个空文件夹。
+故，只需要在 <code>.stfoler</code> 文件夹中随便放入一个文件即可。
+还有一个思路就是根据文档描述，在 <b>高级配置</b> 中把 <code>Marker Name</code> 由默认的 <code>.stfolder</code> 改名为你明确知道在同步文件夹中会一直存在的文件或目录名。(TODO: 未验证)
+</p>
+
+<div class="alert alert-info info" id="org527a09a">
+<p>
+特别提一下，一般这种情况都是放一个空文件，如命名为 <code>.keep</code>, 然而我的手机(XiaoMi Mix 2s)默认文件管理器不支持直接新建文件。
+无奈，我只能在电脑端新建一个 <code>.keep</code> 空文件，同步到手机端后，再移动该文件到 <code>.stfolder</code> 目录。
+</p>
+
+</div></li>
+</ol>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

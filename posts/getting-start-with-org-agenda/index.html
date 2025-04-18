@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Org Agenda 模式下常用快捷键</title>
+<meta name="keywords" content="珊瑚礁上的程序员, emacs. org-mode, org-agenda" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Org Agenda 模式下常用快捷键</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2020-03-10</p>
+</header><p>
+打开 <code>org-agenda</code> 的全局快捷键 <code>C-c a</code>, 或者使用 <code>M-x org-agenda</code> 。
+</p>
+
+<p>
+在 <code>Org Agenda</code> 模式下, 默认绑定的快捷键就有 <b>150</b> 多个。
+要全部记住是不可能的，这辈子都不可能。
+这里就记录一些常用的命令和快捷键。
+</p>
+
+<div class="alert alert-warning info" id="org7fe3742">
+<p>
+如果有需要的化，全局快捷键 <code>C-h m</code> 或 <code>M-x describe-mode</code> 可以查看当前模式下支持的全部命令和对应的快捷键绑定。
+</p>
+
+</div>
+
+<div class="alert alert-info info" id="org25ee420">
+<p>
+在 <code>org</code> 模式下的快捷键也都是可以使用的, 如 <code>C-c C-w</code> 依旧绑定的是 <code>org-agenda-refile</code>, 这里就不再重复列出了。
+</p>
+
+</div>
+
+<table class="table table-sm table-hover">
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">命令</th>
+<th scope="col" class="org-left">解释</th>
+<th scope="col" class="org-left">快捷键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">org-agenda-day-view</td>
+<td class="org-left">按天展示</td>
+<td class="org-left">d</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-week-view</td>
+<td class="org-left">按周展示</td>
+<td class="org-left">w</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-year-view</td>
+<td class="org-left">按年展示</td>
+<td class="org-left">y</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-earlier</td>
+<td class="org-left">更早的日期（向前翻页）</td>
+<td class="org-left">b</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-later</td>
+<td class="org-left">更晚的日期（向后翻页）</td>
+<td class="org-left">f</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-goto-today</td>
+<td class="org-left">跳转到当天</td>
+<td class="org-left">.</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-goto-date</td>
+<td class="org-left">跳转到指定日期</td>
+<td class="org-left">j</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-filter</td>
+<td class="org-left">筛选条目</td>
+<td class="org-left">/</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-filter-by-tag</td>
+<td class="org-left">按标签筛选条目</td>
+<td class="org-left">\</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-filter-by-regexp</td>
+<td class="org-left">按正则筛选条目</td>
+<td class="org-left">=</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-filter-remove-all</td>
+<td class="org-left">移除所有筛选条件</td>
+<td class="org-left">&vert;</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-todo</td>
+<td class="org-left">设置状态</td>
+<td class="org-left">t</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-add-note</td>
+<td class="org-left">为当前条目添加备注</td>
+<td class="org-left">z</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-archive</td>
+<td class="org-left">归档当前条目</td>
+<td class="org-left">$</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-priority</td>
+<td class="org-left">设置权重</td>
+<td class="org-left">，</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-priority-up</td>
+<td class="org-left">提高权重</td>
+<td class="org-left">+</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-priority-down</td>
+<td class="org-left">降低权重</td>
+<td class="org-left">-</td>
+</tr>
+
+<tr>
+<td class="org-left">org-agenda-set-tags</td>
+<td class="org-left">设置标签</td>
+<td class="org-left">：</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

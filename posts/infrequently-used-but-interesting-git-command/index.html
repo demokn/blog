@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>一些不常使用但有趣的 Git 命令</title>
+<meta name="keywords" content="珊瑚礁上的程序员, git, git command" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">一些不常使用但有趣的 Git 命令</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2022-11-23</p>
+</header>
+<section id="outline-container-org3416a4b" class="outline-2">
+<h2 id="org3416a4b">使用指定的私钥克隆仓库</h2>
+<div class="outline-text-2" id="text-org3416a4b">
+<p>
+当具有多个私钥时， <code>git clone</code> 时可以指定私钥克隆:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">git clone REMOTE_GIT_URL --config core.sshCommand=<span class="org-string">"ssh -i ~/.ssh/id_rsa.other"</span>
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-orge0d0b60" class="outline-2">
+<h2 id="orge0d0b60">不同的目录下执行 git 使用不同的配置文件</h2>
+<div class="outline-text-2" id="text-orge0d0b60">
+<p>
+<code>includeIf</code> 是 <code>Git</code> 配置中的一个特性，用于在不同的情境下包含不同的配置文件。
+</p>
+
+<p>
+假设我们有两个不同的 Git 配置文件，一个用于工作，一个用于个人项目。
+我们可以根据工作目录的路径加载不同的配置文件。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">~/.gitconfig</span>
+
+[user]
+  name = Your Name
+  email = your.email@example.com
+
+[includeIf <span class="org-string">"gitdir:~/work/"</span>]
+  path = ~/work/gitconfig-work
+
+[includeIf <span class="org-string">"gitdir:~/personal/"</span>]
+  path = ~/personal/gitconfig-personal
+</pre>
+</div>
+
+<p>
+在这个例子中：
+</p>
+
+<p>
+如果 Git 仓库位于 <code>~/work/</code> 目录下，将加载 <code>~/work/gitconfig-work</code> 文件。
+</p>
+
+<p>
+如果 Git 仓库位于 <code>~/personal/</code> 目录下，将加载 <code>~/personal/gitconfig-personal</code> 文件。
+</p>
+
+<p>
+无论在哪个目录下，都会使用主配置文件的用户姓名和邮箱。
+</p>
+
+<p>
+如果我们工作和个人项目使用的 ssh 私钥不同，则可以分别在两个配置文件中配置 <code>core.sshCommand</code> 配置项。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org17e855c" class="outline-2">
+<h2 id="org17e855c">判断分支是否已经合并到主干</h2>
+<div class="outline-text-2" id="text-org17e855c">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#21028;&#26029;&#31532;&#19968;&#20010;&#20998;&#25903;&#26159;&#20854;&#20182;&#20998;&#25903;&#30340;&#31062;&#20808;&#21527;</span>
+git merge-base --is-ancestor your/feature-brance origin/master
+</pre>
+</div>
+
+<p>
+该命令不会有任何输出, 如果 &ldquo;是&rdquo;，返回值为 &ldquo;0&rdquo;; 如果不是，返回值为 &ldquo;1&rdquo;.
+</p>
+</div>
+</section>
+
+<section id="outline-container-orge367c06" class="outline-2">
+<h2 id="orge367c06">删除所有已合并到主干的分支</h2>
+<div class="outline-text-2" id="text-orge367c06">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#21024;&#38500;&#26412;&#22320;&#20998;&#25903;</span>
+git branch --merged | xargs git branch -d
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#21024;&#38500;&#36828;&#31243;&#20998;&#25903;</span>
+git branch -r --merged | sed <span class="org-string">'s/origin\///'</span> | xargs -I {} git push origin :{}
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org70cd5a6" class="outline-2">
+<h2 id="org70cd5a6">忽略项目中某些文件, 但不放在 .gitignore 文件中</h2>
+<div class="outline-text-2" id="text-org70cd5a6">
+<p>
+在团队合作的项目中, 你使用了某些大家不常用的工具等，可能会在项目根目录下生成一些配置文件等。
+</p>
+
+<p>
+因为不常用，所以极大概率没有加入到 <code>.gitignore</code> 文件中。
+为了避免提交代码时受到这些文件的困扰（误提交）,我们可以在本地忽略掉这些文件。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-builtin">echo</span> <span class="org-string">"/your-some-file"</span> &gt;&gt; .git/info/exclude
+</pre>
+</div>
+
+<p>
+参考：<a href="https://git-scm.com/docs/gitignore">gitignore</a>
+</p>
+</div>
+</section>
+
+<section id="outline-container-org2cd940d" class="outline-2">
+<h2 id="org2cd940d">比较本地文件和某[远程]分支上的文件差异</h2>
+<div class="outline-text-2" id="text-org2cd940d">
+<div class="org-src-container">
+<pre class="src src-shell">git diff origin/dev -- path/to/filename
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-orgb37d5b4" class="outline-2">
+<h2 id="orgb37d5b4">使用 <code>git-hooks</code> 设置受保护的分支(禁止推送)</h2>
+<div class="outline-text-2" id="text-orgb37d5b4">
+<p>
+在团队开发中, 一般都有权限管理的, 比如 <code>master</code> 分支只允许 Team Leader 点合并。
+开发者是没有权限直接推送到 <code>master</code> 分支的。
+</p>
+
+<p>
+但作为 Team Leader, 即便有权限直接推送到 <code>master</code> 分支, 最佳实践还是不要这么干的好。
+更可怕的是，今天由于误操作，将还在开发中的代码直接 push 到了 <code>master</code> 分支, 惊出一身冷汗。
+</p>
+
+<p>
+为了避免再次发生这种情况，可通过 <code>.git/hooks/pre-push</code> 来实现禁止推送到某些受保护的分支。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">sh</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">An example hook script to verify what is about to be pushed.  Called by "git</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">push" after it has checked the remote status, but before anything has been</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">pushed.  If this script exits with a non-zero status nothing will be pushed.</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">This hook is called with the following parameters:</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">$1 -- Name of the remote to which the push is being done</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">$2 -- URL to which the push is being done</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">If pushing without using a named remote those arguments will be equal.</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Information about the commits which are being pushed is supplied as lines to</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">the standard input in the form:</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#   </span><span class="org-comment">&lt;local ref&gt; &lt;local oid&gt; &lt;remote ref&gt; &lt;remote oid&gt;</span>
+
+<span class="org-variable-name">remote</span>=<span class="org-string">"$1"</span>
+<span class="org-variable-name">url</span>=<span class="org-string">"$2"</span>
+
+<span class="org-variable-name">protected_branch</span>=<span class="org-string">"main"</span>
+<span class="org-variable-name">protected_remote_ref</span>=<span class="org-string">"refs/heads/${protected_branch}"</span>
+<span class="org-keyword">while </span><span class="org-builtin">read</span> local_ref local_oid remote_ref remote_oid
+<span class="org-keyword">do</span>
+    <span class="org-comment-delimiter"># </span><span class="org-comment">echo "$local_ref" "$local_oid" "$remote_ref" "$remote_oid"</span>
+    <span class="org-keyword">if </span><span class="org-builtin">test</span> <span class="org-string">"$remote_ref"</span> = <span class="org-string">"$protected_remote_ref"</span>
+    <span class="org-keyword">then</span>
+        <span class="org-builtin">echo</span> &gt;&amp;2 <span class="org-string">"&#20998;&#25903; ${protected_branch} &#20026;&#21463;&#20445;&#25252;&#30340;&#20998;&#25903;, &#19981;&#20801;&#35768;&#25512;&#36865;"</span>
+        <span class="org-keyword">exit</span> 1
+    <span class="org-keyword">fi</span>
+<span class="org-keyword">done</span>
+
+<span class="org-keyword">exit</span> 0
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-orgbf93829" class="outline-2">
+<h2 id="orgbf93829">本地忽略已提交文件的后续变更</h2>
+<div class="outline-text-2" id="text-orgbf93829">
+<p>
+对于新创建的文件, 加入 <code>.gitignore</code> 中即可实现忽略。
+但这种方式仅针对新创建的(从未提交过的)文件生效。
+比如，项目中的 <code>Dockerfile</code> 文件，本身是需要跟着版本库走的，
+且开发，测试，预发布和生产四个环境下的配置可能略有差异（需要指定当前开发环境）。
+每次开始开发新需求，都需要从 <code>master</code> 分支拉取最新代码，然后修改 <code>Dockerfile</code> 将 <code>--env=prod</code> 修改为 <code>--env=dev</code> .
+开发完成需要发布到测试环境时同样需要修改 <code>Dockerfile</code> 将 <code>--env=dev</code> 修改为 <code>--env=test</code> .
+发布到预发布和生产时，同样需要执行这些操作，非常不便。
+尤其是到预发布后发现的问题，需要重新回到 开发，测试 等环节，再经历这么一遍。
+</p>
+
+<p>
+为了解决这个问题，思路很简单，就是本地开发环境对 <code>Dockerfile</code> 文件的修改仅保留在本地，不提交到远程。
+这样本地对该文件的修改就不会提交到远程的开发分支，当合并到 测试，预发布，生产等环境时，也就不存在覆盖的问题，各个环境保留各个环境原有的配置即可。
+为了达到这个目的，可以使用：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#21578;&#35785;Git&#24573;&#30053;&#23545;&#25991;&#20214;&#30340;&#20462;&#25913;&#65292;&#21363;&#20351;&#25991;&#20214;&#24050;&#32463;&#34987;&#20462;&#25913;&#65292;Git&#20063;&#19981;&#20250;&#23558;&#20854;&#26631;&#35760;&#20026;&#24050;&#20462;&#25913;</span>
+git update-index --assume-unchange Dockerfile
+</pre>
+</div>
+
+<p>
+这个时候再执行 <code>git status</code> 命令，会发现该文件并没有被修改的标记。
+</p>
+
+<p>
+当然，如果后续确实有修改 <code>Dockerfile</code> 的需求，
+可以再执行：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">git update-index --no-assume-unchange Dockerfile
+</pre>
+</div>
+<p>
+来恢复对 <code>Dockerfile</code> 文件变动的检查。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org058aeec" class="outline-2">
+<h2 id="org058aeec">切换到上一个分支</h2>
+<div class="outline-text-2" id="text-org058aeec">
+<div class="org-src-container">
+<pre class="src src-shell">git checkout -
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org28dc789" class="outline-2">
+<h2 id="org28dc789">移除指定源文件中行尾的空白字符</h2>
+<div class="outline-text-2" id="text-org28dc789">
+<div class="org-src-container">
+<pre class="src src-shell">sed -i -E <span class="org-string">'s/\s+$//'</span> $(git ls-files <span class="org-string">'*.cpp'</span> <span class="org-string">'*.h'</span>)
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#25110;&#32773;&#20351;&#29992;&#26356;&#24378;&#22823;&#30340; git grep &#26469;&#25628;&#32034;&#25991;&#20214;</span>
+sed -i -E <span class="org-string">'...'</span> $(git grep -lw Foo <span class="org-string">'*.cpp'</span> <span class="org-string">'*.h'</span>)
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org028e556" class="outline-2">
+<h2 id="org028e556">查看分支的最后一次提交时间</h2>
+<div class="outline-text-2" id="text-org028e556">
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#25152;&#26377;&#20998;&#25903;, &#25353;&#29031;&#26368;&#21518;&#25552;&#20132;&#26102;&#38388;&#27491;&#24207;&#25490;&#21015;</span>
+git for-each-ref --sort=committerdate refs/heads/ <span class="org-sh-escaped-newline">\</span>
+    --format=<span class="org-string">'%(committerdate:short) %(refname:short)'</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#33719;&#21462;&#26368;&#36817;&#26356;&#26032;&#30340;5&#20010;&#20998;&#25903;&#21517;</span>
+git for-each-ref --sort=committerdate refs/heads/ <span class="org-sh-escaped-newline">\</span>
+    --format=<span class="org-string">'%(committerdate:short) %(refname:short)'</span> | tail -5 | cut -c 12-
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#21015;&#20986;&#26368;&#36817;&#26356;&#26032;&#30340; 5 &#20010;&#20998;&#25903;&#21517;</span>
+git for-each-ref --sort=-committerdate --count=5 --format=<span class="org-string">'%(refname:short) %(committerdate:relative)'</span> refs/heads/
+</pre>
+</div>
+
+<p>
+<code>git for-each-ref</code> 命令可用于列出和显示各种类型的引用，例如分支、标签、远程跟踪分支等。
+同时可以使用不同的选项来过滤和格式化输出。
+</p>
+
+<p>
+以下是一些常用的参数：
+</p>
+<ul class="org-ul">
+<li><code>--format=&lt;format&gt;</code> : 指定输出的格式。可以使用占位符来引用不同的字段。例如  <code>%d</code>  表示引用的类型， <code>%H</code>  表示引用的完整哈希值， <code>%s</code>  表示引用的简短描述等。</li>
+<li><code>--sort=&lt;key&gt;</code> : 指定排序的键。可以使用不同的键来按照不同的方式排序引用。例如  <code>refname</code>  按引用名称排序， <code>committerdate</code>  按提交时间排序等。可以使用  <code>-</code>  来表示降序排序。</li>
+<li><code>--count=&lt;n&gt;</code> : 限制输出的数量，只显示前 n 个引用。</li>
+<li><code>--merged=&lt;commit&gt;</code> : 仅显示已合并到指定提交的引用。</li>
+<li><code>--no-merged=&lt;commit&gt;</code> : 仅显示未合并到指定提交的引用。</li>
+<li><code>--contains=&lt;commit&gt;</code> : 仅显示包含指定提交的引用。</li>
+<li><code>--points-at=&lt;object&gt;</code> : 仅显示指向指定对象的引用。</li>
+<li><code>--merged-with=&lt;commit&gt;</code> : 仅显示与指定提交合并的引用。</li>
+<li><code>--no-merged-with=&lt;commit&gt;</code> : 仅显示与指定提交未合并的引用。</li>
+<li><code>--format=&lt;format&gt;</code> : 指定输出的格式。可以使用占位符来引用不同的字段。例如  <code>%d</code>  表示引用的类型， <code>%H</code>  表示引用的完整哈希值， <code>%s</code>  表示引用的简短描述等。</li>
+<li><code>--points-at=&lt;object&gt;</code> : 仅显示指向指定对象的引用。</li>
+<li><code>--contains=&lt;commit&gt;</code> : 仅显示包含指定提交的引用。</li>
+<li><code>--merged-with=&lt;commit&gt;</code> : 仅显示与指定提交合并的引用。</li>
+<li><code>--no-merged-with=&lt;commit&gt;</code> : 仅显示与指定提交未合并的引用。</li>
+</ul>
+</div>
+</section>
+
+<section id="outline-container-org8b8307f" class="outline-2">
+<h2 id="org8b8307f">遍历历史所有提交, 删除指定文件的所有痕迹</h2>
+<div class="outline-text-2" id="text-org8b8307f">
+<p>
+应用场景:
+</p>
+
+<p>
+之前把个人密码文件放在了 git 仓库中，而且一直有对该文件的更新。
+后面想想这种方式还是不太安全，所以要把该文件从 git 仓库移除。
+但这个文件已经存在于 git 历史中了，这时就需要遍历所有提交，抹除所有关于该文件的痕迹。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">git filter-branch -f --index-filter <span class="org-string">'git rm -rf --cached --ignore-unmatch YOUR_PRIVATE_FILE_PATH'</span> HEAD
+</pre>
+</div>
+
+<p>
+该命令的作用是在每个提交中执行  <code>git rm -rf --cached --ignore-unmatch path_to_file</code> ，
+将指定的文件从 Git 的索引中移除。这样，在重写历史后，该文件将不再存在于 Git 的历史记录中。
+</p>
+
+<p>
+注意， <code>git filter-branch</code> 是一个强大而危险的命令，它会重写 Git 的历史记录。
+在使用该命令之前，请务必备份你的代码库，并确保你了解该命令的影响和风险。
+</p>
+</div>
+</section>
+
+<section id="outline-container-orgc494017" class="outline-2">
+<h2 id="orgc494017">遍历历史所有提交, 修改提交人的姓名和邮箱</h2>
+<div class="outline-text-2" id="text-orgc494017">
+<p>
+应用场景:
+</p>
+
+<p>
+更换了邮箱地址, 想把 git 历史提交记录中的邮箱地址变更为新的邮箱地址。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">git filter-branch --env-filter <span class="org-string">'</span>
+<span class="org-string">OLD_EMAIL="&#26087;&#30340;&#37038;&#31665;&#22320;&#22336;"</span>
+<span class="org-string">CORRECT_NAME="&#27491;&#30830;&#30340;&#20316;&#32773;&#21517;&#23383;"</span>
+<span class="org-string">CORRECT_EMAIL="&#27491;&#30830;&#30340;&#37038;&#31665;&#22320;&#22336;"</span>
+<span class="org-string">if [ "$GIT_COMMITTER_EMAIL" = "$OLD_EMAIL" ]; then</span>
+<span class="org-string">    export GIT_COMMITTER_NAME="$CORRECT_NAME"</span>
+<span class="org-string">    export GIT_COMMITTER_EMAIL="$CORRECT_EMAIL"</span>
+<span class="org-string">fi</span>
+<span class="org-string">if [ "$GIT_AUTHOR_EMAIL" = "$OLD_EMAIL" ]; then</span>
+<span class="org-string">    export GIT_AUTHOR_NAME="$CORRECT_NAME"</span>
+<span class="org-string">    export GIT_AUTHOR_EMAIL="$CORRECT_EMAIL"</span>
+<span class="org-string">fi</span>
+<span class="org-string">'</span> --tag-name-filter cat -- --branches --tags
+</pre>
+</div>
+
+<p>
+该命令会遍历历史提交，检查每个提交的作者信息。
+如果发现与 <code>OLD_EMAIL</code> 匹配的邮箱地址，就会将作者信息替换为 <code>CORRECT_NAME</code> 和 <code>CORRECT_EMAIL</code> 。
+通过设置环境变量，将正确的作者信息应用于每个匹配的提交。
+</p>
+
+<p>
+注意， <code>git filter-branch</code> 是一个强大而危险的命令，它会重写 Git 的历史记录。
+在使用该命令之前，请务必备份你的代码库，并确保你了解该命令的影响和风险。
+</p>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

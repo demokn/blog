@@ -1,0 +1,103 @@
+pre.src {
+    color: #24292e;
+}
+
+.org-builtin {
+    color: #005cc5;
+}
+.org-comment,
+.org-comment-delimiter {
+    color: #6a737d;
+    font-style: italic;
+}
+.org-constant {
+    color: blue;
+}
+.org-doc {
+    color: purple;
+}
+.org-doc-string {
+    color: #28a745;
+}
+.org-function-name {
+    color: #6f42c1;
+}
+.org-keyword {
+    color: #d73a49;
+}
+.org-negation-char {
+    color: blue;
+}
+.org-preprocessor {
+    color: purple;
+}
+.org-regexp-grouping-backslash {
+    color: #28a745;
+}
+.org-regexp-grouping-construct {
+    color: purple;
+}
+.org-string {
+    color: #032f62;
+}
+.org-type {
+    color: blue;
+}
+.org-variable-name {
+    color: #28a745;
+    font-weight: bold;
+}
+.org-warning {
+    color: red;
+    font-weight: bold;
+}
+
+/* shell builtin */
+.org-sh-quoted-exec {
+    color: #032f62;
+}
+
+/* php-face */
+.org-php-string {
+    color: #032f62;
+}
+.org-php-builtin, .org-php-magical-constant {
+    color: #005cc5;
+}
+.org-php-function-name {
+    color: #6f42c1;
+}
+.org-php-function-call, .org-php-method-call, .org-php-static-method-call { }
+.org-php-variable-name, .org-php-property-name {
+    color: #28a745;
+    font-weight: bold;
+}
+.org-php-variable-sigil { }
+.org-php-operator, .org-php-assignment-op, .org-php-comparison-op, .org-php-logical-op, .org-php-arithmetic-op, .org-php-inc-dec-op, .org-php-string-op, .org-object-op { }
+.org-php-paamayim-nekudotayim {}
+.org-php-type, .org-php-class, .org-php-constant-assign, .org-php-errorcontrol-op {
+    color: blue;
+}
+.org-php-constant, .org-php-this, .org-php-this-sigil {
+    color: blue;
+}
+.org-php-php-tag {
+    color: purple;
+}
+.org-php-doc-annotation-tag {
+    color: blue;
+}
+.org-php-doc-variable-sigil {
+    color: #28a745;
+    font-weight: bold;
+}
+.org-php-doc-this, .org-php-doc-this-sigil {
+    color: blue;
+}
+.org-php-doc-class-name {
+    color: #032f62;
+}
+.org-php-keyword, .org-php-class-declaration, .org-php-class-declaration-spec, .org-php-namespace-declaration, .org-php-import-declaration, .org-php-class-modifier, .org-php-method-modifier, .org-php-visibility-modifier, .org-php-control-structure {
+    color: #d73a49;
+}
+

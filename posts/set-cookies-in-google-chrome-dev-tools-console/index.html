@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>如何在 Chrome 浏览器的Dev Tools - Console 中设置cookie</title>
+<meta name="keywords" content="珊瑚礁上的程序员, chrome dev tools, chrome console, 设置 cookie" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">如何在 Chrome 浏览器的Dev Tools - Console 中设置cookie</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2022-12-06</p>
+</header><p>
+公司项目一般都有区分开发环境，测试环境，预发环境和生产环境。
+通常预发环境连接的也是生产的数据库。
+也就是说预发环境和生产环境的用户 <code>token</code> 是相同的。
+如果你正在登录着生产环境，突然想登录预发环境，这个时候其实完全可以将生产环境的 <code>token</code> 复制到预发环境，
+这样可以免去重新登录的麻烦（需要短信验证码）。
+</p>
+
+<p>
+我们的前端项目，用户 <code>token</code> 是存储在 <code>cookie</code> 中的。
+</p>
+
+<p>
+方案有两种，最简单的就是在开发者工具中点点点，装逼一点就是在开发者工具的 <code>console</code> 中用命令设置。
+</p>
+
+<p>
+方案一没太多好说的，就是在当前登录的环境（生产环境）打开 开发者工具 &gt; 应用 &gt; 存储 &gt; Cookie 中找到 <code>token</code> 的值，复制一下。
+然后到需要登录的环境（预发环境）同样打开 开发者工具 &gt; 应用 &gt; 存储 &gt; Cookie 中新增一个名为 <code>token</code> 的 cookie，把值粘贴进去即可。
+</p>
+
+
+<figure id="orgb572cc2">
+<img src="./chrome-dev-tools-cookie.png" alt="chrome-dev-tools-cookie.png" class="d-block mw-100 mx-auto">
+
+</figure>
+
+<p>
+方案二是查看 <code>cookie</code> 和设置 <code>cookie</code> 都在 <code>console</code> 中完成。
+</p>
+
+<ul class="org-ul">
+<li><p>
+查看 <code>cookie</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-javascript">document.cookie
+</pre>
+</div>
+
+
+<figure id="orgd2f1dca">
+<img src="./console-get-cookie.png" alt="console-get-cookie.png" class="d-block mw-100 mx-auto">
+
+</figure></li>
+
+<li><p>
+设置 <code>cookie</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-javascript">document.cookie=<span class="org-string">'_ga=balabalabala; token=1234567890'</span>
+</pre>
+</div></li>
+</ul>
+
+<p>
+设置好之后再用 <code>document.cookie</code> 查看，“哎呀卧草，怎么没 token 还是没有”&#x2026;
+</p>
+
+<p>
+一番冲浪之后发现在 chrome console 中通过 <code>document.cookie</code> 来设置 cookie 的话，只能一个一个的设置。
+根据表象，其实是只有 <code>;</code> 分号前的第一个键值会生效。所以只能一个个的来设置。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">document.cookie=<span class="org-string">'_ga=balabalabala'</span>
+document.cookie=<span class="org-string">'token=123456789'</span>
+</pre>
+</div>
+
+
+<figure id="org3f16a26">
+<img src="./console-set-cookie.png" alt="console-set-cookie.png" class="d-block mw-100 mx-auto">
+
+</figure>
+
+<p>
+如果不想一个一个的设置，也有小伙伴提供了一个简单的方法封装。
+</p>
+<div class="org-src-container">
+<pre class="src src-javascript"><span class="org-keyword">function</span> <span class="org-function-name">clearCookies</span>(){
+  <span class="org-keyword">var</span> <span class="org-variable-name">cookies</span> = document.cookie.split(<span class="org-string">';'</span>);
+  <span class="org-keyword">for</span>(i <span class="org-keyword">in</span> cookies){
+    <span class="org-keyword">var</span> <span class="org-variable-name">vals</span> = cookies[i].split(<span class="org-string">'='</span>);
+    <span class="org-keyword">var</span> <span class="org-variable-name">name</span> = vals.shift(0, 1).trim();
+    document.cookie = name+<span class="org-string">'='</span>;
+  }
+}
+<span class="org-keyword">function</span> <span class="org-function-name">parseCookies</span>(<span class="org-variable-name">cookie</span>){
+  clearCookies();
+  <span class="org-keyword">var</span> <span class="org-variable-name">cookies</span> = cookie.split(<span class="org-string">';'</span>);
+  <span class="org-keyword">for</span>(i <span class="org-keyword">in</span> cookies){
+    <span class="org-keyword">var</span> <span class="org-variable-name">vals</span> = cookies[i].split(<span class="org-string">'='</span>);
+    <span class="org-keyword">var</span> <span class="org-variable-name">name</span> = vals.shift(0, 1).trim();
+    document.cookie = name+<span class="org-string">'='</span>+vals.join(<span class="org-string">'='</span>);
+  }
+}
+</pre>
+</div>
+
+<p>
+之后就可以调用 <code>parseCookies('_ga=balabalabala; token=1234567890')</code> 来实现一次设置多个 <code>cookie</code> 。
+</p>
+
+
+<figure id="orgf7d45f7">
+<img src="./console-set-cookie-2.png" alt="console-set-cookie-2.png" class="d-block mw-100 mx-auto">
+
+</figure>
+
+<section id="outline-container-org32ed0d0" class="outline-2">
+<h2 id="org32ed0d0">参考</h2>
+<div class="outline-text-2" id="text-org32ed0d0">
+<ul class="org-ul">
+<li><a href="https://stackoverflow.com/questions/26349052/why-would-setting-document-cookie-not-work-in-chrome">Why would setting document.cookie not work in Chrome?</a></li>
+</ul>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

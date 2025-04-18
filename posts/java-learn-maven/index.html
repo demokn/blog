@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Maven 学习笔记</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Java, Maven" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Maven 学习笔记</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2025-01-12</p>
+</header>
+<section id="outline-container-org7bfb974" class="outline-2">
+<h2 id="org7bfb974">通过命令行创建空的 <code>maven</code> 项目骨架</h2>
+<div class="outline-text-2" id="text-org7bfb974">
+</div>
+<div id="outline-container-org58642eb" class="outline-3">
+<h3 id="org58642eb">1. 从 Maven 模板创建项目<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup></h3>
+<div class="outline-text-3" id="text-org58642eb">
+<div class="org-src-container">
+<pre class="src src-shell">mvn archetype:generate <span class="org-sh-escaped-newline">\</span>
+    -DgroupId=com.example <span class="org-sh-escaped-newline">\</span>
+    -DartifactId=my-maven-demo <span class="org-sh-escaped-newline">\</span>
+    -DarchetypeArtifactId=maven-archetype-quickstart <span class="org-sh-escaped-newline">\</span>
+    -DinteractiveMode=false
+</pre>
+</div>
+
+<pre class="example" id="orga8cee3a">
+...
+[INFO] ----------------------------------------------------------------------------
+[INFO] Using following parameters for creating project from Old (1.x) Archetype: maven-archetype-quickstart:1.0
+[INFO] ----------------------------------------------------------------------------
+[INFO] Parameter: basedir, Value: /tmp
+[INFO] Parameter: package, Value: com.example
+[INFO] Parameter: groupId, Value: com.example
+[INFO] Parameter: artifactId, Value: my-maven-demo
+[INFO] Parameter: packageName, Value: com.example
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] project created from Old (1.x) Archetype in dir: /tmp/my-maven-demo
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.908 s
+[INFO] Finished at: 2025-01-17T23:21:31+08:00
+[INFO] ------------------------------------------------------------------------
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org05a9ce2" class="outline-3">
+<h3 id="org05a9ce2">2. 生成的项目目录结构</h3>
+<div class="outline-text-3" id="text-org05a9ce2">
+<pre class="example" id="orgf3e2b8f">
+$ tree my-maven-demo
+maven-demo
+├── pom.xml
+└── src
+    ├── main
+    │   └── java
+    │       └── com
+    │           └── example
+    │               └── App.java
+    └── test
+        └── java
+            └── com
+                └── example
+                    └── AppTest.java
+
+10 directories, 3 files
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgcd04a44" class="outline-3">
+<h3 id="orgcd04a44">3. 生成 <code>pom.xml</code> 文件内容</h3>
+<div class="outline-text-3" id="text-orgcd04a44">
+<p>
+生成的内容如下, 仅包含一个 jUnit 依赖项.
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">project</span> <span class="org-nxml-namespace-attribute-xmlns">xmlns</span>=<span class="org-string">"http://maven.apache.org/POM/4.0.0"</span> <span class="org-nxml-namespace-attribute-xmlns">xmlns</span><span class="org-nxml-namespace-attribute-colon">:</span><span class="org-nxml-namespace-attribute-prefix">xsi</span>=<span class="org-string">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="org-nxml-attribute-prefix">xsi</span><span class="org-nxml-attribute-colon">:</span><span class="org-nxml-attribute-local-name">schemaLocation</span>=<span class="org-string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">modelVersion</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">4.0.0</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">modelVersion</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">com.example</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">my-maven-demo</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">packaging</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">jar</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">packaging</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">1.0-SNAPSHOT</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">name</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-demo</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">name</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">url</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">http://maven.apache.org</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">url</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependencies</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">junit</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">junit</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.8.1</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">scope</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">test</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">scope</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependencies</span><span class="org-nxml-tag-delimiter">&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">project</span><span class="org-nxml-tag-delimiter">&gt;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgeaf1c71" class="outline-3">
+<h3 id="orgeaf1c71">4. 更新 <code>pom.xml</code> 文件</h3>
+<div class="outline-text-3" id="text-orgeaf1c71">
+<p>
+4.1 增加编译器属性，告诉 Maven 使用指定的 JDK 版本来编译源码
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">&#25351;&#23450;&#39033;&#30446;&#26500;&#24314;&#26102;&#30340;&#28304;&#25991;&#20214;&#32534;&#30721;&#26684;&#24335;, &#38450;&#27490;&#28304;&#25991;&#20214;&#20013;&#30340;&#38750; ASCII &#23383;&#31526;&#20986;&#29616;&#20081;&#30721;</span><span class="org-comment-delimiter"> --&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">project.build.sourceEncoding</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">UTF-8</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">project.build.sourceEncoding</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">&#25351;&#23450;&#39033;&#30446;&#28304;&#20195;&#30721;&#25152;&#20351;&#29992;&#30340; Java &#29256;&#26412;</span><span class="org-comment-delimiter"> --&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">maven.compiler.source</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">1.8</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">maven.compiler.source</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">&#25351;&#23450;&#32534;&#35793;&#21518;&#30340;&#23383;&#33410;&#30721;&#30446;&#26631;&#29256;&#26412;</span><span class="org-comment-delimiter"> --&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">maven.compiler.target</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">1.8</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">maven.compiler.target</span><span class="org-nxml-tag-delimiter">&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+</pre>
+</div>
+
+<p>
+4.2 升级到 jUnit4
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">junit</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">junit</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">4.13.2</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">scope</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">test</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">scope</span><span class="org-nxml-tag-delimiter">&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+</pre>
+</div>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org7ec7288" class="outline-2">
+<h2 id="org7ec7288">Maven 项目构建与运行</h2>
+<div class="outline-text-2" id="text-org7ec7288">
+<p>
+接上面创建的 maven 项目骨架，继续进行项目的编译与打包.
+</p>
+</div>
+
+<div id="outline-container-org202bfd1" class="outline-3">
+<h3 id="org202bfd1">1. 增加依赖项</h3>
+<div class="outline-text-3" id="text-org202bfd1">
+<p>
+为更好的演示打包的效果, 增加一个依赖项.
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">commons-codec</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">commons-codec</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">1.17.2</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org37be336" class="outline-3">
+<h3 id="org37be336">2. 编写代码</h3>
+<div class="outline-text-3" id="text-org37be336">
+<p>
+2.1 编写代码
+<code>src/main/java/com/example/App.java</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span class="org-keyword">package</span> com.<span class="org-constant">example</span>;
+
+<span class="org-keyword">import</span> <span class="org-constant">org</span>.<span class="org-constant">apache</span>.<span class="org-constant">commons</span>.<span class="org-constant">codec</span>.<span class="org-constant">digest</span>.<span class="org-type">DigestUtils</span>;
+
+<span class="org-keyword">public</span> <span class="org-keyword">class</span> <span class="org-type">App</span> {
+    <span class="org-keyword">public</span> <span class="org-keyword">static</span> <span class="org-type">void</span> <span class="org-function-name">main</span>(<span class="org-type">String</span>[] <span class="org-variable-name">args</span>) {
+
+        <span class="org-keyword">if</span> (args.length &lt; 1) {
+            System.err.println(<span class="org-string">"&#35831;&#36755;&#20837;&#20219;&#24847;&#23383;&#31526;&#20018;!"</span>);
+            System.exit(0);
+        }
+        System.out.println(<span class="org-string">"SHA-256&#21704;&#24076;&#20540;&#20026;: "</span> + sha256hex(args[0]));
+    }
+
+    <span class="org-keyword">public</span> <span class="org-keyword">static</span> <span class="org-type">String</span> <span class="org-function-name">sha256hex</span>(<span class="org-type">String</span> <span class="org-variable-name">input</span>) {
+        <span class="org-keyword">return</span> DigestUtils.sha256Hex(input);
+    }
+}
+</pre>
+</div>
+
+<p>
+2.2 编写单元测试
+<code>com/example/AppTest.java</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span class="org-keyword">package</span> com.<span class="org-constant">example</span>;
+
+<span class="org-keyword">import</span> <span class="org-constant">org</span>.<span class="org-constant">junit</span>.<span class="org-type">Test</span>;
+
+<span class="org-keyword">import</span> <span class="org-keyword">static</span> <span class="org-constant">org</span>.<span class="org-constant">junit</span>.<span class="org-constant">Assert</span>.*;
+
+<span class="org-keyword">public</span> <span class="org-keyword">class</span> <span class="org-type">AppTest</span> {
+
+    <span class="org-c-annotation">@Test</span>
+    <span class="org-keyword">public</span> <span class="org-type">void</span> <span class="org-function-name">sha256hex</span>() {
+        assertEquals(<span class="org-string">"8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92"</span>, App.sha256hex(<span class="org-string">"123456"</span>));
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga014e8c" class="outline-3">
+<h3 id="orga014e8c">3. maven 构建</h3>
+<div class="outline-text-3" id="text-orga014e8c">
+<p>
+执行 <code>mvn package</code> 完成构建
+</p>
+<pre class="example" id="org986a280">
+$ mvn package
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ---------------------&lt; com.example:my-maven-demo &gt;----------------------
+[INFO] Building my-maven-demo 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- resources:3.3.1:resources (default-resources) @ my-maven-demo ---
+[INFO] skip non existing resourceDirectory /tmp/my-maven-demo/src/main/resources
+[INFO]
+[INFO] --- compiler:3.13.0:compile (default-compile) @ my-maven-demo ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 1 source file with javac [debug target 1.8] to target/classes
+[INFO]
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ my-maven-demo ---
+[INFO] skip non existing resourceDirectory /tmp/my-maven-demo/src/test/resources
+[INFO]
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ my-maven-demo ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug target 1.8] to target/test-classes
+[INFO]
+[INFO] --- surefire:3.2.5:test (default-test) @ my-maven-demo ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junit4.JUnit4Provider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.example.AppTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.111 s -- in com.example.AppTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO]
+[INFO] --- jar:3.4.1:jar (default-jar) @ my-maven-demo ---
+[INFO] Building jar: /tmp/my-maven-demo/target/my-maven-demo-1.0-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.145 s
+[INFO] Finished at: 2025-01-16T23:40:30+08:00
+[INFO] ------------------------------------------------------------------------
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orged96016" class="outline-3">
+<h3 id="orged96016">4. 运行构建后得到的 jar 包</h3>
+<div class="outline-text-3" id="text-orged96016">
+<p>
+4.1 尝试执行
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">java -cp target/my-maven-demo-1.0-SNAPSHOT.jar com.example.App 123456
+</pre>
+</div>
+
+<p>
+发现报错了, 报错原因是根据当前的 pom 文件配置, Maven 不会将项目中的依赖项 <code>commons-codec</code> 添加到 jar 文件中。
+</p>
+<pre class="example" id="orgc5073fb">
+Exception in thread "main" java.lang.NoClassDefFoundError: org/apache/commons/codec/digest/DigestUtils
+        at com.example.App.sha256hex(App.java:16)
+        at com.example.App.main(App.java:12)
+Caused by: java.lang.ClassNotFoundException: org.apache.commons.codec.digest.DigestUtils
+        at java.net.URLClassLoader.findClass(URLClassLoader.java:387)
+        at java.lang.ClassLoader.loadClass(ClassLoader.java:418)
+        at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:352)
+        at java.lang.ClassLoader.loadClass(ClassLoader.java:351)
+        ... 2 more
+</pre>
+
+<p>
+4.2 使用 <code>maven-shade-plugin</code><sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup> 插件来生成 <code>fat-jar</code> - 将所有依赖项打包进同一个 jar 文件中
+</p>
+
+<p>
+更新 <code>pom.xml</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">build</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugins</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">org.apache.maven.plugins</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-shade-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.6.0</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">executions</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">&#25351;&#23450;&#35813;&#25554;&#20214;&#30340; shade &#30446;&#26631;&#22312; Maven &#30340; package &#38454;&#27573;&#25191;&#34892;</span><span class="org-comment-delimiter"> --&gt;</span>
+        <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">&#20063;&#23601;&#26159;&#24403;&#36816;&#34892; mvn package &#21629;&#20196;&#26102;&#65292;&#35813;&#25554;&#20214;&#30340; shade &#30446;&#26631;&#23558;&#34987;&#33258;&#21160;&#35302;&#21457;</span><span class="org-comment-delimiter"> --&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">execution</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">phase</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">package</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">phase</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">goals</span><span class="org-nxml-tag-delimiter">&gt;</span>
+            <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">goal</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">shade</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">goal</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">goals</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">execution</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">executions</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugins</span><span class="org-nxml-tag-delimiter">&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">build</span><span class="org-nxml-tag-delimiter">&gt;</span>
+</pre>
+</div>
+
+<p>
+4.3 重新构建 <code>mvn clean package</code>
+</p>
+
+<pre class="example" id="org074234e">
+...
+[INFO] --- jar:3.4.1:jar (default-jar) @ my-maven-demo ---
+[INFO] Building jar: /tmp/my-maven-demo/target/my-maven-demo-1.0-SNAPSHOT.jar
+[INFO]
+[INFO] --- shade:3.6.0:shade (default) @ my-maven-demo ---
+[INFO] Including commons-codec:commons-codec:jar:1.17.2 in the shaded jar.
+[INFO] Dependency-reduced POM written at: /tmp/my-maven-demo/dependency-reduced-pom.xml
+[WARNING] commons-codec-1.17.2.jar, my-maven-demo-1.0-SNAPSHOT.jar define 1 overlapping resource:
+[WARNING]   - META-INF/MANIFEST.MF
+[WARNING] maven-shade-plugin has detected that some files are
+[WARNING] present in two or more JARs. When this happens, only one
+[WARNING] single version of the file is copied to the uber jar.
+[WARNING] Usually this is not harmful and you can skip these warnings,
+[WARNING] otherwise try to manually exclude artifacts based on
+[WARNING] mvn dependency:tree -Ddetail=true and the above output.
+[WARNING] See https://maven.apache.org/plugins/maven-shade-plugin/
+[INFO] Replacing original artifact with shaded artifact.
+[INFO] Replacing /tmp/my-maven-demo/target/my-maven-demo-1.0-SNAPSHOT.jar with /tmp/my-maven-demo/target/my-maven-demo-1.0-SNAPSHOT-shaded.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.268 s
+[INFO] Finished at: 2025-01-16T23:58:36+08:00
+[INFO] ------------------------------------------------------------------------
+</pre>
+
+<p>
+可以看到生成了两个 jar 包, 查看一下它们的文件大小
+</p>
+<pre class="example" id="org96fa4c5">
+$ ls -lh target
+...
+-rw-r--r-- 1 demo demo 365K Jan 16 23:58 my-maven-demo-1.0-SNAPSHOT.jar
+-rw-r--r-- 1 demo demo 2.9K Jan 16 23:58 original-my-maven-demo-1.0-SNAPSHOT.jar
+...
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org1cd2c3f" class="outline-3">
+<h3 id="org1cd2c3f">5. 第 2 次运行</h3>
+<div class="outline-text-3" id="text-org1cd2c3f">
+<p>
+5.1 尝试运行
+</p>
+<pre class="example" id="orgacb51f8">
+$ java -cp target/my-maven-demo-1.0-SNAPSHOT.jar com.example.App 123456
+SHA-256哈希值为: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+</pre>
+
+<p>
+5.2 很好, 现在执行成功了。但是能不能直接作为 jar 包执行而不用指定主类呢
+</p>
+<pre class="example" id="org4937cbd">
+➜ java -jar target/my-maven-demo-1.0-SNAPSHOT.jar
+no main manifest attribute, in target/my-maven-demo-1.0-SNAPSHOT.jar
+</pre>
+
+<p>
+5.3 很遗憾，还不可以，可以通过配置 maven-shade-plugin 插件来指定主类
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">org.apache.maven.plugins</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-shade-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.6.0</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">executions</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">execution</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">phase</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">package</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">phase</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">goals</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">goal</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">shade</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">goal</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">goals</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">configuration</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">transformers</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">transformer</span> <span class="org-nxml-attribute-local-name">implementation</span>=<span class="org-string">"org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+            <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">mainClass</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">com.example.App</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">mainClass</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">transformer</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">transformers</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">configuration</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">execution</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">executions</span><span class="org-nxml-tag-delimiter">&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org334764a" class="outline-3">
+<h3 id="org334764a">6. 第 3 次运行</h3>
+<div class="outline-text-3" id="text-org334764a">
+<p>
+6.1 重新打包
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">mvn clean package
+</pre>
+</div>
+
+<p>
+6.2 作为 jar 包执行
+</p>
+<pre class="example" id="org6d3ab0c">
+➜ java -jar target/my-maven-demo-1.0-SNAPSHOT.jar
+请输入任意字符串!
+
+➜ java -jar target/my-maven-demo-1.0-SNAPSHOT.jar 123456
+SHA-256哈希值为: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-orge014050" class="outline-2">
+<h2 id="orge014050">7. 完整的 pom 文件</h2>
+<div class="outline-text-2" id="text-orge014050">
+<div class="org-src-container">
+<pre class="src src-xml"><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">project</span> <span class="org-nxml-namespace-attribute-xmlns">xmlns</span>=<span class="org-string">"http://maven.apache.org/POM/4.0.0"</span> <span class="org-nxml-namespace-attribute-xmlns">xmlns</span><span class="org-nxml-namespace-attribute-colon">:</span><span class="org-nxml-namespace-attribute-prefix">xsi</span>=<span class="org-string">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="org-nxml-attribute-prefix">xsi</span><span class="org-nxml-attribute-colon">:</span><span class="org-nxml-attribute-local-name">schemaLocation</span>=<span class="org-string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">modelVersion</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">4.0.0</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">modelVersion</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">com.example</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">my-maven-demo</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">packaging</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">jar</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">packaging</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">1.0-SNAPSHOT</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">name</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">my-maven-demo</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">name</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">url</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">http://maven.apache.org</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">url</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">&#25351;&#23450;&#39033;&#30446;&#26500;&#24314;&#26102;&#30340;&#28304;&#25991;&#20214;&#32534;&#30721;&#26684;&#24335;, &#38450;&#27490;&#28304;&#25991;&#20214;&#20013;&#30340;&#38750; ASCII &#23383;&#31526;&#20986;&#29616;&#20081;&#30721;</span><span class="org-comment-delimiter"> --&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">project.build.sourceEncoding</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">UTF-8</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">project.build.sourceEncoding</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">&#25351;&#23450;&#39033;&#30446;&#28304;&#20195;&#30721;&#25152;&#20351;&#29992;&#30340; Java &#29256;&#26412;</span><span class="org-comment-delimiter"> --&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">maven.compiler.source</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">1.8</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">maven.compiler.source</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">&#25351;&#23450;&#32534;&#35793;&#21518;&#30340;&#23383;&#33410;&#30721;&#30446;&#26631;&#29256;&#26412;</span><span class="org-comment-delimiter"> --&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">maven.compiler.target</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">1.8</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">maven.compiler.target</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependencies</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">junit</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">junit</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">4.13.2</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">scope</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">test</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">scope</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">commons-codec</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">commons-codec</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">1.17.2</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependencies</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">build</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugins</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">org.apache.maven.plugins</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-shade-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.6.0</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">executions</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">&#25351;&#23450;&#35813;&#25554;&#20214;&#30340; shade &#30446;&#26631;&#22312; Maven &#30340; package &#38454;&#27573;&#25191;&#34892;</span><span class="org-comment-delimiter"> --&gt;</span>
+          <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">&#20063;&#23601;&#26159;&#24403;&#36816;&#34892; mvn package &#21629;&#20196;&#26102;&#65292;&#35813;&#25554;&#20214;&#30340; shade &#30446;&#26631;&#23558;&#34987;&#33258;&#21160;&#35302;&#21457;</span><span class="org-comment-delimiter"> --&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">execution</span><span class="org-nxml-tag-delimiter">&gt;</span>
+            <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">phase</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">package</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">phase</span><span class="org-nxml-tag-delimiter">&gt;</span>
+            <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">goals</span><span class="org-nxml-tag-delimiter">&gt;</span>
+              <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">goal</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">shade</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">goal</span><span class="org-nxml-tag-delimiter">&gt;</span>
+            <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">goals</span><span class="org-nxml-tag-delimiter">&gt;</span>
+            <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">configuration</span><span class="org-nxml-tag-delimiter">&gt;</span>
+              <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">transformers</span><span class="org-nxml-tag-delimiter">&gt;</span>
+                <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">transformer</span> <span class="org-nxml-attribute-local-name">implementation</span>=<span class="org-string">"org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+                  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">mainClass</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">com.example.App</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">mainClass</span><span class="org-nxml-tag-delimiter">&gt;</span>
+                <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">transformer</span><span class="org-nxml-tag-delimiter">&gt;</span>
+              <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">transformers</span><span class="org-nxml-tag-delimiter">&gt;</span>
+            <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">configuration</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">execution</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">executions</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugins</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">build</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">project</span><span class="org-nxml-tag-delimiter">&gt;</span>
+</pre>
+</div>
+</div>
+</section>
+
+<section id="outline-container-org28815ad" class="outline-2">
+<h2 id="org28815ad">8. 体验更高版本的 maven-archetype-quickstart</h2>
+<div class="outline-text-2" id="text-org28815ad">
+<p>
+8.1 在步骤 1 的输出中可以看到默认使用的 maven-archetype-quickstart 版本是 1.0.
+通过官网查看目前的最新版本已经是 1.5 了, 体验一下新版本<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>.
+可以直接指定 java 编译器版本, jUnit 版本等。
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">mvn archetype:generate <span class="org-sh-escaped-newline">\</span>
+    -DgroupId=com.example <span class="org-sh-escaped-newline">\</span>
+    -DartifactId=maven-demo <span class="org-sh-escaped-newline">\</span>
+    -DarchetypeArtifactId=maven-archetype-quickstart <span class="org-sh-escaped-newline">\</span>
+    -DarchetypeVersion=1.5 <span class="org-sh-escaped-newline">\</span>
+    -DinteractiveMode=false <span class="org-sh-escaped-newline">\</span>
+    -DjavaCompilerVersion=1.8 <span class="org-sh-escaped-newline">\</span>
+    -DjunitVersion=4.13.2
+</pre>
+</div>
+
+<pre class="example" id="org40f5636">
+...
+[INFO] ----------------------------------------------------------------------------
+[INFO] Using following parameters for creating project from Archetype: maven-archetype-quickstart:1.5
+[INFO] ----------------------------------------------------------------------------
+[INFO] Parameter: groupId, Value: com.example
+[INFO] Parameter: artifactId, Value: maven-demo
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: package, Value: com.example
+[INFO] Parameter: packageInPathFormat, Value: com/example
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: package, Value: com.example
+[INFO] Parameter: javaCompilerVersion, Value: 1.8
+[INFO] Parameter: groupId, Value: com.example
+[INFO] Parameter: junitVersion, Value: 4.13.2
+[INFO] Parameter: artifactId, Value: maven-demo
+[WARNING] Don't override file /tmp/maven-demo/src/main/java/com/example
+[WARNING] Don't override file /tmp/maven-demo/src/test/java/com/example
+[WARNING] CP Don't override file /tmp/maven-demo/.mvn
+[INFO] Project created from Archetype in dir: /tmp/maven-demo
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.926 s
+[INFO] Finished at: 2025-01-17T23:53:49+08:00
+[INFO] ------------------------------------------------------------------------
+</pre>
+
+<p>
+8.2 查看项目目录
+</p>
+<pre class="example" id="org418dc09">
+➜ tree -a maven-demo
+maven-demo
+├── .mvn
+│   ├── jvm.config
+│   └── maven.config
+├── pom.xml
+└── src
+    ├── main
+    │   └── java
+    │       └── com
+    │           └── example
+    │               └── App.java
+    └── test
+        └── java
+            └── com
+                └── example
+                    └── AppTest.java
+
+11 directories, 5 files
+</pre>
+
+<p>
+8.3 pom 文件内容
+</p>
+<div class="org-src-container">
+<pre class="src src-xml"><span class="org-nxml-processing-instruction-delimiter">&lt;?</span><span class="org-nxml-processing-instruction-target">xml</span> <span class="org-nxml-processing-instruction-content">version="1.0" encoding="UTF-8"</span><span class="org-nxml-processing-instruction-delimiter">?&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">project</span> <span class="org-nxml-namespace-attribute-xmlns">xmlns</span>=<span class="org-string">"http://maven.apache.org/POM/4.0.0"</span> <span class="org-nxml-namespace-attribute-xmlns">xmlns</span><span class="org-nxml-namespace-attribute-colon">:</span><span class="org-nxml-namespace-attribute-prefix">xsi</span>=<span class="org-string">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="org-nxml-attribute-prefix">xsi</span><span class="org-nxml-attribute-colon">:</span><span class="org-nxml-attribute-local-name">schemaLocation</span>=<span class="org-string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">modelVersion</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">4.0.0</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">modelVersion</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">com.example</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-demo</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">1.0-SNAPSHOT</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">name</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-demo</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">name</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">FIXME change it to the project's website</span><span class="org-comment-delimiter"> --&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">url</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">http://www.example.com</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">url</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">project.build.sourceEncoding</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">UTF-8</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">project.build.sourceEncoding</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">maven.compiler.source</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">1.8</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">maven.compiler.source</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">maven.compiler.target</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">1.8</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">maven.compiler.target</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">properties</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependencies</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">junit</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">groupId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">junit</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">4.13.2</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">scope</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">test</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">scope</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependency</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">dependencies</span><span class="org-nxml-tag-delimiter">&gt;</span>
+
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">build</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">pluginManagement</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">lock down plugins versions to avoid using Maven defaults (may be moved to parent pom)</span><span class="org-comment-delimiter"> --&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugins</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle</span><span class="org-comment-delimiter"> --&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-clean-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.4.0</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging</span><span class="org-comment-delimiter"> --&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-resources-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.3.1</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-compiler-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.13.0</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-surefire-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.3.0</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-jar-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.4.2</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-install-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.1.2</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-deploy-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.1.2</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-comment-delimiter">&lt;!-- </span><span class="org-comment">site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle</span><span class="org-comment-delimiter"> --&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-site-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.12.1</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">maven-project-info-reports-plugin</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">artifactId</span><span class="org-nxml-tag-delimiter">&gt;</span>
+          <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">3.6.1</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">version</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugin</span><span class="org-nxml-tag-delimiter">&gt;</span>
+      <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">plugins</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">pluginManagement</span><span class="org-nxml-tag-delimiter">&gt;</span>
+  <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">build</span><span class="org-nxml-tag-delimiter">&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">project</span><span class="org-nxml-tag-delimiter">&gt;</span>
+</pre>
+</div>
+</div>
+</section>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Thanks to <a href="https://mkyong.com/maven/how-to-create-a-java-project-with-maven/">https://mkyong.com/maven/how-to-create-a-java-project-with-maven/</a></p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Homepage of maven-shade-plugin <a href="https://maven.apache.org/plugins/maven-shade-plugin/index.html">https://maven.apache.org/plugins/maven-shade-plugin/index.html</a></p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Homepage of maven-archetype-quickstart <a href="https://maven.apache.org/archetypes/maven-archetype-quickstart/">https://maven.apache.org/archetypes/maven-archetype-quickstart/</a></p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

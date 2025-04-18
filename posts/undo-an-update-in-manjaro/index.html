@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Manjaro滚挂了如何回滚</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Arch Linux, Manjaro, Pacman" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">Manjaro滚挂了如何回滚</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2024-03-12</p>
+</header><p>
+日常执行 <code>pacman -Syyuu</code> 升级系统，不幸的事情发生了，重启之后黑屏了。
+</p>
+
+<p>
+具体现象是:
+</p>
+<ol class="org-ol">
+<li>开机后进入 <code>LUKS</code> 输入密码页面正常</li>
+<li>输入密码后进入 <code>GRUB</code> 引导页正常</li>
+<li>选择系统后进入登录页面，黑屏了</li>
+<li><code>Ctrl+Alt+F2</code> 进入 tty 页面无反应（还是黑屏）</li>
+</ol>
+
+<section id="outline-container-orgf2d4c07" class="outline-2">
+<h2 id="orgf2d4c07">解决方案</h2>
+<div class="outline-text-2" id="text-orgf2d4c07">
+<ol class="org-ol">
+<li>使用 U 盘进入 Manjaro 系统</li>
+<li>使用文件管理器访问硬盘，会提示输入 <code>LUKS</code> 解密密码（这一步是为了借助文件管理器来解密硬盘并自动挂载，而不用命令行解密和挂载，更便捷）</li>
+<li>从文件管理器的地址栏拿到银盘挂载的路径</li>
+<li>打开终端，执行 <code>manjaro-chroot /硬盘挂载路径</code> 进入系统</li>
+<li>查看 pacman 日志文件 <code>/var/log/pacman.log</code> ，检查本次升级的软件包有哪些，找出可疑的包（首先怀疑内核升级或 Window Manager）</li>
+<li>对可疑的包执行回滚操作（安装升级之前的版本,存在于 pacman 缓存目录） <code>pacman -U /var/cache/pacman/pkg/linux515-5.15.148-2-x86_64.pkg.tar.zst</code></li>
+<li>重启查看系统是否恢复正常</li>
+</ol>
+
+<p>
+我还是比较幸运的，对 linux 内核和 linux 固件回滚到上一个版本后系统就恢复正常了。
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">sudo pacman -U /var/cache/pacman/pkg/linux515-5.15.148-2-x86_64.pkg.tar.zst
+sudo pacman -U /var/cache/pacman/pkg/linux-firmware-20240115.9b6d0b08-2-any.pkg.tar.zst
+</pre>
+</div>
+<p>
+具体是因为这两者中的哪一个，我也不知道。
+</p>
+
+<p>
+系统恢复之后再次 <code>pacman -Syyuu</code> 升级后依旧还是黑屏，但也不能一直就不升级了吧。
+后面尝试升级了内核大版本，从 5.15 升级到 6.10，再执行 <code>pacman -Syyuu</code> 升级系统后黑屏现象没有再出现。
+</p>
+</div>
+</section>
+
+<section id="outline-container-org0321742" class="outline-2">
+<h2 id="org0321742">后记</h2>
+<div class="outline-text-2" id="text-org0321742">
+<p>
+出现这个问题的时候，刚好着急用电脑，确实慌张的不行，生怕资料也丢了。
+处理问题的过程中，甚至一度想着后面换成以稳定著称的 <code>Debian</code> 系统了。
+</p>
+
+<p>
+生命在于折腾吧~
+</p>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OpenSSH 格式的密钥转换为 PEM 格式</title>
+<meta name="keywords" content="珊瑚礁上的程序员, openssh private key, id_rsa" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">OpenSSH 格式的密钥转换为 PEM 格式</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2022-06-29</p>
+</header><p>
+MySQL 客户端软件一直使用的 <code>DBeaver</code>, 使用 <code>SSH</code> 隧道连接数据库的时候报错 <code>Specified private key cannot be converted</code>.
+</p>
+
+<p>
+出现这个错误是由于 <code>SSH</code> 私钥的格式造成的。
+默认情况下 <code>ssh-keygen</code> 创建的密钥使用的是 <code>OpenSSH</code> 格式。
+密钥的文件头是:
+</p>
+<pre class="example" id="org9e7466e">
+-----BEGIN OPENSSH PRIVATE KEY-----
+</pre>
+<p>
+但 <code>DBeaver</code> 使用的是旧的 <code>PEM</code> 格式的密钥，密钥的文件头应该是：
+</p>
+<pre class="example" id="orgf032569">
+-----BEGIN RSA PRIVATE KEY-----
+</pre>
+
+<p>
+解决方案的话也比较简单，可以重新生成一个 <code>PEM</code> 格式的密钥，也可以将原有的 <code>OpenSSH</code> 格式密钥装换为 <code>PEM</code> 格式。
+</p>
+
+<p>
+重新生成 <code>PEM</code> 格式的密钥:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">ssh-keygen -t rsa -b 2048 -m PEM
+</pre>
+</div>
+
+<p>
+将现有密钥转换为 <code>PEM</code> 格式:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-comment-delimiter"># </span><span class="org-comment">&#27880;&#24847;&#22791;&#20221;&#21407;&#26377;&#30340;&#23494;&#38053;, &#25191;&#34892; ssh-keygen -p &#26102;&#20250;&#30452;&#25509;&#35206;&#30422;&#21407;&#23494;&#38053;&#25991;&#20214;</span>
+cp id_rsa id_rsa.bak
+ssh-keygen -p -m PEM -f id_rsa
+</pre>
+</div>
+
+<section id="outline-container-org309609c" class="outline-2">
+<h2 id="org309609c">参考</h2>
+<div class="outline-text-2" id="text-org309609c">
+<ul class="org-ul">
+<li><a href="https://stackoverflow.com/questions/56979849/dbeaver-ssh-tunnel-invalid-private-key">DBeaver ssh tunnel invalid private key</a></li>
+<li><a href="https://github.com/dbeaver/dbeaver/issues/5845">&ldquo;invalid privatekey&rdquo; connecting through SSH tunnel #5845</a></li>
+</ul>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>

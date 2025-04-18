@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>通过 Chrome Console 填写表单内容未生效</title>
+<meta name="keywords" content="珊瑚礁上的程序员, Chrome Console, React, Javascript, Autofill, Event Bubbles" />
+<meta name="generator" content="Org Mode" />
+<link rel="icon" href="https://demokn.github.io/blog/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/twitter-bootstrap/4.4.1/bootstrap.min.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/lib/font-awesome/5.12.1/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe|Amaranth|Handlee|Libre+Baskerville|Bree+Serif|Ubuntu+Mono|Pacifico&subset=latin,greek"/>
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/site.css">
+<link rel="stylesheet" href="https://demokn.github.io/blog/assets/css/highlight.css">
+</head>
+<body>
+<div class="content-wrapper container">
+<div class="row">
+<div class="col-lg-8 col-md-10 mx-auto">
+
+<div id="preamble" class="status">
+<div class="banner">
+  <a href="/" style="font-family: 'ZCOOL KuaiLe', cursive;"> 珊瑚礁上的程序员 </a>
+</div>
+<ul class="banner-links">
+  <li><a href="https://demokn.github.io/blog/posts/archive.html"> Archive </a></li>
+  <li><a href="https://demokn.github.io/blog/posts/rss.xml"> RSS </a></li>
+  <li><a href="https://demokn.github.io/blog/about.html"> About </a></li>
+</ul>
+<hr>
+</div>
+<div id="article" class="content">
+<header>
+<h1 class="title">通过 Chrome Console 填写表单内容未生效</h1>
+<p class="subtitle" role="doc-subtitle">发布于 2019-11-15</p>
+</header><p>
+出于某些原因，需要通过浏览器插件的方式实现自动登录某平台。
+这里选择 <code>Google Chrome</code> 浏览器。
+</p>
+
+<p>
+方案设想很简单，无非就是通过 JS 找到表单元素，自动填入用户名、密码，再触发一下登录按钮的 click 事件。完事。
+</p>
+
+<p>
+在开始写插件之前，总要先通过 <code>Chrome Console</code> 验证一下方案的可行性吧。代码也是相当简单。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">$(<span class="org-string">"#username"</span>).value = <span class="org-string">"USERNAME"</span>
+$(<span class="org-string">"#password"</span>).value = <span class="org-string">"PASSWORD"</span>
+$(<span class="org-string">"#submit"</span>).click()
+</pre>
+</div>
+
+<p>
+然而，“卧槽，无情” 的一幕出现了，页面上竟然提示我 “请输入账号”。
+可明明已经给你赋值了呀，输入框里不还填充着明明赋值的内容呢，难道你是盲僧吗？
+</p>
+
+
+<figure id="orga712c50">
+<img src="./页面提示请输入账号.png" alt="页面提示请输入账号" class="d-block mw-100 mx-auto" title="页面提示请输入账号">
+
+</figure>
+
+<p>
+没办法，只能开启我的漫漫 debug 之路了。
+</p>
+
+<ul class="org-ul">
+<li>手动输入用户名密码，手动点击登录； <b>成功</b></li>
+<li>手动输入用户名密码，脚本触发登录； <b>成功</b></li>
+<li>脚本输入用户名密码，手动点击登录； <b>失败</b></li>
+<li>使用其他网站(我用的 <code>GitHub</code>)尝试，脚本输入用户名密码，脚本触发登录； <b>成功了，成功了，成功了</b></li>
+
+<li>脚本输入用户名密码，并分别点击用户名密码输入框，使其获取焦点，手动点击登录； <b>失败</b></li>
+<li>脚本输入用户名密码，并分别点击用户名密码输入框，并再追加输入内容，手动点击登录； <b>成功</b></li>
+<li>脚本输入用户名密码，并分别点击用户名密码输入框，并再追加输入内容，脚本点击登录； <b>成功</b></li>
+</ul>
+
+<p>
+哦，对了，还有一种成功的情况是使用浏览器的密码自动填充功能，也是可以正常登录的。
+</p>
+
+<p>
+根据以上测试情况，初步猜想应该是使用脚本直接赋值的时候，输入框DOM元素上的某个事件没触发。
+</p>
+
+<p>
+接着，用 Chrome 开发者工具的 <code>search</code> 功能，查找报错内容 “请输入账号”，找到了定义在某个js文件里的代码:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">_this.validation = {
+  login: [{ f: _validator.isEmpty, msg: <span class="org-string">'&#35831;&#36755;&#20837;&#36134;&#21495;'</span> }],
+  password: [{ f: _validator.isEmpty, msg: <span class="org-string">'&#35831;&#36755;&#20837;&#23494;&#30721;'</span> }],
+};
+</pre>
+</div>
+
+<p>
+继续猜测，报错“请输入账号”是因为验证器为空，验证器为空的原因应该是验证方法没有执行，
+而验证方法没被执行的原因还是因为没有监听到某个指定的事件。
+至于到底是什么事件，我也不知道，也没从代码里找到什么有用的线索。
+不过倒是从代码里看出这是用 <code>react</code> 框架写的，在后面google的时候也算是一个用得到的关键词吧。
+</p>
+
+<p>
+接下来就是通过 <code>Chrome Console</code> 脚本触发事件，逐一验证了。
+根据上面的测试结果 <code>脚本输入用户名密码，并分别点击用户名密码输入框，并再追加输入内容，手动点击登录； 成功</code> 。
+我选择了几个可能性比较大的事件： <code>onchange, oninput, onkeydown, onkeyup, onkeypress</code> 。
+测试代码如下：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><span class="org-keyword">var</span> <span class="org-variable-name">change</span> = document.createEvent(<span class="org-string">"HTMLEvents"</span>)
+change.initEvent(<span class="org-string">"change"</span>)
+
+<span class="org-keyword">var</span> <span class="org-variable-name">input</span> = document.createEvent(<span class="org-string">"HTMLEvents"</span>)
+input.initEvent(<span class="org-string">"input"</span>)
+
+<span class="org-keyword">var</span> <span class="org-variable-name">focus</span> = document.createEvent(<span class="org-string">"HTMLEvents"</span>)
+focus.initEvent(<span class="org-string">"focus"</span>)
+
+<span class="org-keyword">var</span> <span class="org-variable-name">blur</span> = document.createEvent(<span class="org-string">"HTMLEvents"</span>)
+blur.initEvent(<span class="org-string">"blur"</span>)
+
+<span class="org-keyword">var</span> <span class="org-variable-name">keydown</span> = document.createEvent(<span class="org-string">"KeyboardEvent"</span>)
+keydown.initKeyboardEvent(<span class="org-string">"keydown"</span>)
+
+<span class="org-keyword">var</span> <span class="org-variable-name">keyup</span> = document.createEvent(<span class="org-string">"KeyboardEvent"</span>)
+keyup.initKeyboardEvent(<span class="org-string">"keyup"</span>)
+
+<span class="org-keyword">var</span> <span class="org-variable-name">keypress</span> = document.createEvent(<span class="org-string">"KeyboardEvent"</span>)
+keypress.initKeyboardEvent(<span class="org-string">"keypress"</span>)
+
+<span class="org-keyword">var</span> <span class="org-variable-name">el</span> = $(<span class="org-string">"#username"</span>)
+el.value = <span class="org-string">"USERNAME"</span>
+el.dispatchEvent(change)
+el.dispatchevent(input)
+el.dispatchEvent(keydown)
+el.dispatchEvent(keyup)
+el.dispatchEvent(keypress)
+</pre>
+</div>
+
+<p>
+然而，又是“卧槽，无情”的一幕，还是不行。
+</p>
+
+<p>
+继续尝试，google，尝试，此处省略半小时。。。
+</p>
+
+<p>
+最终发现，确实是 <code>input</code> 事件的问题，至于上面的事件测试中明明有 <code>input</code> 事件却没生效的原因是：
+<b>初始化事件时，没有明确指定事件的冒泡属性为 <code>true</code> ， 即 <code>input.initEvent("input", {bubbles: true})</code> 。</b>
+至于，这之中涉及到的 DOM事件, 事件监听, 事件触发, 事件冒泡 和 React组件State 等，我也不是专业前端，很难讲明白，有兴趣的就自行 google 吧。
+</p>
+
+<p>
+完整的代码如下：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><span class="org-keyword">var</span> <span class="org-variable-name">inputEvent</span> = document.createEvent(<span class="org-string">"HTMLEvents"</span>)
+inputEvent.initEvent(<span class="org-string">"input"</span>, {bubbles: <span class="org-constant">true</span>})
+
+$(<span class="org-string">"#username"</span>).value = <span class="org-string">"USERNAME"</span>
+$(<span class="org-string">"#username"</span>).dispatchEvent(inputEvent)
+$(<span class="org-string">"#password"</span>).value = <span class="org-string">"PASSWORD"</span>
+$(<span class="org-string">"#password"</span>).dispatchEvent(inputEvent)
+$(<span class="org-string">"#submit"</span>).click()
+</pre>
+</div>
+
+<section id="outline-container-orgfd50846" class="outline-2">
+<h2 id="orgfd50846">参考</h2>
+<div class="outline-text-2" id="text-orgfd50846">
+<ol class="org-ol">
+<li><a href="https://www.runoob.com/jsref/dom-obj-event.html">HTML DOM 事件</a></li>
+
+<li><a href="https://stackoverflow.com/questions/41166005/modify-react-components-state-using-jquery-plain-javascript-from-chrome-extensi">Modify React Component&rsquo;s State using jQuery/Plain Javascript from Chrome Extension</a></li>
+
+<li><a href="https://stackoverflow.com/questions/50035325/filling-a-react-form-from-the-google-chrome-console">Filling a react form from the Google Chrome console</a></li>
+
+<li><a href="https://javascript.info/bubbling-and-capturing">Event bubbling and capturing</a></li>
+</ol>
+</div>
+</section>
+</div>
+<div id="postamble" class="status">
+<footer class="footer">
+  <a href="https://github.com/demokn/blog">
+    <p>
+      Built with <img id="i-orgmode" src="https://demokn.github.io/blog/assets/images/orgmode.svg"/> in <img id="i-emacs" src="https://demokn.github.io/blog/assets/images/emacs.svg"/>
+      <span id="view-source-link"> View Source </span>
+    </p>
+  </a>
+</footer>
+</div>
+<div id="disqus_thread"></div>
+<script>
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://coral-reef.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+</div>
+</div>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-92899354-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92899354-1');
+</script>
+<!-- Default Statcounter code -->
+<script type="text/javascript">
+var sc_project=11272126;
+var sc_invisible=1;
+var sc_security="cc0cb8d5";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/11272126/0/cc0cb8d5/1/"
+alt="Web Analytics"></a></div></noscript>
+<!-- End of Statcounter Code -->
+</body>
+</html>
